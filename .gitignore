@@ -1,0 +1,25 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# VS Code
+.vscode/
+
+# Backups en tijdelijke versies
+*.bak
+*.tmp
+*~
+*.swp
+
+# Lokale notities die niet publiek mogen
+TODO.md
+notes.md
+credentials.txt
+secrets.txt
+
+# Tool exports/backups
+tijdregister-backup-*.json
+
+# Netlify
+.netlify/
