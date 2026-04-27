@@ -1,0 +1,2688 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Tijdregister</title>
+
+<!-- Supabase configuratie -->
+<script>
+  window.SUPABASE_URL = 'https://gorraxuviwmvigmddgry.supabase.co';
+  window.SUPABASE_ANON_KEY = 'sb_publishable_4z2ztUJRUUKf2AyoPv2asA__k3Mf-N8';
+</script>
+<script type="module">
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+  window.sb = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+  window.dispatchEvent(new Event('supabase-ready'));
+</script>
+
+<!-- iOS PWA: when added to Home Screen, runs fullscreen with custom icon -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tijdregister">
+<meta name="theme-color" content="#faf7f2">
+<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' fill='%23faf7f2'/><circle cx='90' cy='90' r='62' fill='none' stroke='%231a1614' stroke-width='4'/><line x1='90' y1='90' x2='90' y2='42' stroke='%23b34a35' stroke-width='5' stroke-linecap='round'/><line x1='90' y1='90' x2='124' y2='90' stroke='%231a1614' stroke-width='5' stroke-linecap='round'/><circle cx='90' cy='90' r='4' fill='%231a1614'/></svg>">
+<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23faf7f2'/><text x='50%25' y='62%25' font-family='Georgia,serif' font-size='70' font-weight='600' font-style='italic' fill='%231a1614' text-anchor='middle'>T</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #faf7f2;
+    --paper-2: #f3ede2;
+    --ink: #1a1614;
+    --ink-soft: #4a423d;
+    --ink-faint: #8b837c;
+    --rule: #d9d1c5;
+    --rule-soft: #e8e0d3;
+
+    --c-inefficient: #b34a35;
+    --c-inefficient-bg: #f0d4cb;
+    --c-zelf: #c97e3a;
+    --c-zelf-bg: #f0dcc1;
+    --c-boek: #5a7a3e;
+    --c-boek-bg: #d8e4c8;
+    --c-smart: #4a7a5e;
+    --c-smart-bg: #cce0d4;
+    --c-bedrijf: #6a8a3e;
+    --c-bedrijf-bg: #dde6c8;
+
+    --shadow: 0 1px 0 rgba(26,22,20,0.04), 0 8px 24px -12px rgba(26,22,20,0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(184,133,58,0.04), transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(42,74,107,0.03), transparent 50%);
+  }
+
+  .app {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 32px 40px 80px;
+  }
+
+  /* === HEADER === */
+  header.masthead {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 16px;
+    margin-bottom: 28px;
+  }
+  .masthead h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 38px;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .masthead h1 em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--ink-soft);
+  }
+  .masthead .meta {
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+  }
+  .masthead .meta strong {
+    display: block;
+    font-size: 13px;
+    color: var(--ink);
+    letter-spacing: 0.05em;
+    font-weight: 500;
+    margin-top: 2px;
+  }
+
+  /* === CONTROL BAR === */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .nav-group, .view-group, .util-group {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--ink);
+  }
+  .util-group { margin-left: auto; }
+
+  button.btn, .nav-group button, .view-group button, .util-group button {
+    background: var(--paper);
+    border: none;
+    border-right: 1px solid var(--ink);
+    padding: 8px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink);
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .nav-group button:last-child, .view-group button:last-child, .util-group button:last-child {
+    border-right: none;
+  }
+  button.btn:hover, .nav-group button:hover, .view-group button:hover, .util-group button:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .view-group button.active, .nav-group button.active {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .date-display {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 500;
+    padding: 0 16px;
+    min-width: 280px;
+  }
+  .date-display .day-name {
+    color: var(--ink-soft);
+    font-style: italic;
+    margin-right: 8px;
+  }
+
+  input[type="date"] {
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    padding: 7px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink);
+  }
+
+  /* === LAYOUT === */
+  .grid-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 28px;
+    align-items: flex-start;
+  }
+  @media (max-width: 1100px) {
+    .grid-layout { grid-template-columns: 1fr; }
+  }
+
+  /* === DAY VIEW === */
+  .day-grid {
+    border: 1px solid var(--ink);
+    background: var(--paper);
+  }
+  .day-grid .row {
+    display: grid;
+    grid-template-columns: 60px 100px 1fr 1.2fr;
+    border-bottom: 1px solid var(--rule-soft);
+    min-height: 36px;
+  }
+  .day-grid .row:last-child { border-bottom: none; }
+  .day-grid .row.hour-start { border-top: 1px solid var(--rule); }
+  .day-grid .row.now { background: rgba(184,133,58,0.10); }
+
+  .day-grid .row > div {
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    border-right: 1px solid var(--rule-soft);
+  }
+  .day-grid .row > div:last-child { border-right: none; }
+
+  .col-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-faint);
+    background: var(--paper-2);
+  }
+  .col-cat { font-weight: 500; cursor: pointer; }
+  .col-cat:empty::before { content: '—'; color: var(--ink-faint); font-weight: 400; }
+  .col-act { cursor: pointer; }
+  .col-act:empty::before { content: 'klik om in te vullen'; color: var(--ink-faint); font-style: italic; font-size: 12px; }
+  .col-note { cursor: pointer; color: var(--ink-soft); font-size: 13px; }
+  .col-note:empty::before { content: '+ notitie'; color: var(--ink-faint); opacity: 0.5; font-size: 11px; }
+
+  .day-grid .row[data-cat="Inefficiënt"] .col-cat { background: var(--c-inefficient-bg); color: var(--c-inefficient); }
+  .day-grid .row[data-cat="Zelf"] .col-cat { background: var(--c-zelf-bg); color: var(--c-zelf); }
+  .day-grid .row[data-cat="Boek"] .col-cat { background: var(--c-boek-bg); color: var(--c-boek); }
+  .day-grid .row[data-cat="SMART"] .col-cat { background: var(--c-smart-bg); color: var(--c-smart); }
+  .day-grid .row[data-cat="Bedrijf"] .col-cat { background: var(--c-bedrijf-bg); color: var(--c-bedrijf); }
+
+  /* === WEEK VIEW === */
+  .week-grid {
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    overflow-x: auto;
+  }
+  .week-grid table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+  .week-grid th, .week-grid td {
+    border-right: 1px solid var(--rule-soft);
+    border-bottom: 1px solid var(--rule-soft);
+    padding: 4px 6px;
+    text-align: left;
+    vertical-align: top;
+    height: 28px;
+    min-width: 110px;
+  }
+  .week-grid th {
+    background: var(--paper-2);
+    border-bottom: 2px solid var(--ink);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 13px;
+  }
+  .week-grid th.col-time-h, .week-grid td.col-time-h {
+    min-width: 50px;
+    width: 50px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    background: var(--paper-2);
+  }
+  .week-grid td.cell { cursor: pointer; }
+  .week-grid td.cell:hover { outline: 2px solid var(--ink); outline-offset: -2px; }
+  .week-grid td.hour-mark { border-top: 1px solid var(--rule); }
+  .week-grid td.now-cell { box-shadow: inset 0 0 0 2px var(--c-bedrijf); }
+
+  .week-grid td[data-cat="Inefficiënt"] { background: var(--c-inefficient-bg); color: var(--c-inefficient); font-weight: 500; }
+  .week-grid td[data-cat="Zelf"] { background: var(--c-zelf-bg); color: var(--c-zelf); font-weight: 500; }
+  .week-grid td[data-cat="Boek"] { background: var(--c-boek-bg); color: var(--c-boek); font-weight: 500; }
+  .week-grid td[data-cat="SMART"] { background: var(--c-smart-bg); color: var(--c-smart); font-weight: 500; }
+  .week-grid td[data-cat="Bedrijf"] { background: var(--c-bedrijf-bg); color: var(--c-bedrijf); font-weight: 500; }
+
+  .week-grid th.today { background: var(--ink); color: var(--paper); }
+
+  /* === STATS PANEL === */
+  .stats {
+    border: 1px solid var(--ink);
+    padding: 20px;
+    background: var(--paper);
+  }
+  .stats h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    font-weight: 500;
+    font-style: italic;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .stats .scope {
+    display: flex;
+    border: 1px solid var(--ink);
+    margin-bottom: 16px;
+  }
+  .stats .scope button {
+    flex: 1;
+    background: var(--paper);
+    border: none;
+    border-right: 1px solid var(--ink);
+    padding: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    color: var(--ink);
+  }
+  .stats .scope button:last-child { border-right: none; }
+  .stats .scope button.active { background: var(--ink); color: var(--paper); }
+
+  .stat-bar {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--rule);
+  }
+  .stat-bar:last-of-type { border-bottom: none; }
+  .stat-bar .label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+  }
+  .stat-bar .swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 1px;
+  }
+  .stat-bar .value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+  .stat-bar .value .min {
+    color: var(--ink-faint);
+    font-size: 11px;
+    margin-left: 4px;
+  }
+
+  .stat-total {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 2px solid var(--ink);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .stat-total .label {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 14px;
+  }
+  .stat-total .value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  /* progress bar */
+  .bar-track {
+    height: 4px;
+    background: var(--rule-soft);
+    border-radius: 2px;
+    margin-top: 4px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    transition: width 0.3s;
+  }
+  .bar-fill.inefficient { background: var(--c-inefficient); }
+  .bar-fill.zelf { background: var(--c-zelf); }
+  .bar-fill.boek { background: var(--c-boek); }
+  .bar-fill.smart { background: var(--c-smart); }
+  .bar-fill.bedrijf { background: var(--c-bedrijf); }
+
+  /* === SECTION NAV (Tracker vs Checklist) === */
+  nav.section-nav {
+    display: flex;
+    gap: 0;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--rule);
+  }
+  nav.section-nav button {
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    padding: 12px 22px;
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--ink-faint);
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: -1px;
+  }
+  nav.section-nav button:hover { color: var(--ink); }
+  nav.section-nav button.active {
+    color: var(--ink);
+    border-bottom-color: var(--ink);
+  }
+
+  /* === CHECKLIST: DAY VIEW === */
+  .cl-day {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .cl-group {
+    border: 1px solid var(--ink);
+    background: var(--paper);
+  }
+  .cl-group-header {
+    padding: 14px 18px;
+    border-bottom: 2px solid var(--ink);
+    background: var(--paper-2);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    cursor: pointer;
+    user-select: none;
+  }
+  .cl-group-header h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 500;
+    font-style: italic;
+  }
+  .cl-group-header .count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .cl-group.collapsed .cl-items { display: none; }
+  .cl-items { display: flex; flex-direction: column; }
+
+  .cl-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .cl-item:last-child { border-bottom: none; }
+  .cl-item .info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .cl-item .name {
+    font-weight: 500;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cl-item .target {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+  }
+  .cl-item .penalty {
+    font-style: italic;
+    color: var(--c-inefficient);
+    font-size: 11px;
+    margin-top: 2px;
+  }
+
+  .status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--rule);
+    flex-shrink: 0;
+  }
+  .status-dot.hit { background: var(--c-boek); }
+  .status-dot.partial { background: var(--c-zelf); }
+  .status-dot.miss { background: var(--c-inefficient); }
+
+  .cl-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cl-control button.step {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .cl-control button.step:hover { background: var(--ink); color: var(--paper); }
+  .cl-control input.value {
+    width: 60px;
+    height: 32px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ink);
+    padding: 0 4px;
+  }
+  .cl-control .unit {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    min-width: 40px;
+  }
+
+  .cl-control button.check {
+    height: 32px;
+    min-width: 90px;
+    padding: 0 16px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.1s;
+  }
+  .cl-control button.check.checked { background: var(--c-boek); color: var(--paper); border-color: var(--c-boek); }
+  .cl-control button.check:hover { transform: translateY(-1px); }
+
+  .cl-control .week-counter {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    padding: 4px 8px;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    min-width: 60px;
+    text-align: center;
+  }
+  .cl-control .week-counter.over { background: var(--c-inefficient-bg); color: var(--c-inefficient); border-color: var(--c-inefficient); }
+  .cl-control .week-counter.warning { background: var(--c-zelf-bg); color: var(--c-zelf); border-color: var(--c-zelf); }
+  .cl-control .week-counter.ok { background: var(--c-boek-bg); color: var(--c-boek); border-color: var(--c-boek); }
+
+  .cl-control .due-info {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+    text-align: right;
+  }
+  .cl-control .due-info.overdue { color: var(--c-inefficient); }
+  .cl-control .due-info.due-soon { color: var(--c-zelf); }
+
+  .cl-item-edit {
+    margin-left: 4px;
+    background: transparent;
+    border: 1px solid var(--rule);
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 11px;
+    color: var(--ink-faint);
+  }
+  .cl-item-edit:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  .cl-add {
+    padding: 14px 18px;
+    border-top: 1px dashed var(--rule);
+    background: var(--paper-2);
+    text-align: center;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+  }
+  .cl-add:hover { background: var(--ink); color: var(--paper); }
+
+  /* === CHECKLIST: WEEK VIEW === */
+  .cl-week {
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    overflow-x: auto;
+  }
+  .cl-week table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .cl-week th, .cl-week td {
+    border-right: 1px solid var(--rule-soft);
+    border-bottom: 1px solid var(--rule-soft);
+    padding: 8px 6px;
+    text-align: center;
+    vertical-align: middle;
+  }
+  .cl-week th {
+    background: var(--paper-2);
+    border-bottom: 2px solid var(--ink);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+  }
+  .cl-week th.today { background: var(--ink); color: var(--paper); }
+  .cl-week th.col-name, .cl-week td.col-name {
+    text-align: left;
+    padding-left: 14px;
+    min-width: 180px;
+    max-width: 240px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .cl-week td.col-name {
+    font-weight: 500;
+    font-size: 12px;
+  }
+  .cl-week td.col-name .target-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    font-weight: 400;
+  }
+  .cl-week tr.group-row td {
+    background: var(--paper-2);
+    text-align: left;
+    padding: 8px 14px;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 13px;
+    border-bottom: 2px solid var(--rule);
+    border-top: 2px solid var(--rule);
+  }
+  .cl-week td.day-cell { font-family: 'JetBrains Mono', monospace; font-size: 11px; min-width: 50px; }
+  .cl-week td.day-cell.hit { background: var(--c-boek-bg); color: var(--c-boek); font-weight: 500; }
+  .cl-week td.day-cell.partial { background: var(--c-zelf-bg); color: var(--c-zelf); }
+  .cl-week td.day-cell.miss { background: var(--c-inefficient-bg); color: var(--c-inefficient); }
+  .cl-week td.summary {
+    text-align: right;
+    padding-right: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    min-width: 110px;
+    background: var(--paper-2);
+    border-left: 2px solid var(--ink);
+    font-weight: 500;
+  }
+  .cl-week td.summary.ok { color: var(--c-boek); }
+  .cl-week td.summary.warning { color: var(--c-zelf); }
+  .cl-week td.summary.miss { color: var(--c-inefficient); }
+
+  /* === CHECKLIST: MONTH VIEW === */
+  .cl-month {
+    border: 1px solid var(--ink);
+    background: var(--paper);
+  }
+  .cl-month-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    gap: 16px;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--rule-soft);
+    align-items: center;
+  }
+  .cl-month-row:last-child { border-bottom: none; }
+  .cl-month-row.group-header {
+    background: var(--paper-2);
+    border-bottom: 2px solid var(--ink);
+    border-top: 2px solid var(--rule);
+  }
+  .cl-month-row.group-header h3 {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 16px;
+  }
+  .cl-month-row.group-header .col-h {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    text-align: right;
+  }
+  .cl-month-row .name { font-weight: 500; }
+  .cl-month-row .target-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    margin-left: 8px;
+  }
+  .cl-month-row .stat {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    text-align: right;
+    min-width: 80px;
+  }
+  .cl-month-row .stat.label {
+    font-size: 10px;
+    color: var(--ink-faint);
+  }
+
+  /* === ITEM EDIT MODAL === */
+  .item-modal-section { margin-bottom: 14px; }
+  .item-modal-section label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    margin-bottom: 6px;
+  }
+  .item-modal-section input, .item-modal-section select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .item-modal-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* === LOGIN OVERLAY === */
+  .auth-overlay {
+    position: fixed; inset: 0;
+    background: var(--paper);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+  }
+  .auth-overlay.hidden { display: none; }
+  .auth-card {
+    width: 100%; max-width: 420px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    padding: 36px 32px;
+  }
+  .auth-brand h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 36px;
+    font-weight: 500;
+    font-style: italic;
+    margin: 0 0 4px;
+  }
+  .auth-brand .subtitle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 28px;
+  }
+  .auth-card label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    margin-bottom: 6px;
+  }
+  .auth-card input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    color: var(--ink);
+    margin-bottom: 14px;
+    box-sizing: border-box;
+  }
+  .auth-card input:focus { outline: 2px solid var(--c-bedrijf); outline-offset: -1px; }
+  .auth-card #auth-code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    letter-spacing: 0.18em;
+    text-align: center;
+  }
+  .auth-primary {
+    width: 100%;
+    padding: 13px;
+    background: var(--ink);
+    color: var(--paper);
+    border: 1px solid var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    margin-bottom: 8px;
+  }
+  .auth-primary:hover { background: var(--ink-soft); }
+  .auth-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .auth-secondary {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    color: var(--ink-faint);
+    border: 1px solid var(--rule);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .auth-secondary:hover { color: var(--ink); border-color: var(--ink); }
+  .auth-hint {
+    font-size: 12px;
+    color: var(--ink-faint);
+    margin-top: 12px;
+    line-height: 1.4;
+  }
+  .auth-confirm {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-bottom: 18px;
+    line-height: 1.5;
+  }
+  .auth-status {
+    margin-top: 16px;
+    padding: 10px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    min-height: 18px;
+  }
+  .auth-status.error { background: var(--c-inefficient-bg); color: var(--c-inefficient); }
+  .auth-status.success { background: var(--c-boek-bg); color: var(--c-boek); }
+  .auth-status.info { background: var(--paper-2); color: var(--ink-soft); }
+
+  /* === USER INFO IN MASTHEAD === */
+  .user-info { font-size: 11px; color: var(--ink-faint); }
+  .link-btn {
+    background: none; border: none; padding: 0;
+    color: var(--ink-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .link-btn:hover { color: var(--c-inefficient); }
+  .sync-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--c-boek);
+  }
+  .sync-status.syncing { color: var(--c-zelf); }
+  .sync-status.error { color: var(--c-inefficient); }
+  .sync-status.offline { color: var(--ink-faint); }
+
+  /* === MOBILE RESPONSIVE === */
+  @media (max-width: 700px) {
+    .app { padding: 18px 14px 60px; }
+    .masthead { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .masthead h1 { font-size: 28px; }
+    .masthead .meta { text-align: left; }
+    nav.section-nav button { padding: 10px 16px; font-size: 15px; }
+    .controls { gap: 8px; }
+    .controls > * { font-size: 11px; }
+    .date-display { font-size: 17px; min-width: 0; padding: 4px 8px; flex: 1 1 100%; order: 99; }
+    .util-group { margin-left: 0; }
+
+    /* Day view tracker: tighter columns */
+    .day-grid .row { grid-template-columns: 50px 80px 1fr; }
+    .col-note { display: none; }
+
+    /* Checklist day items: stack control under info on mobile */
+    .cl-item { grid-template-columns: 1fr; }
+    .cl-control { justify-content: flex-start; flex-wrap: wrap; }
+
+    /* Modal */
+    .modal { padding: 18px; }
+    .cat-buttons { grid-template-columns: repeat(3, 1fr); }
+    .cat-btn { padding: 10px 4px; font-size: 11px; }
+
+    /* Month view: smaller cells */
+    #month-view td { height: 80px !important; padding: 4px !important; }
+    #month-view td > div:first-child { font-size: 10px !important; }
+  }
+
+  /* === MODAL === */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(26,22,20,0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    width: 480px;
+    max-width: 90vw;
+  }
+  .modal h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .modal .modal-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-faint);
+    margin-bottom: 18px;
+  }
+  .modal-section { margin-bottom: 18px; }
+  .modal-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    margin-bottom: 6px;
+  }
+  .cat-buttons {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+  .cat-btn {
+    padding: 12px 4px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    transition: all 0.1s;
+  }
+  .cat-btn:hover { transform: translateY(-1px); }
+  .cat-btn.selected { color: var(--paper); }
+  .cat-btn[data-cat="Inefficiënt"].selected { background: var(--c-inefficient); border-color: var(--c-inefficient); }
+  .cat-btn[data-cat="Zelf"].selected { background: var(--c-zelf); border-color: var(--c-zelf); }
+  .cat-btn[data-cat="Boek"].selected { background: var(--c-boek); border-color: var(--c-boek); }
+  .cat-btn[data-cat="SMART"].selected { background: var(--c-smart); border-color: var(--c-smart); }
+  .cat-btn[data-cat="Bedrijf"].selected { background: var(--c-bedrijf); border-color: var(--c-bedrijf); }
+
+  .activity-input-wrap {
+    position: relative;
+  }
+  .activity-input-wrap input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .activity-input-wrap input:focus { outline: 2px solid var(--c-bedrijf); outline-offset: -1px; }
+
+  .suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 8px;
+  }
+  .suggestion-chip {
+    padding: 4px 10px;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.1s;
+  }
+  .suggestion-chip:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  .modal-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+  }
+  .modal-actions button {
+    padding: 10px 18px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+  }
+  .modal-actions button.primary { background: var(--ink); color: var(--paper); }
+  .modal-actions button.danger { color: var(--c-zelf); border-color: var(--c-zelf); margin-left: auto; }
+  .modal-actions button:hover { transform: translateY(-1px); }
+
+  /* footer / hint */
+  .hint {
+    font-size: 11px;
+    color: var(--ink-faint);
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 8px;
+  }
+
+  /* helpers */
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN OVERLAY -->
+<div id="auth-overlay" class="auth-overlay">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <h1>Tijdregister</h1>
+      <p class="subtitle">Log in om je data overal te zien</p>
+    </div>
+
+    <div id="auth-step-email">
+      <label>E-mailadres</label>
+      <input type="email" id="auth-email" placeholder="jij@example.com" autocomplete="email" />
+      <button class="auth-primary" id="auth-send-code">Stuur me een code</button>
+      <p class="auth-hint">We sturen een code naar je e-mail. Geen wachtwoord nodig.</p>
+    </div>
+
+    <div id="auth-step-code" class="hidden">
+      <p class="auth-confirm">Code verzonden naar <strong id="auth-email-display"></strong></p>
+      <label>Code uit de e-mail</label>
+      <input type="text" id="auth-code" placeholder="········" maxlength="10" inputmode="numeric" autocomplete="one-time-code" />
+      <button class="auth-primary" id="auth-verify">Inloggen</button>
+      <button class="auth-secondary" id="auth-back">← Andere e-mail</button>
+    </div>
+
+    <div id="auth-status" class="auth-status"></div>
+  </div>
+</div>
+
+<div class="app hidden" id="app-container">
+
+  <header class="masthead">
+    <h1>Tijdregister <em>— vijftien minuten</em></h1>
+    <div class="meta">
+      <span class="user-info"><span id="user-email">—</span> · <button id="btn-logout" class="link-btn">uitloggen</button></span><br>
+      <span class="sync-status" id="sync-status">●&nbsp;synchroniseert</span> · <strong id="today-label">—</strong>
+    </div>
+  </header>
+
+  <nav class="section-nav">
+    <button data-section="tracker" class="active">Tijdregister</button>
+    <button data-section="checklist">Checklist</button>
+  </nav>
+
+  <div class="controls">
+    <div class="nav-group">
+      <button id="btn-prev">‹ vorige</button>
+      <button id="btn-today">vandaag</button>
+      <button id="btn-next">volgende ›</button>
+    </div>
+    <input type="date" id="date-picker" />
+    <div class="date-display" id="date-display">—</div>
+
+    <div class="view-group">
+      <button data-view="day" class="active">Dag</button>
+      <button data-view="week">Week</button>
+      <button data-view="month">Maand</button>
+    </div>
+
+    <div class="util-group">
+      <button id="btn-export">Export</button>
+      <button id="btn-import">Import</button>
+      <button id="btn-reset">Reset</button>
+    </div>
+    <input type="file" id="import-file" accept=".json" class="hidden" />
+  </div>
+
+  <section id="section-tracker">
+    <div class="grid-layout">
+      <div>
+        <div id="day-view"></div>
+        <div id="week-view" class="hidden"></div>
+        <div id="month-view" class="hidden"></div>
+      </div>
+
+      <aside class="stats">
+        <h2>Overzicht</h2>
+        <div class="scope">
+          <button data-scope="day" class="active">Dag</button>
+          <button data-scope="week">Week</button>
+          <button data-scope="month">Maand</button>
+        </div>
+        <div id="stats-content"></div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="section-checklist" class="hidden">
+    <div id="cl-day-view"></div>
+    <div id="cl-week-view" class="hidden"></div>
+    <div id="cl-month-view" class="hidden"></div>
+  </section>
+
+  <p class="hint" style="margin-top: 24px;">
+    Tip · Tijdregister: klik blok → categorie + activiteit. Toetsen 1-5 = Inefficiënt/Zelf/Boek/SMART/Bedrijf in modal. Checklist: tap items om te updaten. Data lokaal — Export voor backup.
+  </p>
+</div>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal">
+    <h3 id="modal-title">Tijdblok</h3>
+    <div class="modal-time" id="modal-subtitle">—</div>
+
+    <div class="modal-section">
+      <div class="modal-label">Categorie</div>
+      <div class="cat-buttons">
+        <button class="cat-btn" data-cat="Inefficiënt">Inefficiënt</button>
+        <button class="cat-btn" data-cat="Zelf">Zelf</button>
+        <button class="cat-btn" data-cat="Boek">Boek</button>
+        <button class="cat-btn" data-cat="SMART">SMART</button>
+        <button class="cat-btn" data-cat="Bedrijf">Bedrijf</button>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-label">Activiteit</div>
+      <div class="activity-input-wrap">
+        <input type="text" id="activity-input" placeholder="Wat heb je gedaan? (typ of klik suggestie)" />
+      </div>
+      <div class="suggestions" id="suggestions"></div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-label">Notitie (optioneel)</div>
+      <div class="activity-input-wrap">
+        <input type="text" id="note-input" placeholder="Korte aantekening" />
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="primary" id="modal-save">Opslaan</button>
+      <button id="modal-cancel">Annuleer</button>
+      <button class="danger" id="modal-delete">Verwijder</button>
+    </div>
+  </div>
+</div>
+
+<!-- ITEM EDIT MODAL (checklist) -->
+<div class="modal-backdrop" id="item-modal-backdrop">
+  <div class="modal">
+    <h3 id="item-modal-title">Item</h3>
+    <div class="modal-time" id="item-modal-subtitle">Bewerk of voeg toe</div>
+
+    <div class="item-modal-section">
+      <label>Naam</label>
+      <input type="text" id="item-name" placeholder="bv. Lezen" />
+    </div>
+
+    <div class="item-modal-row">
+      <div class="item-modal-section">
+        <label>Groep</label>
+        <select id="item-group">
+          <option value="goede">Goede zaken</option>
+          <option value="slechte">Slechte zaken</option>
+          <option value="sidequests">Sidequests</option>
+        </select>
+      </div>
+      <div class="item-modal-section">
+        <label>Type</label>
+        <select id="item-type">
+          <option value="DAILY_VALUE">Dagelijks doel (getal)</option>
+          <option value="DAILY_CHECK">Dagelijks check (ja/nee)</option>
+          <option value="WEEKLY_LIMIT">Week-limiet (max N/wk)</option>
+          <option value="PERIODIC">Periodiek (1x per N dagen)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="item-modal-row" id="item-target-row">
+      <div class="item-modal-section">
+        <label>Target</label>
+        <input type="number" id="item-target" placeholder="30" />
+      </div>
+      <div class="item-modal-section">
+        <label id="item-unit-label">Eenheid</label>
+        <input type="text" id="item-unit" placeholder="min, x, L, stappen…" />
+      </div>
+    </div>
+
+    <div class="item-modal-section" id="item-direction-row">
+      <label>Richting (alleen DAILY_VALUE)</label>
+      <select id="item-direction">
+        <option value="min">Minimaal (haal target)</option>
+        <option value="max">Maximaal (overschrijd niet)</option>
+      </select>
+    </div>
+
+    <div class="item-modal-section" id="item-period-row" style="display:none;">
+      <label>Periode in dagen (alleen PERIODIC)</label>
+      <input type="number" id="item-period" placeholder="7" />
+    </div>
+
+    <div class="item-modal-section">
+      <label>Penalty / opmerking (optioneel)</label>
+      <input type="text" id="item-penalty" placeholder="bv. 10x push-up als straf" />
+    </div>
+
+    <div class="modal-actions">
+      <button class="primary" id="item-modal-save">Opslaan</button>
+      <button id="item-modal-cancel">Annuleer</button>
+      <button class="danger" id="item-modal-delete">Verwijder</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================
+   AUTH & CLOUD SYNC
+============================================ */
+const auth = { user: null, ready: false };
+
+function ensureSb() {
+  if (window.sb) return Promise.resolve(window.sb);
+  return new Promise(resolve => {
+    window.addEventListener('supabase-ready', () => resolve(window.sb), { once: true });
+  });
+}
+
+async function checkSession() {
+  const sb = await ensureSb();
+  const { data } = await sb.auth.getSession();
+  auth.user = data?.session?.user || null;
+  auth.ready = true;
+  return auth.user;
+}
+
+async function sendOtp(email) {
+  const sb = await ensureSb();
+  const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true }});
+  if (error) throw error;
+}
+
+async function verifyOtp(email, code) {
+  const sb = await ensureSb();
+  // Probeer 'email' (returning users / magic link), val terug op 'signup' (eerste keer)
+  let { data, error } = await sb.auth.verifyOtp({ email, token: code, type: 'email' });
+  if (error) {
+    const r = await sb.auth.verifyOtp({ email, token: code, type: 'signup' });
+    if (r.error) throw r.error;
+    data = r.data;
+  }
+  auth.user = data.user;
+  return data.user;
+}
+
+async function logoutUser() {
+  const sb = await ensureSb();
+  await sb.auth.signOut();
+  auth.user = null;
+  location.reload();
+}
+
+// Sync indicator
+function setSyncStatus(text, cls) {
+  const el = document.getElementById('sync-status');
+  if (!el) return;
+  el.textContent = text;
+  el.className = 'sync-status ' + (cls || '');
+}
+
+// Track in-flight sync ops to update the visual indicator
+let syncInFlight = 0;
+function syncStart() { syncInFlight++; setSyncStatus('● synchroniseert…', 'syncing'); }
+function syncEnd(err) {
+  syncInFlight = Math.max(0, syncInFlight - 1);
+  if (err) { setSyncStatus('● sync-fout', 'error'); console.warn('sync err', err); }
+  else if (syncInFlight === 0) setSyncStatus('● gesynchroniseerd', '');
+}
+
+// Initial fetch from Supabase
+async function cloudFetchAll() {
+  const sb = await ensureSb();
+  syncStart();
+  try {
+    const [entriesRes, itemsRes, logRes] = await Promise.all([
+      sb.from('tracker_entries').select('*'),
+      sb.from('checklist_items').select('*'),
+      sb.from('checklist_log').select('*')
+    ]);
+    if (entriesRes.error) throw entriesRes.error;
+    if (itemsRes.error) throw itemsRes.error;
+    if (logRes.error) throw logRes.error;
+
+    // Reset state
+    state.entries = {};
+    state.activities = { 'Inefficiënt':[], Zelf:[], Boek:[], SMART:[], Bedrijf:[] };
+
+    for (const e of entriesRes.data || []) {
+      if (!state.entries[e.date]) state.entries[e.date] = {};
+      state.entries[e.date][e.time] = { category: e.category, activity: e.activity || '', note: e.note || '' };
+      if (e.category && e.activity) {
+        const list = state.activities[e.category];
+        if (list && !list.includes(e.activity)) list.push(e.activity);
+      }
+    }
+
+    cl.items = (itemsRes.data || []).map(r => ({ ...(r.data || {}), id: r.item_id }));
+    cl.log = {};
+    for (const l of logRes.data || []) {
+      if (!cl.log[l.item_id]) cl.log[l.item_id] = {};
+      cl.log[l.item_id][l.date] = l.value;
+    }
+    if (cl.items.length === 0) await seedDefaultItems();
+    syncEnd();
+  } catch (err) { syncEnd(err); throw err; }
+}
+
+async function seedDefaultItems() {
+  const sb = await ensureSb();
+  const rows = DEFAULT_ITEMS.map(item => ({
+    user_id: auth.user.id,
+    item_id: item.id,
+    data: item
+  }));
+  const { error } = await sb.from('checklist_items').insert(rows);
+  if (error) console.warn('seed failed', error);
+  cl.items = DEFAULT_ITEMS.map(x => ({...x}));
+}
+
+async function cloudUpsertEntry(date, time, entry) {
+  const sb = await ensureSb();
+  syncStart();
+  const { error } = await sb.from('tracker_entries').upsert({
+    user_id: auth.user.id,
+    date, time,
+    category: entry.category,
+    activity: entry.activity || null,
+    note: entry.note || null,
+    updated_at: new Date().toISOString()
+  });
+  syncEnd(error);
+}
+
+async function cloudDeleteEntry(date, time) {
+  const sb = await ensureSb();
+  syncStart();
+  const { error } = await sb.from('tracker_entries').delete().match({ user_id: auth.user.id, date, time });
+  syncEnd(error);
+}
+
+async function cloudUpsertChecklistLog(itemId, dateStr, value) {
+  const sb = await ensureSb();
+  syncStart();
+  let error;
+  // jsonb column: store any JSON value (number, bool, etc)
+  if (value === null || value === undefined || value === '' || value === 0 || value === false) {
+    ({ error } = await sb.from('checklist_log').delete().match({ user_id: auth.user.id, item_id: itemId, date: dateStr }));
+  } else {
+    ({ error } = await sb.from('checklist_log').upsert({
+      user_id: auth.user.id, item_id: itemId, date: dateStr, value, updated_at: new Date().toISOString()
+    }));
+  }
+  syncEnd(error);
+}
+
+async function cloudUpsertItem(item) {
+  const sb = await ensureSb();
+  syncStart();
+  const { error } = await sb.from('checklist_items').upsert({
+    user_id: auth.user.id, item_id: item.id, data: item, updated_at: new Date().toISOString()
+  });
+  syncEnd(error);
+}
+
+async function cloudDeleteItem(itemId) {
+  const sb = await ensureSb();
+  syncStart();
+  const r1 = await sb.from('checklist_items').delete().match({ user_id: auth.user.id, item_id: itemId });
+  const r2 = await sb.from('checklist_log').delete().match({ user_id: auth.user.id, item_id: itemId });
+  syncEnd(r1.error || r2.error);
+}
+
+// Real-time: refetch on any change to my data
+async function startRealtime() {
+  const sb = await ensureSb();
+  sb.channel('user-data')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'tracker_entries' }, () => {
+      cloudFetchAll().then(() => updateView()).catch(()=>{});
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'checklist_items' }, () => {
+      cloudFetchAll().then(() => updateView()).catch(()=>{});
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'checklist_log' }, () => {
+      cloudFetchAll().then(() => updateView()).catch(()=>{});
+    })
+    .subscribe();
+}
+
+/* ============================================
+   STATE & STORAGE
+============================================ */
+const STORAGE_KEY = 'tijdregister-v1';
+const CATEGORIES = ['Inefficiënt', 'Zelf', 'Boek', 'SMART', 'Bedrijf'];
+const DAY_NAMES_NL = ['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag'];
+const DAY_NAMES_NL_SHORT = ['zo','ma','di','wo','do','vr','za'];
+const MONTH_NAMES_NL = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+
+let state = {
+  activities: { 'Inefficiënt': [], Zelf: [], Boek: [], SMART: [], Bedrijf: [] },
+  entries: {} // entries[YYYY-MM-DD][HH:MM] = {category, activity, note}
+};
+
+let view = 'day';     // day | week | month
+let scope = 'day';    // for stats panel
+let cursor = new Date(); // currently viewed date
+let modal = { date: null, time: null, draft: null };
+
+function loadState() {
+  // No-op: data wordt geladen via cloudFetchAll() na login
+}
+
+function saveState() {
+  // No-op: per-operatie cloud sync via setEntry/deleteEntry
+}
+
+/* ============================================
+   DATE HELPERS
+============================================ */
+function fmtDate(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function parseDate(str) {
+  const [y,m,d] = str.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+function fmtDateLong(d) {
+  return `${DAY_NAMES_NL[d.getDay()]} ${d.getDate()} ${MONTH_NAMES_NL[d.getMonth()]} ${d.getFullYear()}`;
+}
+function isSameDate(a, b) {
+  return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+}
+function startOfWeek(d) { // Monday-based
+  const day = d.getDay(); // 0=Sun..6=Sat
+  const diff = (day === 0 ? -6 : 1 - day);
+  const out = new Date(d);
+  out.setDate(d.getDate() + diff);
+  out.setHours(0,0,0,0);
+  return out;
+}
+function startOfMonth(d) {
+  return new Date(d.getFullYear(), d.getMonth(), 1);
+}
+function endOfMonth(d) {
+  return new Date(d.getFullYear(), d.getMonth()+1, 0);
+}
+function eachDay(start, end) {
+  const out = [];
+  const cur = new Date(start);
+  while (cur <= end) {
+    out.push(new Date(cur));
+    cur.setDate(cur.getDate()+1);
+  }
+  return out;
+}
+
+/* ============================================
+   TIME GRID HELPERS (07:00 → 24:00 in 15min)
+============================================ */
+function getTimeSlots() {
+  const out = [];
+  for (let h = 7; h < 24; h++) {
+    for (let m = 0; m < 60; m += 15) {
+      out.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+    }
+  }
+  return out;
+}
+const TIME_SLOTS = getTimeSlots();
+
+function currentTimeSlot() {
+  const now = new Date();
+  if (now.getHours() < 7 || now.getHours() >= 24) return null;
+  const h = now.getHours();
+  const m = Math.floor(now.getMinutes() / 15) * 15;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+}
+
+/* ============================================
+   ENTRY ACCESS
+============================================ */
+function getEntry(dateStr, time) {
+  return state.entries[dateStr] && state.entries[dateStr][time] || null;
+}
+function setEntry(dateStr, time, entry) {
+  if (!state.entries[dateStr]) state.entries[dateStr] = {};
+  state.entries[dateStr][time] = entry;
+  // learn activity
+  if (entry.category && entry.activity) {
+    const list = state.activities[entry.category];
+    if (!list.includes(entry.activity)) list.push(entry.activity);
+  }
+  // Cloud sync
+  cloudUpsertEntry(dateStr, time, entry).catch(e => console.warn('upsert entry', e));
+}
+function deleteEntry(dateStr, time) {
+  if (state.entries[dateStr]) {
+    delete state.entries[dateStr][time];
+    if (Object.keys(state.entries[dateStr]).length === 0) delete state.entries[dateStr];
+  }
+  cloudDeleteEntry(dateStr, time).catch(e => console.warn('delete entry', e));
+}
+
+/* ============================================
+   AGGREGATION
+============================================ */
+function aggregateRange(startDate, endDate) {
+  // returns {Zelf: nBlocks, Boek: ..., SMART:..., Bedrijf:..., empty: nBlocks, total: nBlocks}
+  const out = { 'Inefficiënt':0, Zelf:0, Boek:0, SMART:0, Bedrijf:0, empty:0, total:0 };
+  const days = eachDay(startDate, endDate);
+  for (const d of days) {
+    const ds = fmtDate(d);
+    for (const t of TIME_SLOTS) {
+      const e = getEntry(ds, t);
+      out.total++;
+      if (e && e.category) out[e.category]++;
+      else out.empty++;
+    }
+  }
+  return out;
+}
+
+function blocksToHrs(n) {
+  const totalMin = n * 15;
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  if (h === 0) return `${m}m`;
+  if (m === 0) return `${h}u`;
+  return `${h}u${String(m).padStart(2,'0')}`;
+}
+
+/* ============================================
+   RENDER — DAY VIEW
+============================================ */
+function renderDayView() {
+  const dateStr = fmtDate(cursor);
+  const today = new Date();
+  const isToday = isSameDate(cursor, today);
+  const nowSlot = isToday ? currentTimeSlot() : null;
+
+  let html = '<div class="day-grid">';
+  for (const time of TIME_SLOTS) {
+    const isHourStart = time.endsWith(':00');
+    const entry = getEntry(dateStr, time);
+    const cat = entry?.category || '';
+    const act = entry?.activity || '';
+    const note = entry?.note || '';
+    const classes = ['row'];
+    if (isHourStart) classes.push('hour-start');
+    if (time === nowSlot) classes.push('now');
+    html += `<div class="${classes.join(' ')}" data-time="${time}" ${cat ? `data-cat="${cat}"` : ''}>`;
+    html += `<div class="col-time">${time}</div>`;
+    html += `<div class="col-cat" data-action="edit">${cat}</div>`;
+    html += `<div class="col-act" data-action="edit">${escapeHtml(act)}</div>`;
+    html += `<div class="col-note" data-action="edit">${escapeHtml(note)}</div>`;
+    html += `</div>`;
+  }
+  html += '</div>';
+
+  document.getElementById('day-view').innerHTML = html;
+
+  // event delegation
+  document.querySelectorAll('#day-view .row').forEach(row => {
+    row.addEventListener('click', () => {
+      openModal(dateStr, row.dataset.time);
+    });
+  });
+}
+
+/* ============================================
+   RENDER — WEEK VIEW (Monday → Sunday)
+============================================ */
+function renderWeekView() {
+  const start = startOfWeek(cursor);
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate()+i);
+    days.push(d);
+  }
+  const today = new Date();
+  const nowSlot = currentTimeSlot();
+
+  let html = '<div class="week-grid"><table>';
+  // header row
+  html += '<thead><tr><th class="col-time-h">tijd</th>';
+  for (const d of days) {
+    const cls = isSameDate(d, today) ? 'today' : '';
+    html += `<th class="${cls}">${DAY_NAMES_NL_SHORT[d.getDay()]} ${d.getDate()}/${d.getMonth()+1}</th>`;
+  }
+  html += '</tr></thead><tbody>';
+
+  for (const time of TIME_SLOTS) {
+    const isHourStart = time.endsWith(':00');
+    html += '<tr>';
+    html += `<td class="col-time-h${isHourStart?' hour-mark':''}">${time}</td>`;
+    for (const d of days) {
+      const ds = fmtDate(d);
+      const entry = getEntry(ds, time);
+      const cls = ['cell'];
+      if (isHourStart) cls.push('hour-mark');
+      if (isSameDate(d, today) && time === nowSlot) cls.push('now-cell');
+      const catAttr = entry?.category ? `data-cat="${entry.category}"` : '';
+      const label = entry?.activity || '';
+      html += `<td class="${cls.join(' ')}" data-date="${ds}" data-time="${time}" ${catAttr}>${escapeHtml(label)}</td>`;
+    }
+    html += '</tr>';
+  }
+  html += '</tbody></table></div>';
+  document.getElementById('week-view').innerHTML = html;
+
+  document.querySelectorAll('#week-view td.cell').forEach(cell => {
+    cell.addEventListener('click', () => {
+      openModal(cell.dataset.date, cell.dataset.time);
+    });
+  });
+}
+
+/* ============================================
+   RENDER — MONTH VIEW (calendar with daily totals)
+============================================ */
+function renderMonthView() {
+  const monthStart = startOfMonth(cursor);
+  const monthEnd = endOfMonth(cursor);
+  const gridStart = startOfWeek(monthStart);
+  const gridEnd = startOfWeek(monthEnd);
+  gridEnd.setDate(gridEnd.getDate()+6);
+
+  const today = new Date();
+  let html = `<div class="day-grid" style="border:1px solid var(--ink);background:var(--paper);">`;
+  html += `<div style="padding:14px 18px;border-bottom:2px solid var(--ink);font-family:'Fraunces',serif;font-size:22px;font-weight:500;">${MONTH_NAMES_NL[cursor.getMonth()]} <em style="font-style:italic;color:var(--ink-soft);">${cursor.getFullYear()}</em></div>`;
+  html += `<table style="width:100%;border-collapse:collapse;">`;
+  html += '<thead><tr>';
+  ['ma','di','wo','do','vr','za','zo'].forEach(n => {
+    html += `<th style="padding:8px;font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-faint);background:var(--paper-2);border-bottom:1px solid var(--rule);text-align:left;">${n}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  const cur = new Date(gridStart);
+  while (cur <= gridEnd) {
+    html += '<tr>';
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(cur);
+      const inMonth = d.getMonth() === cursor.getMonth();
+      const ds = fmtDate(d);
+      const totals = aggregateRange(d, d);
+      const filled = totals.total - totals.empty;
+      const isTodayCell = isSameDate(d, today);
+
+      html += `<td data-date="${ds}" style="border:1px solid var(--rule-soft);padding:8px;height:100px;vertical-align:top;cursor:pointer;${inMonth?'':'opacity:0.35;'}${isTodayCell?'background:rgba(184,133,58,0.10);':''}">`;
+      html += `<div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:${isTodayCell?'var(--ink)':'var(--ink-soft)'};margin-bottom:6px;font-weight:${isTodayCell?'600':'400'};">${d.getDate()}</div>`;
+      if (filled > 0) {
+        html += `<div style="display:flex;flex-direction:column;gap:2px;">`;
+        for (const c of CATEGORIES) {
+          if (totals[c] > 0) {
+            const w = Math.round((totals[c] / 68) * 100);
+            const colorVar = `--c-${c.toLowerCase()}`;
+            html += `<div style="display:flex;align-items:center;gap:4px;font-size:9px;font-family:'JetBrains Mono',monospace;color:var(${colorVar});">`;
+            html += `<div style="width:6px;height:6px;background:var(${colorVar});"></div>`;
+            html += `<span style="font-weight:500;">${c}</span>`;
+            html += `<span style="margin-left:auto;">${blocksToHrs(totals[c])}</span>`;
+            html += `</div>`;
+          }
+        }
+        html += `</div>`;
+      }
+      html += '</td>';
+      cur.setDate(cur.getDate()+1);
+    }
+    html += '</tr>';
+  }
+  html += '</tbody></table></div>';
+  document.getElementById('month-view').innerHTML = html;
+
+  document.querySelectorAll('#month-view td[data-date]').forEach(td => {
+    td.addEventListener('click', () => {
+      cursor = parseDate(td.dataset.date);
+      view = 'day';
+      updateView();
+    });
+  });
+}
+
+/* ============================================
+   RENDER — STATS PANEL
+============================================ */
+function renderStats() {
+  let start, end, scopeLabel;
+  if (scope === 'day') {
+    start = end = new Date(cursor);
+    scopeLabel = 'Dag';
+  } else if (scope === 'week') {
+    start = startOfWeek(cursor);
+    end = new Date(start); end.setDate(start.getDate()+6);
+    scopeLabel = 'Week';
+  } else {
+    start = startOfMonth(cursor);
+    end = endOfMonth(cursor);
+    scopeLabel = 'Maand';
+  }
+
+  const totals = aggregateRange(start, end);
+  const filled = totals.total - totals.empty;
+  const filledPct = totals.total ? (filled / totals.total) * 100 : 0;
+
+  let html = '';
+  for (const c of CATEGORIES) {
+    const blocks = totals[c];
+    const pct = filled > 0 ? (blocks / filled) * 100 : 0;
+    const cssClass = c.toLowerCase();
+    html += `
+      <div class="stat-bar">
+        <div style="flex:1;">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;">
+            <div class="label">
+              <div class="swatch" style="background:var(--c-${cssClass});"></div>
+              ${c}
+            </div>
+            <div class="value">${blocksToHrs(blocks)} <span class="min">${blocks}b</span></div>
+          </div>
+          <div class="bar-track"><div class="bar-fill ${cssClass}" style="width:${pct}%;"></div></div>
+        </div>
+      </div>`;
+  }
+
+  html += `<div class="stat-total">
+    <div class="label">Geregistreerd</div>
+    <div class="value">${blocksToHrs(filled)} <span style="color:var(--ink-faint);font-size:11px;">/ ${blocksToHrs(totals.total)} (${filledPct.toFixed(0)}%)</span></div>
+  </div>`;
+
+  document.getElementById('stats-content').innerHTML = html;
+}
+
+/* ============================================
+   MODAL
+============================================ */
+function openModal(dateStr, time) {
+  const entry = getEntry(dateStr, time) || { category: '', activity: '', note: '' };
+  modal = { date: dateStr, time, draft: { ...entry } };
+
+  const d = parseDate(dateStr);
+  document.getElementById('modal-title').textContent = `${time}`;
+  document.getElementById('modal-subtitle').textContent = fmtDateLong(d);
+
+  // category buttons
+  document.querySelectorAll('.cat-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.cat === modal.draft.category);
+  });
+  document.getElementById('activity-input').value = modal.draft.activity;
+  document.getElementById('note-input').value = modal.draft.note;
+  renderSuggestions();
+
+  document.getElementById('modal-backdrop').classList.add('open');
+  setTimeout(() => {
+    if (!modal.draft.category) {
+      // focus first cat button
+      document.querySelector('.cat-btn').focus();
+    } else {
+      document.getElementById('activity-input').focus();
+    }
+  }, 50);
+}
+
+function closeModal() {
+  document.getElementById('modal-backdrop').classList.remove('open');
+  modal = { date: null, time: null, draft: null };
+}
+
+function renderSuggestions() {
+  const cat = modal.draft.category;
+  const wrap = document.getElementById('suggestions');
+  if (!cat || !state.activities[cat] || state.activities[cat].length === 0) {
+    wrap.innerHTML = `<div style="font-size:11px;color:var(--ink-faint);font-family:'JetBrains Mono',monospace;">${cat ? 'Nog geen opgeslagen activiteiten — typ er eentje, dan wordt deze onthouden.' : 'Kies eerst een categorie.'}</div>`;
+    return;
+  }
+  wrap.innerHTML = state.activities[cat]
+    .map(a => `<button class="suggestion-chip" data-act="${escapeAttr(a)}">${escapeHtml(a)}</button>`)
+    .join('');
+  wrap.querySelectorAll('.suggestion-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const inp = document.getElementById('activity-input');
+      inp.value = chip.dataset.act;
+      modal.draft.activity = chip.dataset.act;
+      inp.focus();
+    });
+  });
+}
+
+function selectCategory(cat) {
+  modal.draft.category = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.cat === cat);
+  });
+  renderSuggestions();
+  document.getElementById('activity-input').focus();
+}
+
+function saveModal() {
+  modal.draft.activity = document.getElementById('activity-input').value.trim();
+  modal.draft.note = document.getElementById('note-input').value.trim();
+  if (!modal.draft.category) {
+    alert('Kies een categorie.');
+    return;
+  }
+  setEntry(modal.date, modal.time, { ...modal.draft });
+  closeModal();
+  updateView();
+}
+
+function deleteFromModal() {
+  if (!modal.date || !modal.time) return;
+  if (confirm('Verwijderen?')) {
+    deleteEntry(modal.date, modal.time);
+    closeModal();
+    updateView();
+  }
+}
+
+/* ============================================
+   UPDATE / WIRING
+============================================ */
+function updateView() {
+  // date display
+  document.getElementById('date-display').innerHTML = `<span class="day-name">${DAY_NAMES_NL[cursor.getDay()]}</span> ${cursor.getDate()} ${MONTH_NAMES_NL[cursor.getMonth()]} ${cursor.getFullYear()}`;
+  document.getElementById('date-picker').value = fmtDate(cursor);
+  document.getElementById('today-label').textContent = fmtDateLong(new Date());
+
+  // toggle sections
+  document.getElementById('section-tracker').classList.toggle('hidden', section !== 'tracker');
+  document.getElementById('section-checklist').classList.toggle('hidden', section !== 'checklist');
+  document.querySelectorAll('.section-nav button').forEach(b => {
+    b.classList.toggle('active', b.dataset.section === section);
+  });
+
+  // toggle view tabs (shared across sections)
+  document.querySelectorAll('.view-group button').forEach(b => {
+    b.classList.toggle('active', b.dataset.view === view);
+  });
+
+  if (section === 'tracker') {
+    document.getElementById('day-view').classList.toggle('hidden', view !== 'day');
+    document.getElementById('week-view').classList.toggle('hidden', view !== 'week');
+    document.getElementById('month-view').classList.toggle('hidden', view !== 'month');
+    if (view === 'day') renderDayView();
+    else if (view === 'week') renderWeekView();
+    else renderMonthView();
+    renderStats();
+  } else {
+    clView = view;
+    renderChecklist();
+  }
+}
+
+function escapeHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeAttr(s) { return escapeHtml(s); }
+
+/* ============================================
+   IMPORT / EXPORT
+============================================ */
+function exportData() {
+  const payload = { tracker: state, checklist: cl, _exportedAt: new Date().toISOString(), _version: 2 };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `tijdregister-backup-${fmtDate(new Date())}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function importData(file) {
+  const reader = new FileReader();
+  reader.onload = async e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      const isV2 = data._version === 2 || data.tracker || data.checklist;
+      if (!isV2 && (!data.activities || !data.entries)) throw new Error('Onbekend formaat');
+      if (!confirm('Huidige cloud-data overschrijven met geïmporteerde backup? Dit kan niet ongedaan gemaakt worden.')) return;
+
+      const sb = await ensureSb();
+      syncStart();
+
+      // Tracker
+      const trackerData = isV2 ? (data.tracker || null) : data;
+      if (trackerData && trackerData.entries) {
+        await sb.from('tracker_entries').delete().match({ user_id: auth.user.id });
+        const rows = [];
+        for (const date of Object.keys(trackerData.entries)) {
+          for (const time of Object.keys(trackerData.entries[date])) {
+            const ent = trackerData.entries[date][time];
+            rows.push({
+              user_id: auth.user.id, date, time,
+              category: ent.category, activity: ent.activity || null, note: ent.note || null
+            });
+          }
+        }
+        if (rows.length) {
+          // batch in chunks of 500
+          for (let i = 0; i < rows.length; i += 500) {
+            await sb.from('tracker_entries').insert(rows.slice(i, i+500));
+          }
+        }
+      }
+
+      // Checklist
+      if (isV2 && data.checklist) {
+        await sb.from('checklist_log').delete().match({ user_id: auth.user.id });
+        await sb.from('checklist_items').delete().match({ user_id: auth.user.id });
+        const itemRows = (data.checklist.items || []).map(it => ({
+          user_id: auth.user.id, item_id: it.id, data: it
+        }));
+        if (itemRows.length) await sb.from('checklist_items').insert(itemRows);
+        const logRows = [];
+        for (const itemId of Object.keys(data.checklist.log || {})) {
+          for (const dateStr of Object.keys(data.checklist.log[itemId])) {
+            logRows.push({
+              user_id: auth.user.id, item_id: itemId, date: dateStr,
+              value: data.checklist.log[itemId][dateStr]
+            });
+          }
+        }
+        for (let i = 0; i < logRows.length; i += 500) {
+          await sb.from('checklist_log').insert(logRows.slice(i, i+500));
+        }
+      }
+
+      await cloudFetchAll();
+      syncEnd();
+      updateView();
+      alert('Geïmporteerd ✓');
+    } catch (err) {
+      syncEnd(err);
+      alert('Import mislukt: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ============================================
+   INIT
+============================================ */
+/* ============================================
+   CHECKLIST MODULE
+============================================ */
+const CL_STORAGE_KEY = 'tijdregister-checklist-v1';
+
+// Default seeded items based on user's list
+const DEFAULT_ITEMS = [
+  // GOEDE ZAKEN
+  { id: 'lezen', group: 'goede', name: 'Lezen', type: 'DAILY_VALUE', target: 30, unit: 'min', direction: 'min' },
+  { id: 'ai-inlezen', group: 'goede', name: 'Inlezen over AI', type: 'DAILY_VALUE', target: 60, unit: 'min', direction: 'min' },
+  { id: 'sport', group: 'goede', name: 'Sport', type: 'DAILY_VALUE', target: 60, unit: 'min', direction: 'min' },
+  { id: 'stappen', group: 'goede', name: '10.000 stappen', type: 'DAILY_VALUE', target: 10000, unit: 'stappen', direction: 'min' },
+  { id: 'opstaan-7', group: 'goede', name: 'Opstaan om 7 uur', type: 'DAILY_CHECK' },
+  { id: 'bed-24', group: 'goede', name: 'Voor 24:00 naar bed', type: 'DAILY_CHECK' },
+  { id: 'hyperfocus', group: 'goede', name: 'Hyperfocus', type: 'DAILY_VALUE', target: 300, unit: 'min', direction: 'min' },
+  { id: 'tanden', group: 'goede', name: 'Tandenpoetsen', type: 'DAILY_VALUE', target: 2, unit: 'x', direction: 'min' },
+  { id: 'email-sameday', group: 'goede', name: 'Emails dezelfde dag beantwoord', type: 'DAILY_CHECK' },
+  { id: 'huis-bed', group: 'goede', name: 'Voor bed huis organiseren', type: 'DAILY_CHECK' },
+  { id: 'water-2l', group: 'goede', name: 'Water drinken', type: 'DAILY_VALUE', target: 2, unit: 'L', direction: 'min' },
+  { id: 'water-start', group: 'goede', name: '2x glas water bij ontwaken', type: 'DAILY_CHECK' },
+  { id: 'no-snacks', group: 'goede', name: 'Geen onnodige snacks', type: 'DAILY_CHECK' },
+  { id: 'tiktok-2', group: 'goede', name: 'TikTok posts', type: 'DAILY_VALUE', target: 2, unit: 'x', direction: 'min' },
+  { id: 'instagram-1', group: 'goede', name: 'Instagram post', type: 'DAILY_VALUE', target: 1, unit: 'x', direction: 'min' },
+  { id: 'serie-max-1u', group: 'goede', name: 'Serie kijken (max)', type: 'DAILY_VALUE', target: 60, unit: 'min', direction: 'max' },
+  { id: 'netwerk-30', group: 'goede', name: 'Aan netwerk werken', type: 'DAILY_VALUE', target: 30, unit: 'min', direction: 'min' },
+  // SLECHTE ZAKEN
+  { id: 'chips', group: 'slechte', name: 'Chips', type: 'WEEKLY_LIMIT', target: 3, unit: 'x' },
+  { id: 'huidpulken', group: 'slechte', name: 'Huidpulken', type: 'WEEKLY_LIMIT', target: 0, unit: 'x', penalty: '10x push-up als straf' },
+  { id: 'gamen', group: 'slechte', name: 'Gamen (sessies van 1u)', type: 'WEEKLY_LIMIT', target: 3, unit: 'x' },
+  { id: 'no-procrastinate', group: 'slechte', name: 'Start met moeilijkste werk', type: 'DAILY_CHECK' },
+  { id: 'no-doomscroll', group: 'slechte', name: 'Geen doomscrolling', type: 'DAILY_CHECK' },
+  { id: 'inchecken', group: 'slechte', name: 'Inchecken bij mensen', type: 'PERIODIC', period: 7 },
+  { id: 'gezond-eten', group: 'slechte', name: 'Gezond eten (ma-vr)', type: 'DAILY_CHECK' },
+  // SIDEQUESTS
+  { id: 'buitenshuis', group: 'sidequests', name: 'Buitenshuis werken', type: 'PERIODIC', period: 7 },
+  { id: 'nieuw-leren', group: 'sidequests', name: 'Iets nieuws leren', type: 'PERIODIC', period: 30 },
+  { id: 'strand', group: 'sidequests', name: 'Strand bezoeken', type: 'PERIODIC', period: 21 },
+  { id: 'datenight', group: 'sidequests', name: 'Datenight met vrouw', type: 'PERIODIC', period: 7 },
+  { id: 'vrienden', group: 'sidequests', name: 'Nieuwe vriend / connectie', type: 'PERIODIC', period: 14 }
+];
+
+const GROUP_LABELS = { goede: 'Goede zaken', slechte: 'Slechte zaken / te verbeteren', sidequests: 'Sidequests' };
+
+let cl = { items: [], log: {}, collapsed: {} };
+let clView = 'day';
+let editingItemId = null;
+
+function loadCl() {
+  // No-op: data wordt geladen via cloudFetchAll() na login
+}
+function saveCl() {
+  // No-op: per-operatie cloud sync; collapsed-state blijft lokaal
+  try { localStorage.setItem('tijdregister-cl-ui', JSON.stringify(cl.collapsed || {})); } catch(e) {}
+}
+
+function getItemValue(itemId, dateStr) {
+  return cl.log[itemId] && cl.log[itemId][dateStr];
+}
+function setItemValue(itemId, dateStr, value) {
+  if (!cl.log[itemId]) cl.log[itemId] = {};
+  if (value === null || value === undefined || value === '' || value === 0 || value === false) {
+    delete cl.log[itemId][dateStr];
+    if (Object.keys(cl.log[itemId]).length === 0) delete cl.log[itemId];
+  } else {
+    cl.log[itemId][dateStr] = value;
+  }
+  cloudUpsertChecklistLog(itemId, dateStr, value).catch(e => console.warn('upsert log', e));
+}
+
+// status: hit | partial | miss | pending
+function getDailyStatus(item, dateStr) {
+  const v = getItemValue(item.id, dateStr);
+  if (item.type === 'DAILY_CHECK' || item.type === 'PERIODIC') {
+    return v === true ? 'hit' : 'pending';
+  }
+  if (item.type === 'DAILY_VALUE') {
+    const actual = Number(v) || 0;
+    if (actual === 0) return 'pending';
+    if (item.direction === 'max') return actual <= item.target ? 'hit' : 'miss';
+    return actual >= item.target ? 'hit' : 'partial';
+  }
+  return 'pending';
+}
+
+function getWeekStats(item, weekStart) {
+  let total = 0, daysHit = 0, daysAny = 0, daysMissed = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(weekStart); d.setDate(weekStart.getDate()+i);
+    const ds = fmtDate(d);
+    const v = getItemValue(item.id, ds);
+    if (item.type === 'DAILY_VALUE') {
+      const n = Number(v) || 0;
+      total += n;
+      if (n > 0) daysAny++;
+      const hit = item.direction === 'max' ? (n > 0 && n <= item.target) : n >= item.target;
+      if (hit) daysHit++;
+    } else if (item.type === 'DAILY_CHECK') {
+      if (v === true) { total++; daysHit++; daysAny++; }
+    } else if (item.type === 'WEEKLY_LIMIT') {
+      const n = Number(v) || 0;
+      total += n;
+      if (n > 0) daysAny++;
+    } else if (item.type === 'PERIODIC') {
+      if (v === true) { total++; daysHit++; daysAny++; }
+    }
+  }
+  return { total, daysHit, daysAny };
+}
+
+function getMonthStats(item, monthStart, monthEnd) {
+  let total = 0, daysHit = 0, daysAny = 0, dayCount = 0;
+  const cur = new Date(monthStart);
+  while (cur <= monthEnd) {
+    dayCount++;
+    const ds = fmtDate(cur);
+    const v = getItemValue(item.id, ds);
+    if (item.type === 'DAILY_VALUE') {
+      const n = Number(v) || 0;
+      total += n;
+      if (n > 0) daysAny++;
+      const hit = item.direction === 'max' ? (n > 0 && n <= item.target) : n >= item.target;
+      if (hit) daysHit++;
+    } else if (item.type === 'DAILY_CHECK') {
+      if (v === true) { total++; daysHit++; daysAny++; }
+    } else if (item.type === 'WEEKLY_LIMIT') {
+      const n = Number(v) || 0;
+      total += n;
+      if (n > 0) daysAny++;
+    } else if (item.type === 'PERIODIC') {
+      if (v === true) { total++; daysHit++; daysAny++; }
+    }
+    cur.setDate(cur.getDate()+1);
+  }
+  return { total, daysHit, daysAny, dayCount };
+}
+
+function lastDoneDate(itemId) {
+  const log = cl.log[itemId] || {};
+  const dates = Object.keys(log).filter(d => log[d]).sort();
+  return dates.length ? dates[dates.length - 1] : null;
+}
+function daysBetween(fromStr, toDate) {
+  const a = parseDate(fromStr); a.setHours(0,0,0,0);
+  const b = new Date(toDate); b.setHours(0,0,0,0);
+  return Math.floor((b - a) / 86400000);
+}
+
+function fmtValue(v, unit) {
+  if (unit === 'min') {
+    const n = Number(v) || 0;
+    if (n < 60) return `${n}m`;
+    const h = Math.floor(n/60); const m = n%60;
+    return m === 0 ? `${h}u` : `${h}u${String(m).padStart(2,'0')}`;
+  }
+  if (unit === 'stappen') return Number(v).toLocaleString('nl-NL');
+  if (unit === 'L') return `${v} L`;
+  return `${v}${unit ? ' '+unit : ''}`;
+}
+
+/* === CHECKLIST: DAY VIEW === */
+function renderChecklistDay() {
+  const dateStr = fmtDate(cursor);
+  const groups = ['goede','slechte','sidequests'];
+  let html = '<div class="cl-day">';
+  for (const g of groups) {
+    const items = cl.items.filter(i => i.group === g);
+    const collapsed = cl.collapsed[g];
+    html += `<div class="cl-group${collapsed?' collapsed':''}" data-group="${g}">`;
+    html += `<div class="cl-group-header" data-action="toggle">
+      <h3>${GROUP_LABELS[g]}</h3>
+      <span class="count">${items.length} items ${collapsed?'· ingeklapt':''}</span>
+    </div>`;
+    html += `<div class="cl-items">`;
+    for (const item of items) html += renderClItem(item, dateStr);
+    html += `<div class="cl-add" data-group="${g}" data-action="add">+ item toevoegen aan ${GROUP_LABELS[g].toLowerCase()}</div>`;
+    html += `</div></div>`;
+  }
+  html += '</div>';
+  document.getElementById('cl-day-view').innerHTML = html;
+
+  // wire interactions
+  document.querySelectorAll('.cl-group-header').forEach(h => {
+    h.addEventListener('click', () => {
+      const g = h.parentElement.dataset.group;
+      cl.collapsed[g] = !cl.collapsed[g];
+      saveCl(); renderChecklistDay();
+    });
+  });
+  document.querySelectorAll('.cl-add').forEach(a => {
+    a.addEventListener('click', e => { e.stopPropagation(); openItemModal(null, a.dataset.group); });
+  });
+  document.querySelectorAll('.cl-item-edit').forEach(b => {
+    b.addEventListener('click', e => { e.stopPropagation(); openItemModal(b.dataset.id); });
+  });
+  document.querySelectorAll('.cl-control [data-act]').forEach(el => {
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      handleClAction(el.dataset.id, el.dataset.act, el);
+    });
+  });
+  document.querySelectorAll('.cl-control input.value').forEach(inp => {
+    inp.addEventListener('change', () => {
+      const v = inp.value === '' ? 0 : Number(inp.value);
+      setItemValue(inp.dataset.id, dateStr, v);
+      renderChecklistDay();
+    });
+  });
+}
+
+function renderClItem(item, dateStr) {
+  const v = getItemValue(item.id, dateStr);
+  const status = getDailyStatus(item, dateStr);
+  const dotCls = status === 'hit' ? 'hit' : status === 'partial' ? 'partial' : status === 'miss' ? 'miss' : '';
+
+  let target = '';
+  if (item.type === 'DAILY_VALUE') target = `${fmtValue(item.target, item.unit)}${item.direction==='max'?' max':''}`;
+  else if (item.type === 'WEEKLY_LIMIT') target = `≤ ${item.target}${item.unit?item.unit:''} per week`;
+  else if (item.type === 'PERIODIC') target = `1× per ${item.period} dagen`;
+  else target = 'ja / nee';
+
+  let control = '';
+  if (item.type === 'DAILY_VALUE') {
+    const cur = Number(v) || 0;
+    const step = item.unit === 'min' ? 5 : item.unit === 'stappen' ? 500 : item.unit === 'L' ? 0.25 : 1;
+    control = `
+      <button class="step" data-id="${item.id}" data-act="dec" data-step="${step}">−</button>
+      <input class="value" type="number" inputmode="decimal" step="${step}" data-id="${item.id}" value="${cur||''}" placeholder="0">
+      <button class="step" data-id="${item.id}" data-act="inc" data-step="${step}">+</button>
+      <span class="unit">${item.unit||''}</span>`;
+  } else if (item.type === 'DAILY_CHECK') {
+    const checked = v === true;
+    control = `<button class="check ${checked?'checked':''}" data-id="${item.id}" data-act="toggle">${checked?'✓ Gedaan':'☐ Vandaag'}</button>`;
+  } else if (item.type === 'WEEKLY_LIMIT') {
+    const cur = Number(v) || 0;
+    const wkStart = startOfWeek(cursor);
+    const wk = getWeekStats(item, wkStart);
+    let cls = 'ok';
+    if (wk.total > item.target) cls = 'over';
+    else if (wk.total === item.target) cls = 'warning';
+    control = `
+      <button class="step" data-id="${item.id}" data-act="dec" data-step="1">−</button>
+      <input class="value" type="number" inputmode="numeric" step="1" data-id="${item.id}" value="${cur||''}" placeholder="0">
+      <button class="step" data-id="${item.id}" data-act="inc" data-step="1">+</button>
+      <span class="week-counter ${cls}">${wk.total}/${item.target} wk</span>`;
+  } else if (item.type === 'PERIODIC') {
+    const checked = v === true;
+    const last = lastDoneDate(item.id);
+    let dueInfo = '';
+    let dueCls = '';
+    if (!last) {
+      dueInfo = 'nog nooit gedaan';
+      dueCls = 'overdue';
+    } else {
+      const since = daysBetween(last, cursor);
+      const remaining = item.period - since;
+      if (remaining <= 0) { dueInfo = `${-remaining}d te laat`; dueCls = 'overdue'; }
+      else if (remaining <= 1) { dueInfo = `vandaag/morgen`; dueCls = 'due-soon'; }
+      else dueInfo = `over ${remaining}d`;
+    }
+    control = `
+      <button class="check ${checked?'checked':''}" data-id="${item.id}" data-act="toggle">${checked?'✓ Vandaag':'☐ Vandaag'}</button>
+      <span class="due-info ${dueCls}">${dueInfo}</span>`;
+  }
+  // step -> +/- helper data attribute (so dec=−step, inc=+step) we'll handle in handleClAction
+  control = control.replace('data-act="dec"', 'data-act="step" data-dir="-1"').replace('data-act="inc"', 'data-act="step" data-dir="1"');
+
+  const penalty = (item.penalty && (status === 'miss' || (item.type==='WEEKLY_LIMIT'))) ? `<div class="penalty">${escapeHtml(item.penalty)}</div>` : '';
+
+  return `<div class="cl-item">
+    <div class="info">
+      <div class="name"><span class="status-dot ${dotCls}"></span>${escapeHtml(item.name)}<button class="cl-item-edit" data-id="${item.id}" title="bewerk">✎</button></div>
+      <div class="target">${target}</div>
+      ${penalty}
+    </div>
+    <div class="cl-control">${control}</div>
+  </div>`;
+}
+
+function handleClAction(itemId, act, el) {
+  const item = cl.items.find(i => i.id === itemId);
+  if (!item) return;
+  const dateStr = fmtDate(cursor);
+  const cur = Number(getItemValue(itemId, dateStr)) || 0;
+
+  if (act === 'toggle') {
+    const v = getItemValue(itemId, dateStr);
+    setItemValue(itemId, dateStr, v === true ? false : true);
+  } else if (act === 'step') {
+    const step = parseFloat(el.dataset.step) * parseInt(el.dataset.dir);
+    const next = Math.max(0, +(cur + step).toFixed(2));
+    setItemValue(itemId, dateStr, next);
+  }
+  renderChecklistDay();
+}
+
+/* === CHECKLIST: WEEK VIEW === */
+function renderChecklistWeek() {
+  const start = startOfWeek(cursor);
+  const days = [];
+  for (let i = 0; i < 7; i++) { const d = new Date(start); d.setDate(start.getDate()+i); days.push(d); }
+  const today = new Date();
+
+  let html = '<div class="cl-week"><table>';
+  html += '<thead><tr><th class="col-name">Item</th>';
+  for (const d of days) {
+    const cls = isSameDate(d, today) ? 'today' : '';
+    html += `<th class="${cls}">${DAY_NAMES_NL_SHORT[d.getDay()]}<br>${d.getDate()}/${d.getMonth()+1}</th>`;
+  }
+  html += '<th>Week</th></tr></thead><tbody>';
+
+  for (const g of ['goede','slechte','sidequests']) {
+    const items = cl.items.filter(i => i.group === g);
+    if (items.length === 0) continue;
+    html += `<tr class="group-row"><td colspan="9">${GROUP_LABELS[g]}</td></tr>`;
+    for (const item of items) {
+      let target = '';
+      if (item.type === 'DAILY_VALUE') target = `${fmtValue(item.target, item.unit)}/d${item.direction==='max'?' max':''}`;
+      else if (item.type === 'WEEKLY_LIMIT') target = `≤ ${item.target}${item.unit?item.unit:''}/wk`;
+      else if (item.type === 'PERIODIC') target = `1× /${item.period}d`;
+      else target = 'ja/nee';
+
+      html += `<tr><td class="col-name">${escapeHtml(item.name)}<br><span class="target-sub">${target}</span></td>`;
+      for (const d of days) {
+        const ds = fmtDate(d);
+        const v = getItemValue(item.id, ds);
+        const status = getDailyStatus(item, ds);
+        let cell = '';
+        if (item.type === 'DAILY_VALUE') {
+          cell = v ? fmtValue(v, item.unit) : '';
+        } else if (item.type === 'DAILY_CHECK' || item.type === 'PERIODIC') {
+          cell = v === true ? '✓' : '';
+        } else if (item.type === 'WEEKLY_LIMIT') {
+          cell = v ? String(v) : '';
+        }
+        const cls = status;
+        html += `<td class="day-cell ${cls}">${cell}</td>`;
+      }
+      // week summary
+      const wk = getWeekStats(item, start);
+      let summary = '', sumCls = '';
+      if (item.type === 'DAILY_VALUE') {
+        const wkTarget = item.target * 7;
+        if (item.direction === 'max') {
+          const overDays = wk.daysAny - wk.daysHit; // days where exceeded
+          summary = `${fmtValue(wk.total, item.unit)}`;
+          sumCls = overDays > 0 ? 'miss' : 'ok';
+        } else {
+          summary = `${fmtValue(wk.total, item.unit)} / ${fmtValue(wkTarget, item.unit)}`;
+          sumCls = wk.total >= wkTarget ? 'ok' : (wk.total >= wkTarget*0.6 ? 'warning' : 'miss');
+        }
+      } else if (item.type === 'DAILY_CHECK') {
+        summary = `${wk.daysHit} / 7 dagen`;
+        sumCls = wk.daysHit >= 6 ? 'ok' : wk.daysHit >= 4 ? 'warning' : 'miss';
+      } else if (item.type === 'WEEKLY_LIMIT') {
+        summary = `${wk.total} / ${item.target}`;
+        sumCls = wk.total > item.target ? 'miss' : (wk.total === item.target ? 'warning' : 'ok');
+      } else if (item.type === 'PERIODIC') {
+        summary = wk.daysHit > 0 ? `✓ deze week` : '— niet';
+        sumCls = wk.daysHit > 0 ? 'ok' : (item.period <= 7 ? 'miss' : 'warning');
+      }
+      html += `<td class="summary ${sumCls}">${summary}</td></tr>`;
+    }
+  }
+  html += '</tbody></table></div>';
+  document.getElementById('cl-week-view').innerHTML = html;
+}
+
+/* === CHECKLIST: MONTH VIEW === */
+function renderChecklistMonth() {
+  const monthStart = startOfMonth(cursor);
+  const monthEnd = endOfMonth(cursor);
+  let html = `<div class="cl-month">`;
+  html += `<div class="cl-month-row group-header"><h3>${MONTH_NAMES_NL[cursor.getMonth()]} ${cursor.getFullYear()}</h3><div class="col-h">Werkelijk</div><div class="col-h">Doel-dagen</div><div class="col-h">Gem./dag</div></div>`;
+
+  for (const g of ['goede','slechte','sidequests']) {
+    const items = cl.items.filter(i => i.group === g);
+    if (items.length === 0) continue;
+    html += `<div class="cl-month-row group-header"><h3>${GROUP_LABELS[g]}</h3><div class="col-h"></div><div class="col-h"></div><div class="col-h"></div></div>`;
+    for (const item of items) {
+      const m = getMonthStats(item, monthStart, monthEnd);
+      let target = '', actual = '', hitInfo = '', avg = '';
+      if (item.type === 'DAILY_VALUE') {
+        target = `${fmtValue(item.target, item.unit)}/d${item.direction==='max'?' max':''}`;
+        actual = fmtValue(m.total, item.unit);
+        hitInfo = `${m.daysHit}/${m.dayCount}`;
+        avg = fmtValue(Math.round(m.total / m.dayCount), item.unit);
+      } else if (item.type === 'DAILY_CHECK') {
+        target = 'ja/nee';
+        actual = `${m.daysHit} dgn ✓`;
+        hitInfo = `${m.daysHit}/${m.dayCount}`;
+        avg = `${Math.round(m.daysHit/m.dayCount*100)}%`;
+      } else if (item.type === 'WEEKLY_LIMIT') {
+        const wkLimit = item.target * (m.dayCount/7);
+        target = `≤ ${item.target}/wk`;
+        actual = `${m.total}${item.unit||''}`;
+        hitInfo = `vs ${wkLimit.toFixed(1)} max`;
+        avg = `${(m.total/(m.dayCount/7)).toFixed(1)}/wk`;
+      } else if (item.type === 'PERIODIC') {
+        target = `1× /${item.period}d`;
+        actual = `${m.daysHit}× gedaan`;
+        const expected = Math.floor(m.dayCount/item.period);
+        hitInfo = `${m.daysHit}/${expected || 1} verwacht`;
+        avg = m.daysHit > 0 ? `${(m.dayCount/m.daysHit).toFixed(0)}d gem.` : '—';
+      }
+      html += `<div class="cl-month-row"><div><span class="name">${escapeHtml(item.name)}</span><span class="target-sub">${target}</span></div><div class="stat">${actual}</div><div class="stat">${hitInfo}</div><div class="stat">${avg}</div></div>`;
+    }
+  }
+  html += `</div>`;
+  document.getElementById('cl-month-view').innerHTML = html;
+}
+
+/* === ITEM EDIT MODAL === */
+function openItemModal(itemId, defaultGroup) {
+  editingItemId = itemId;
+  const item = itemId ? cl.items.find(i => i.id === itemId) : null;
+  document.getElementById('item-modal-title').textContent = item ? 'Bewerk item' : 'Nieuw item';
+  document.getElementById('item-name').value = item?.name || '';
+  document.getElementById('item-group').value = item?.group || defaultGroup || 'goede';
+  document.getElementById('item-type').value = item?.type || 'DAILY_VALUE';
+  document.getElementById('item-target').value = item?.target ?? 30;
+  document.getElementById('item-unit').value = item?.unit || 'min';
+  document.getElementById('item-direction').value = item?.direction || 'min';
+  document.getElementById('item-period').value = item?.period ?? 7;
+  document.getElementById('item-penalty').value = item?.penalty || '';
+  document.getElementById('item-modal-delete').style.display = item ? '' : 'none';
+  toggleItemModalFields();
+  document.getElementById('item-modal-backdrop').classList.add('open');
+}
+function closeItemModal() {
+  document.getElementById('item-modal-backdrop').classList.remove('open');
+  editingItemId = null;
+}
+function toggleItemModalFields() {
+  const t = document.getElementById('item-type').value;
+  document.getElementById('item-target-row').style.display = (t === 'DAILY_CHECK') ? 'none' : 'grid';
+  document.getElementById('item-direction-row').style.display = (t === 'DAILY_VALUE') ? '' : 'none';
+  document.getElementById('item-period-row').style.display = (t === 'PERIODIC') ? '' : 'none';
+}
+function saveItemModal() {
+  const name = document.getElementById('item-name').value.trim();
+  if (!name) { alert('Naam verplicht'); return; }
+  const data = {
+    name,
+    group: document.getElementById('item-group').value,
+    type: document.getElementById('item-type').value,
+    penalty: document.getElementById('item-penalty').value.trim() || undefined
+  };
+  if (data.type === 'DAILY_VALUE' || data.type === 'WEEKLY_LIMIT' || data.type === 'PERIODIC') {
+    data.target = Number(document.getElementById('item-target').value) || 0;
+    data.unit = document.getElementById('item-unit').value.trim() || '';
+  }
+  if (data.type === 'DAILY_VALUE') data.direction = document.getElementById('item-direction').value;
+  if (data.type === 'PERIODIC') data.period = Number(document.getElementById('item-period').value) || 7;
+
+  let itemToSync;
+  if (editingItemId) {
+    const it = cl.items.find(i => i.id === editingItemId);
+    Object.assign(it, data);
+    itemToSync = it;
+  } else {
+    data.id = 'custom-' + Date.now();
+    cl.items.push(data);
+    itemToSync = data;
+  }
+  cloudUpsertItem(itemToSync).catch(e => console.warn('upsert item', e));
+  closeItemModal();
+  updateView();
+}
+function deleteItem() {
+  if (!editingItemId) return;
+  if (!confirm('Item verwijderen? Alle logs van dit item gaan ook weg.')) return;
+  const id = editingItemId;
+  cl.items = cl.items.filter(i => i.id !== id);
+  delete cl.log[id];
+  cloudDeleteItem(id).catch(e => console.warn('delete item', e));
+  closeItemModal();
+  updateView();
+}
+
+/* === SECTION ROUTING === */
+let section = 'tracker'; // tracker | checklist
+function renderChecklist() {
+  document.getElementById('cl-day-view').classList.toggle('hidden', clView !== 'day');
+  document.getElementById('cl-week-view').classList.toggle('hidden', clView !== 'week');
+  document.getElementById('cl-month-view').classList.toggle('hidden', clView !== 'month');
+  if (clView === 'day') renderChecklistDay();
+  else if (clView === 'week') renderChecklistWeek();
+  else renderChecklistMonth();
+}
+
+
+function init() {
+  loadState();
+  loadCl();
+
+  // section nav
+  document.querySelectorAll('.section-nav button').forEach(b => {
+    b.addEventListener('click', () => {
+      section = b.dataset.section;
+      updateView();
+    });
+  });
+
+  // item modal wiring
+  document.getElementById('item-type').addEventListener('change', toggleItemModalFields);
+  document.getElementById('item-modal-save').addEventListener('click', saveItemModal);
+  document.getElementById('item-modal-cancel').addEventListener('click', closeItemModal);
+  document.getElementById('item-modal-delete').addEventListener('click', deleteItem);
+  document.getElementById('item-modal-backdrop').addEventListener('click', e => {
+    if (e.target.id === 'item-modal-backdrop') closeItemModal();
+  });
+
+  // navigation
+  document.getElementById('btn-prev').addEventListener('click', () => {
+    if (view === 'day') cursor.setDate(cursor.getDate()-1);
+    else if (view === 'week') cursor.setDate(cursor.getDate()-7);
+    else cursor.setMonth(cursor.getMonth()-1);
+    updateView();
+  });
+  document.getElementById('btn-next').addEventListener('click', () => {
+    if (view === 'day') cursor.setDate(cursor.getDate()+1);
+    else if (view === 'week') cursor.setDate(cursor.getDate()+7);
+    else cursor.setMonth(cursor.getMonth()+1);
+    updateView();
+  });
+  document.getElementById('btn-today').addEventListener('click', () => {
+    cursor = new Date();
+    updateView();
+  });
+  document.getElementById('date-picker').addEventListener('change', e => {
+    if (e.target.value) {
+      cursor = parseDate(e.target.value);
+      updateView();
+    }
+  });
+
+  // view tabs
+  document.querySelectorAll('.view-group button').forEach(b => {
+    b.addEventListener('click', () => {
+      view = b.dataset.view;
+      updateView();
+    });
+  });
+
+  // stats scope
+  document.querySelectorAll('.stats .scope button').forEach(b => {
+    b.addEventListener('click', () => {
+      scope = b.dataset.scope;
+      document.querySelectorAll('.stats .scope button').forEach(x => x.classList.toggle('active', x === b));
+      renderStats();
+    });
+  });
+
+  // modal
+  document.querySelectorAll('.cat-btn').forEach(b => {
+    b.addEventListener('click', () => selectCategory(b.dataset.cat));
+  });
+  document.getElementById('modal-save').addEventListener('click', saveModal);
+  document.getElementById('modal-cancel').addEventListener('click', closeModal);
+  document.getElementById('modal-delete').addEventListener('click', deleteFromModal);
+  document.getElementById('modal-backdrop').addEventListener('click', e => {
+    if (e.target.id === 'modal-backdrop') closeModal();
+  });
+
+  // keyboard shortcuts in modal
+  document.addEventListener('keydown', e => {
+    const open = document.getElementById('modal-backdrop').classList.contains('open');
+    if (!open) return;
+    if (e.key === 'Escape') closeModal();
+    else if (e.key === 'Enter' && (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target === document.body)) {
+      // Don't intercept if focused on a button (let the button handle it)
+      if (e.target.tagName === 'INPUT') {
+        e.preventDefault();
+        saveModal();
+      }
+    }
+    else if (['1','2','3','4','5'].includes(e.key) && document.activeElement.tagName !== 'INPUT') {
+      const cats = ['Inefficiënt','Zelf','Boek','SMART','Bedrijf'];
+      selectCategory(cats[parseInt(e.key)-1]);
+    }
+  });
+
+  // import/export
+  document.getElementById('btn-export').addEventListener('click', exportData);
+  document.getElementById('btn-import').addEventListener('click', () => document.getElementById('import-file').click());
+  document.getElementById('import-file').addEventListener('change', e => {
+    if (e.target.files[0]) importData(e.target.files[0]);
+    e.target.value = '';
+  });
+  document.getElementById('btn-reset').addEventListener('click', async () => {
+    const choice = prompt('Wat wil je wissen?\n• "tracker" — alle tijdregister-blokken\n• "checklist" — alle checklist items + logs\n• "alles" — alles\n\n(annuleer = niets doen)\n\nLET OP: dit wist data in de cloud, ook van je andere apparaten.');
+    if (!choice) return;
+    const c = choice.toLowerCase().trim();
+    if (!['tracker','checklist','alles'].includes(c)) { alert('Onbekende keuze. Niets gewist.'); return; }
+    if (!confirm('Zeker weten? Data wordt permanent verwijderd uit de cloud.')) return;
+
+    syncStart();
+    const sb = await ensureSb();
+    try {
+      if (c === 'tracker' || c === 'alles') {
+        await sb.from('tracker_entries').delete().match({ user_id: auth.user.id });
+        state = { activities: { 'Inefficiënt':[], Zelf:[], Boek:[], SMART:[], Bedrijf:[] }, entries: {} };
+      }
+      if (c === 'checklist' || c === 'alles') {
+        await sb.from('checklist_log').delete().match({ user_id: auth.user.id });
+        await sb.from('checklist_items').delete().match({ user_id: auth.user.id });
+        cl = { items: [], log: {}, collapsed: {} };
+        await seedDefaultItems();
+      }
+      syncEnd();
+      updateView();
+    } catch (err) {
+      syncEnd(err);
+      alert('Wissen mislukt: ' + err.message);
+    }
+  });
+
+  // Auth form wiring
+  document.getElementById('auth-send-code').addEventListener('click', async () => {
+    const email = document.getElementById('auth-email').value.trim();
+    if (!email || !email.includes('@')) { setAuthStatus('Vul een geldig e-mailadres in', 'error'); return; }
+    setAuthStatus('Versturen…', 'info');
+    document.getElementById('auth-send-code').disabled = true;
+    try {
+      await sendOtp(email);
+      document.getElementById('auth-email-display').textContent = email;
+      document.getElementById('auth-step-email').classList.add('hidden');
+      document.getElementById('auth-step-code').classList.remove('hidden');
+      setAuthStatus('Code verstuurd. Check je inbox (ook spam).', 'success');
+      document.getElementById('auth-code').focus();
+    } catch (e) {
+      setAuthStatus('Fout: ' + e.message, 'error');
+    } finally {
+      document.getElementById('auth-send-code').disabled = false;
+    }
+  });
+  document.getElementById('auth-verify').addEventListener('click', async () => {
+    const email = document.getElementById('auth-email').value.trim();
+    const code = document.getElementById('auth-code').value.trim();
+    if (!code || code.length < 4) { setAuthStatus('Vul de code uit de e-mail in', 'error'); return; }
+    setAuthStatus('Inloggen…', 'info');
+    document.getElementById('auth-verify').disabled = true;
+    try {
+      await verifyOtp(email, code);
+      await postLoginBootstrap();
+    } catch (e) {
+      setAuthStatus('Fout: ' + e.message, 'error');
+    } finally {
+      document.getElementById('auth-verify').disabled = false;
+    }
+  });
+  document.getElementById('auth-back').addEventListener('click', () => {
+    document.getElementById('auth-step-code').classList.add('hidden');
+    document.getElementById('auth-step-email').classList.remove('hidden');
+    setAuthStatus('', '');
+  });
+  document.getElementById('auth-email').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('auth-send-code').click();
+  });
+  document.getElementById('auth-code').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('auth-verify').click();
+  });
+  document.getElementById('btn-logout').addEventListener('click', () => {
+    if (confirm('Uitloggen?')) logoutUser();
+  });
+
+  // Bootstrap: check session, route to login or app
+  bootstrap();
+}
+
+function setAuthStatus(text, cls) {
+  const el = document.getElementById('auth-status');
+  el.textContent = text;
+  el.className = 'auth-status ' + (cls || '');
+}
+
+async function bootstrap() {
+  // Restore collapsed state for checklist groups (UI-only, lokaal)
+  try {
+    const ui = JSON.parse(localStorage.getItem('tijdregister-cl-ui') || '{}');
+    cl.collapsed = ui;
+  } catch(e) {}
+
+  setAuthStatus('Verbinden…', 'info');
+  try {
+    await checkSession();
+  } catch (e) {
+    setAuthStatus('Geen verbinding: ' + e.message, 'error');
+    return;
+  }
+
+  if (!auth.user) {
+    // Not logged in — show login overlay
+    document.getElementById('auth-overlay').classList.remove('hidden');
+    document.getElementById('app-container').classList.add('hidden');
+    setAuthStatus('', '');
+    return;
+  }
+
+  await postLoginBootstrap();
+}
+
+async function postLoginBootstrap() {
+  document.getElementById('user-email').textContent = auth.user.email;
+  document.getElementById('auth-overlay').classList.add('hidden');
+  document.getElementById('app-container').classList.remove('hidden');
+  try {
+    await cloudFetchAll();
+    await startRealtime();
+    updateView();
+  } catch (e) {
+    setSyncStatus('● fout bij laden', 'error');
+    console.error('bootstrap failed', e);
+    alert('Fout bij ophalen data: ' + e.message);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
