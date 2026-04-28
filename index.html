@@ -237,35 +237,14 @@
   .col-note { cursor: pointer; color: var(--ink-soft); font-size: 13px; }
   .col-note:empty::before { content: '+ notitie'; color: var(--ink-faint); opacity: 0.5; font-size: 11px; }
 
-  /* Doortrek-knop: kopieer inhoud van vorig kwartier */
-  .col-time { gap: 6px; }
-  .copy-prev-slot {
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .copy-prev {
-    width: 18px;
-    height: 18px;
-    border: 1px solid var(--ink);
-    background: var(--paper);
-    color: var(--ink);
-    font-size: 13px;
-    font-weight: 500;
-    line-height: 1;
+  /* Doortrek-tijdvak: klik op het donkergrijze tijdvak om inhoud van vorig kwartier over te nemen */
+  .col-time.can-copy {
+    background: #4a423d;
+    color: #faf7f2;
     cursor: pointer;
-    padding: 0;
-    border-radius: 2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0.55;
-    transition: all 0.12s;
+    transition: background 0.12s;
   }
-  .copy-prev:hover { background: var(--ink); color: var(--paper); opacity: 1; }
+  .col-time.can-copy:hover { background: #1a1614; }
 
   .day-grid .row[data-cat="Inefficiënt"] .col-cat { background: var(--c-inefficient-bg); color: var(--c-inefficient); }
   .day-grid .row[data-cat="Zelf"] .col-cat { background: var(--c-zelf-bg); color: var(--c-zelf); }
@@ -920,14 +899,12 @@
     .util-group { margin-left: 0; }
 
     /* Day view tracker: alles op 1 regel — tijd, categorie, omschrijving */
-    .day-grid .row { grid-template-columns: 70px 70px 1fr; min-height: 32px; }
+    .day-grid .row { grid-template-columns: 50px 70px 1fr; min-height: 32px; }
     .day-grid .row > div { padding: 5px 6px; font-size: 12px; }
-    .col-time { font-size: 11px; gap: 4px; padding-left: 4px !important; padding-right: 4px !important; }
+    .col-time { font-size: 11px; }
     .col-cat { font-size: 11px; }
     .col-act { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block !important; }
     .col-note { display: none; }
-    .copy-prev-slot, .copy-prev { width: 16px; height: 16px; }
-    .copy-prev { font-size: 12px; }
 
     /* Checklist day items: stack control under info on mobile */
     .cl-item { grid-template-columns: 1fr; }
@@ -1632,7 +1609,9 @@ function renderDayView() {
     if (isHourStart) classes.push('hour-start');
     if (time === nowSlot) classes.push('now');
     html += `<div class="${classes.join(' ')}" data-time="${time}" ${cat ? `data-cat="${cat}"` : ''}>`;
-    html += `<div class="col-time"><span class="copy-prev-slot">${showCopyBtn ? `<button class="copy-prev" data-action="copy-prev" data-time="${time}" title="Neem inhoud vorig kwartier over">+</button>` : ''}</span>${time}</div>`;
+    const timeClasses = ['col-time'];
+    if (showCopyBtn) timeClasses.push('can-copy');
+    html += `<div class="${timeClasses.join(' ')}" ${showCopyBtn ? `data-action="copy-prev" title="Klik om inhoud vorig kwartier over te nemen"` : ''}>${time}</div>`;
     html += `<div class="col-cat" data-action="edit">${cat}</div>`;
     html += `<div class="col-act" data-action="edit">${escapeHtml(act)}</div>`;
     html += `<div class="col-note" data-action="edit">${escapeHtml(note)}</div>`;
@@ -1642,30 +1621,26 @@ function renderDayView() {
 
   document.getElementById('day-view').innerHTML = html;
 
-  // copy-prev knop
-  document.querySelectorAll('#day-view .copy-prev').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const time = btn.dataset.time;
-      const idx = TIME_SLOTS.indexOf(time);
-      if (idx <= 0) return;
-      const prev = getEntry(dateStr, TIME_SLOTS[idx-1]);
-      if (!prev) return;
-      setEntry(dateStr, time, {
-        category: prev.category || '',
-        activity: prev.activity || '',
-        note: prev.note || ''
-      });
-      renderDayView();
-      renderStats();
-    });
-  });
-
   // event delegation
   document.querySelectorAll('#day-view .row').forEach(row => {
     row.addEventListener('click', (e) => {
-      if (e.target.closest('.copy-prev')) return;
-      openModal(dateStr, row.dataset.time);
+      const time = row.dataset.time;
+      // Klik op donkergrijs tijdvak → neem inhoud vorig kwartier over
+      if (e.target.closest('.col-time.can-copy')) {
+        const idx = TIME_SLOTS.indexOf(time);
+        if (idx <= 0) return;
+        const prev = getEntry(dateStr, TIME_SLOTS[idx-1]);
+        if (!prev) return;
+        setEntry(dateStr, time, {
+          category: prev.category || '',
+          activity: prev.activity || '',
+          note: prev.note || ''
+        });
+        renderDayView();
+        renderStats();
+        return;
+      }
+      openModal(dateStr, time);
     });
   });
 }
