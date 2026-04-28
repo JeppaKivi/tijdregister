@@ -238,18 +238,22 @@
   .col-note:empty::before { content: '+ notitie'; color: var(--ink-faint); opacity: 0.5; font-size: 11px; }
 
   /* Doortrek-knop: kopieer inhoud van vorig kwartier */
-  .col-time { position: relative; }
+  .col-time { gap: 6px; }
+  .copy-prev-slot {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
   .copy-prev {
-    position: absolute;
-    right: 4px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 22px;
-    height: 22px;
+    width: 18px;
+    height: 18px;
     border: 1px solid var(--ink);
     background: var(--paper);
     color: var(--ink);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     line-height: 1;
     cursor: pointer;
@@ -916,13 +920,14 @@
     .util-group { margin-left: 0; }
 
     /* Day view tracker: alles op 1 regel — tijd, categorie, omschrijving */
-    .day-grid .row { grid-template-columns: 48px 70px 1fr; min-height: 32px; }
+    .day-grid .row { grid-template-columns: 70px 70px 1fr; min-height: 32px; }
     .day-grid .row > div { padding: 5px 6px; font-size: 12px; }
-    .col-time { font-size: 11px; padding-right: 22px !important; }
+    .col-time { font-size: 11px; gap: 4px; padding-left: 4px !important; padding-right: 4px !important; }
     .col-cat { font-size: 11px; }
     .col-act { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block !important; }
     .col-note { display: none; }
-    .copy-prev { width: 18px; height: 18px; font-size: 13px; right: 2px; }
+    .copy-prev-slot, .copy-prev { width: 16px; height: 16px; }
+    .copy-prev { font-size: 12px; }
 
     /* Checklist day items: stack control under info on mobile */
     .cl-item { grid-template-columns: 1fr; }
@@ -1627,7 +1632,7 @@ function renderDayView() {
     if (isHourStart) classes.push('hour-start');
     if (time === nowSlot) classes.push('now');
     html += `<div class="${classes.join(' ')}" data-time="${time}" ${cat ? `data-cat="${cat}"` : ''}>`;
-    html += `<div class="col-time">${time}${showCopyBtn ? `<button class="copy-prev" data-action="copy-prev" data-time="${time}" title="Neem inhoud vorig kwartier over">+</button>` : ''}</div>`;
+    html += `<div class="col-time"><span class="copy-prev-slot">${showCopyBtn ? `<button class="copy-prev" data-action="copy-prev" data-time="${time}" title="Neem inhoud vorig kwartier over">+</button>` : ''}</span>${time}</div>`;
     html += `<div class="col-cat" data-action="edit">${cat}</div>`;
     html += `<div class="col-act" data-action="edit">${escapeHtml(act)}</div>`;
     html += `<div class="col-note" data-action="edit">${escapeHtml(note)}</div>`;
