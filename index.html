@@ -77,6 +77,7 @@
     max-width: 1400px;
     margin: 0 auto;
     padding: 32px 40px 80px;
+    padding-top: max(32px, calc(env(safe-area-inset-top) + 16px));
   }
 
   /* === HEADER === */
@@ -898,13 +899,16 @@
     .date-display { font-size: 17px; min-width: 0; padding: 4px 8px; flex: 1 1 100%; order: 99; }
     .util-group { margin-left: 0; }
 
-    /* Day view tracker: alles op 1 regel — tijd, categorie, omschrijving */
-    .day-grid .row { grid-template-columns: 50px 70px 1fr; min-height: 32px; }
-    .day-grid .row > div { padding: 5px 6px; font-size: 12px; }
-    .col-time { font-size: 11px; }
+    /* Mobiel: app iets meer ademruimte ook horizontaal */
+    .app { padding-left: 12px; padding-right: 12px; }
+
+    /* Day view tracker: tijd + categorie + omschrijving op 1 regel, notitie verborgen */
+    .day-grid .row { grid-template-columns: 50px 78px 1fr; min-height: 30px; }
+    .day-grid .row > div { padding: 4px 6px; font-size: 12px; }
+    .col-time { font-size: 11px; padding: 4px 4px !important; }
     .col-cat { font-size: 11px; }
-    .col-act { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block !important; }
-    .col-note { display: none; }
+    .col-act { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .day-grid .col-note { display: none !important; }
 
     /* Checklist day items: stack control under info on mobile */
     .cl-item { grid-template-columns: 1fr; }
