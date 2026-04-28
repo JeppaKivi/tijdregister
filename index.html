@@ -22,8 +22,12 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Tijdregister">
 <meta name="theme-color" content="#faf7f2">
-<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' fill='%23faf7f2'/><circle cx='90' cy='90' r='62' fill='none' stroke='%231a1614' stroke-width='4'/><line x1='90' y1='90' x2='90' y2='42' stroke='%23b34a35' stroke-width='5' stroke-linecap='round'/><line x1='90' y1='90' x2='124' y2='90' stroke='%231a1614' stroke-width='5' stroke-linecap='round'/><circle cx='90' cy='90' r='4' fill='%231a1614'/></svg>">
-<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23faf7f2'/><text x='50%25' y='62%25' font-family='Georgia,serif' font-size='70' font-weight='600' font-style='italic' fill='%231a1614' text-anchor='middle'>T</text></svg>">
+<link rel="apple-touch-icon" sizes="1024x1024" href="tijdregister-app-icon-1024.png">
+<link rel="apple-touch-icon" sizes="512x512" href="tijdregister-app-icon-512.png">
+<link rel="apple-touch-icon" sizes="256x256" href="tijdregister-app-icon-256.png">
+<link rel="apple-touch-icon" sizes="128x128" href="tijdregister-app-icon-128.png">
+<link rel="icon" type="image/png" sizes="256x256" href="tijdregister-logo-256.png">
+<link rel="icon" type="image/svg+xml" href="tijdregister-logo-16.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -83,6 +87,16 @@
     border-bottom: 2px solid var(--ink);
     padding-bottom: 16px;
     margin-bottom: 28px;
+  }
+  .masthead .brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .masthead .brand-logo {
+    height: 48px;
+    width: auto;
+    display: block;
   }
   .masthead h1 {
     font-family: 'Fraunces', serif;
@@ -222,6 +236,32 @@
   .col-act:empty::before { content: 'klik om in te vullen'; color: var(--ink-faint); font-style: italic; font-size: 12px; }
   .col-note { cursor: pointer; color: var(--ink-soft); font-size: 13px; }
   .col-note:empty::before { content: '+ notitie'; color: var(--ink-faint); opacity: 0.5; font-size: 11px; }
+
+  /* Doortrek-knop: kopieer inhoud van vorig kwartier */
+  .col-time { position: relative; }
+  .copy-prev {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.55;
+    transition: all 0.12s;
+  }
+  .copy-prev:hover { background: var(--ink); color: var(--paper); opacity: 1; }
 
   .day-grid .row[data-cat="Inefficiënt"] .col-cat { background: var(--c-inefficient-bg); color: var(--c-inefficient); }
   .day-grid .row[data-cat="Zelf"] .col-cat { background: var(--c-zelf-bg); color: var(--c-zelf); }
@@ -865,7 +905,9 @@
   @media (max-width: 700px) {
     .app { padding: 18px 14px 60px; }
     .masthead { flex-direction: column; align-items: flex-start; gap: 8px; }
-    .masthead h1 { font-size: 28px; }
+    .masthead h1 { font-size: 24px; }
+    .masthead .brand { gap: 10px; }
+    .masthead .brand-logo { height: 36px; }
     .masthead .meta { text-align: left; }
     nav.section-nav button { padding: 10px 16px; font-size: 15px; }
     .controls { gap: 8px; }
@@ -873,9 +915,14 @@
     .date-display { font-size: 17px; min-width: 0; padding: 4px 8px; flex: 1 1 100%; order: 99; }
     .util-group { margin-left: 0; }
 
-    /* Day view tracker: tighter columns */
-    .day-grid .row { grid-template-columns: 50px 80px 1fr; }
+    /* Day view tracker: alles op 1 regel — tijd, categorie, omschrijving */
+    .day-grid .row { grid-template-columns: 48px 70px 1fr; min-height: 32px; }
+    .day-grid .row > div { padding: 5px 6px; font-size: 12px; }
+    .col-time { font-size: 11px; padding-right: 22px !important; }
+    .col-cat { font-size: 11px; }
+    .col-act { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block !important; }
     .col-note { display: none; }
+    .copy-prev { width: 18px; height: 18px; font-size: 13px; right: 2px; }
 
     /* Checklist day items: stack control under info on mobile */
     .cl-item { grid-template-columns: 1fr; }
@@ -1050,7 +1097,10 @@
 <div class="app hidden" id="app-container">
 
   <header class="masthead">
-    <h1>Tijdregister <em>— vijftien minuten</em></h1>
+    <div class="brand">
+      <img src="tijdregister-logo-256.png" alt="Tijdregister" class="brand-logo">
+      <h1>Tijdregister <em>— vijftien minuten</em></h1>
+    </div>
     <div class="meta">
       <span class="user-info"><span id="user-email">—</span> · <button id="btn-logout" class="link-btn">uitloggen</button></span><br>
       <span class="sync-status" id="sync-status">●&nbsp;synchroniseert</span> · <strong id="today-label">—</strong>
@@ -1562,17 +1612,22 @@ function renderDayView() {
   const nowSlot = isToday ? currentTimeSlot() : null;
 
   let html = '<div class="day-grid">';
-  for (const time of TIME_SLOTS) {
+  for (let i = 0; i < TIME_SLOTS.length; i++) {
+    const time = TIME_SLOTS[i];
     const isHourStart = time.endsWith(':00');
     const entry = getEntry(dateStr, time);
     const cat = entry?.category || '';
     const act = entry?.activity || '';
     const note = entry?.note || '';
+    const prevTime = i > 0 ? TIME_SLOTS[i-1] : null;
+    const prevEntry = prevTime ? getEntry(dateStr, prevTime) : null;
+    const prevHasContent = prevEntry && (prevEntry.category || prevEntry.activity || prevEntry.note);
+    const showCopyBtn = !cat && !act && !note && prevHasContent;
     const classes = ['row'];
     if (isHourStart) classes.push('hour-start');
     if (time === nowSlot) classes.push('now');
     html += `<div class="${classes.join(' ')}" data-time="${time}" ${cat ? `data-cat="${cat}"` : ''}>`;
-    html += `<div class="col-time">${time}</div>`;
+    html += `<div class="col-time">${time}${showCopyBtn ? `<button class="copy-prev" data-action="copy-prev" data-time="${time}" title="Neem inhoud vorig kwartier over">+</button>` : ''}</div>`;
     html += `<div class="col-cat" data-action="edit">${cat}</div>`;
     html += `<div class="col-act" data-action="edit">${escapeHtml(act)}</div>`;
     html += `<div class="col-note" data-action="edit">${escapeHtml(note)}</div>`;
@@ -1582,9 +1637,29 @@ function renderDayView() {
 
   document.getElementById('day-view').innerHTML = html;
 
+  // copy-prev knop
+  document.querySelectorAll('#day-view .copy-prev').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const time = btn.dataset.time;
+      const idx = TIME_SLOTS.indexOf(time);
+      if (idx <= 0) return;
+      const prev = getEntry(dateStr, TIME_SLOTS[idx-1]);
+      if (!prev) return;
+      setEntry(dateStr, time, {
+        category: prev.category || '',
+        activity: prev.activity || '',
+        note: prev.note || ''
+      });
+      renderDayView();
+      renderStats();
+    });
+  });
+
   // event delegation
   document.querySelectorAll('#day-view .row').forEach(row => {
-    row.addEventListener('click', () => {
+    row.addEventListener('click', (e) => {
+      if (e.target.closest('.copy-prev')) return;
       openModal(dateStr, row.dataset.time);
     });
   });

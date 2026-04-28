@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140" width="512" height="512">
+  <text x="20" y="108" font-family="Inter, system-ui, sans-serif" font-weight="800" font-size="110" letter-spacing="-6" fill="#26334d">24</text>
+  <circle cx="118" cy="22" r="5" fill="#1f8fc4"></circle>
+  <line x1="118" y1="22" x2="118" y2="42" stroke="#1f8fc4" stroke-width="2.5" stroke-linecap="round"></line>
+</svg>
