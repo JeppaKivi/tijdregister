@@ -910,6 +910,145 @@
   .sync-status.error { color: var(--c-inefficient); }
   .sync-status.offline { color: var(--ink-faint); }
 
+  /* === RAPPORTAGE === */
+  .rap-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px 24px;
+    border: 1px solid var(--rule);
+    background: var(--paper-2);
+    margin-bottom: 24px;
+  }
+  .rap-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+  .rap-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 160px;
+  }
+  .rap-field.rap-grow { flex: 1; min-width: 240px; }
+  .rap-field label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+  }
+  .rap-field input[type="text"],
+  .rap-field input[type="date"],
+  .rap-field select {
+    padding: 10px 12px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+  .rap-cats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .rap-cat-pill {
+    padding: 6px 12px;
+    border: 1px solid var(--rule);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    user-select: none;
+    background: var(--paper);
+    color: var(--ink-faint);
+  }
+  .rap-cat-pill.active {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  .rap-export-btn {
+    padding: 10px 18px;
+    background: var(--ink);
+    color: var(--paper);
+    border: 1px solid var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+  }
+  .rap-export-btn:hover { background: var(--ink-soft); }
+  .rap-totals {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .rap-totals .stat-card {
+    padding: 14px 16px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+  }
+  .rap-totals .stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    margin-bottom: 4px;
+  }
+  .rap-totals .stat-value {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 500;
+    line-height: 1.1;
+  }
+  .rap-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    margin-bottom: 20px;
+  }
+  .rap-results h3 {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 18px;
+    font-weight: 400;
+    margin: 24px 0 8px;
+  }
+  .rap-results table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .rap-results th {
+    text-align: left;
+    padding: 8px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    border-bottom: 1px solid var(--ink);
+  }
+  .rap-results td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .rap-results tr:hover td { background: var(--paper-2); }
+  .rap-results .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .rap-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--ink-faint);
+    font-style: italic;
+  }
+
   /* === MOBILE RESPONSIVE === */
   @media (max-width: 700px) {
     .app { padding: 18px 14px 60px; }
@@ -1152,6 +1291,7 @@
   <nav class="section-nav">
     <button data-section="tracker" class="active">Tijdregister</button>
     <button data-section="checklist">Checklist</button>
+    <button data-section="rapportage">Rapportage</button>
   </nav>
 
   <div class="controls">
@@ -1201,6 +1341,51 @@
     <div id="cl-day-view"></div>
     <div id="cl-week-view" class="hidden"></div>
     <div id="cl-month-view" class="hidden"></div>
+  </section>
+
+  <section id="section-rapportage" class="section hidden">
+    <div class="rap-filters">
+      <div class="rap-row">
+        <div class="rap-field">
+          <label>Periode</label>
+          <select id="rap-period">
+            <option value="today">Vandaag</option>
+            <option value="this-week">Deze week</option>
+            <option value="last-week">Vorige week</option>
+            <option value="this-month">Deze maand</option>
+            <option value="last-month">Vorige maand</option>
+            <option value="last-30">Laatste 30 dagen</option>
+            <option value="all" selected>Alles</option>
+            <option value="custom">Aangepast</option>
+          </select>
+        </div>
+        <div class="rap-field rap-custom hidden">
+          <label>Van</label>
+          <input type="date" id="rap-from">
+        </div>
+        <div class="rap-field rap-custom hidden">
+          <label>Tot</label>
+          <input type="date" id="rap-to">
+        </div>
+      </div>
+      <div class="rap-row">
+        <div class="rap-field rap-grow">
+          <label>Categorieën (klik om aan/uit te zetten)</label>
+          <div id="rap-cats" class="rap-cats"></div>
+        </div>
+      </div>
+      <div class="rap-row">
+        <div class="rap-field rap-grow">
+          <label>Activiteit (zoekt op bevat)</label>
+          <input type="text" id="rap-activity" placeholder="laat leeg voor alle activiteiten">
+        </div>
+        <div class="rap-field">
+          <label>&nbsp;</label>
+          <button id="rap-export" class="rap-export-btn">↓ Excel exporteren</button>
+        </div>
+      </div>
+    </div>
+    <div class="rap-results" id="rap-results"></div>
   </section>
 
   <p class="hint" style="margin-top: 24px;">
@@ -2166,6 +2351,8 @@ function updateView() {
   // toggle sections
   document.getElementById('section-tracker').classList.toggle('hidden', section !== 'tracker');
   document.getElementById('section-checklist').classList.toggle('hidden', section !== 'checklist');
+  document.getElementById('section-rapportage').classList.toggle('hidden', section !== 'rapportage');
+  if (section === 'rapportage') renderRapportage();
   document.querySelectorAll('.section-nav button').forEach(b => {
     b.classList.toggle('active', b.dataset.section === section);
   });
@@ -2807,6 +2994,272 @@ function renderChecklist() {
 }
 
 
+/* ============================================
+   SHEETJS LAZY LOADER
+============================================ */
+function loadSheetJS() {
+  if (typeof XLSX !== 'undefined') return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js';
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('SheetJS kon niet geladen worden'));
+    document.head.appendChild(script);
+  });
+}
+
+/* ============================================
+   RAPPORTAGE MODULE
+============================================ */
+const rap = {
+  period: 'all',
+  from: null,
+  to: null,
+  categories: [],
+  activity: ''
+};
+
+function getRapDateRange() {
+  const today = new Date();
+  const todayStr = fmtDate(today);
+  switch (rap.period) {
+    case 'today':
+      return { from: todayStr, to: todayStr };
+    case 'this-week': {
+      const start = startOfWeek(today);
+      const end = new Date(start); end.setDate(start.getDate() + 6);
+      return { from: fmtDate(start), to: fmtDate(end) };
+    }
+    case 'last-week': {
+      const start = startOfWeek(today); start.setDate(start.getDate() - 7);
+      const end = new Date(start); end.setDate(start.getDate() + 6);
+      return { from: fmtDate(start), to: fmtDate(end) };
+    }
+    case 'this-month':
+      return { from: fmtDate(startOfMonth(today)), to: fmtDate(endOfMonth(today)) };
+    case 'last-month': {
+      const prev = new Date(today.getFullYear(), today.getMonth() - 1, 15);
+      return { from: fmtDate(startOfMonth(prev)), to: fmtDate(endOfMonth(prev)) };
+    }
+    case 'last-30': {
+      const start = new Date(today); start.setDate(today.getDate() - 30);
+      return { from: fmtDate(start), to: todayStr };
+    }
+    case 'custom':
+      return { from: rap.from || todayStr, to: rap.to || todayStr };
+    case 'all':
+    default: {
+      const all = Object.keys(state.entries).sort();
+      return { from: all[0] || todayStr, to: all[all.length - 1] || todayStr };
+    }
+  }
+}
+
+function filterEntries() {
+  const { from, to } = getRapDateRange();
+  const out = [];
+  const actLower = (rap.activity || '').toLowerCase().trim();
+  for (const [date, blocks] of Object.entries(state.entries)) {
+    if (date < from || date > to) continue;
+    for (const [time, entry] of Object.entries(blocks)) {
+      if (rap.categories.length && !rap.categories.includes(entry.category)) continue;
+      if (actLower && !(entry.activity || '').toLowerCase().includes(actLower)) continue;
+      out.push({ date, time, ...entry });
+    }
+  }
+  return { entries: out, from, to };
+}
+
+function aggregateEntries(entries) {
+  const byActivity = {};
+  const byCategory = {};
+  const byDate = {};
+  for (const e of entries) {
+    const a = e.activity || '(geen activiteit)';
+    byActivity[a] = (byActivity[a] || 0) + 1;
+    byCategory[e.category] = (byCategory[e.category] || 0) + 1;
+    byDate[e.date] = (byDate[e.date] || 0) + 1;
+  }
+  const dayCount = Object.keys(byDate).length;
+  return {
+    totalBlocks: entries.length,
+    totalMinutes: entries.length * 15,
+    dayCount,
+    avgPerDay: dayCount ? (entries.length * 15) / dayCount : 0,
+    byActivity: Object.entries(byActivity).sort((a, b) => b[1] - a[1]),
+    byCategory: Object.entries(byCategory).sort((a, b) => b[1] - a[1]),
+    byDate: Object.entries(byDate).sort()
+  };
+}
+
+function renderRapportage() {
+  const { entries, from, to } = filterEntries();
+  const agg = aggregateEntries(entries);
+  const container = document.getElementById('rap-results');
+  if (!container) return;
+
+  if (entries.length === 0) {
+    container.innerHTML = `<div class="rap-empty">Geen blokken gevonden voor deze filter.</div>`;
+    return;
+  }
+
+  const allCatNames = getCategoryNames();
+  const filterDesc = [
+    `${from} t/m ${to}`,
+    rap.categories.length < allCatNames.length ? `${rap.categories.length} van ${allCatNames.length} categorieën` : 'alle categorieën',
+    rap.activity ? `activiteit bevat "${rap.activity}"` : 'alle activiteiten'
+  ].join(' · ');
+
+  let html = `
+    <div class="rap-totals">
+      <div class="stat-card"><div class="stat-label">Totale tijd</div><div class="stat-value">${fmtValue(agg.totalMinutes, 'min')}</div></div>
+      <div class="stat-card"><div class="stat-label">Blokken</div><div class="stat-value">${agg.totalBlocks}</div></div>
+      <div class="stat-card"><div class="stat-label">Dagen actief</div><div class="stat-value">${agg.dayCount}</div></div>
+      <div class="stat-card"><div class="stat-label">Gem. per dag</div><div class="stat-value">${fmtValue(Math.round(agg.avgPerDay), 'min')}</div></div>
+    </div>
+    <div class="rap-meta">${escapeHtml(filterDesc)}</div>
+  `;
+
+  html += `<h3>Per activiteit</h3><table><thead><tr><th>Activiteit</th><th class="num">Blokken</th><th class="num">Tijd</th></tr></thead><tbody>`;
+  for (const [name, blocks] of agg.byActivity) {
+    html += `<tr><td>${escapeHtml(name)}</td><td class="num">${blocks}</td><td class="num">${fmtValue(blocks * 15, 'min')}</td></tr>`;
+  }
+  html += `</tbody></table>`;
+
+  html += `<h3>Per categorie</h3><table><thead><tr><th>Categorie</th><th class="num">Blokken</th><th class="num">Tijd</th></tr></thead><tbody>`;
+  for (const [name, blocks] of agg.byCategory) {
+    html += `<tr><td>${escapeHtml(name)}</td><td class="num">${blocks}</td><td class="num">${fmtValue(blocks * 15, 'min')}</td></tr>`;
+  }
+  html += `</tbody></table>`;
+
+  if (agg.dayCount > 1) {
+    html += `<h3>Per dag</h3><table><thead><tr><th>Datum</th><th class="num">Blokken</th><th class="num">Tijd</th></tr></thead><tbody>`;
+    for (const [date, blocks] of agg.byDate) {
+      html += `<tr><td>${date}</td><td class="num">${blocks}</td><td class="num">${fmtValue(blocks * 15, 'min')}</td></tr>`;
+    }
+    html += `</tbody></table>`;
+  }
+
+  container.innerHTML = html;
+}
+
+async function exportRapportageToExcel() {
+  try {
+    await loadSheetJS();
+  } catch (e) {
+    alert('Excel-library kon niet geladen worden. Check je internetverbinding.');
+    return;
+  }
+
+  const { entries, from, to } = filterEntries();
+  if (entries.length === 0) {
+    alert('Geen blokken om te exporteren met huidige filter.');
+    return;
+  }
+  const agg = aggregateEntries(entries);
+
+  const detailData = [
+    ['Datum', 'Tijd', 'Categorie', 'Activiteit', 'Notitie', 'Duur (min)', 'Duur (uur)']
+  ];
+  const sorted = [...entries].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  for (const e of sorted) {
+    detailData.push([e.date, e.time, e.category, e.activity || '', e.note || '', 15, 0.25]);
+  }
+  detailData.push([]);
+  detailData.push(['', '', '', '', 'TOTAAL', entries.length * 15, (entries.length * 15) / 60]);
+
+  const detailWs = XLSX.utils.aoa_to_sheet(detailData);
+  detailWs['!cols'] = [{wch:12},{wch:8},{wch:14},{wch:28},{wch:32},{wch:11},{wch:11}];
+
+  const allCatNames = getCategoryNames();
+  const summaryData = [
+    ['Tijdregister export'],
+    [],
+    ['Periode', `${from} t/m ${to}`],
+    ['Categorieën', rap.categories.join(', ')],
+    ['Activiteit-filter', rap.activity || '(geen)'],
+    ['Gegenereerd', new Date().toISOString().slice(0,16).replace('T',' ')],
+    [],
+    ['Totaal blokken', entries.length],
+    ['Totaal tijd (min)', entries.length * 15],
+    ['Totaal tijd (uur)', (entries.length * 15) / 60],
+    ['Aantal dagen', agg.dayCount],
+    ['Gemiddeld per dag (min)', Math.round(agg.avgPerDay)],
+    [],
+    ['Per activiteit', 'Blokken', 'Min', 'Uur'],
+  ];
+  for (const [name, blocks] of agg.byActivity) {
+    summaryData.push([name, blocks, blocks * 15, (blocks * 15) / 60]);
+  }
+  summaryData.push([]);
+  summaryData.push(['Per categorie', 'Blokken', 'Min', 'Uur']);
+  for (const [name, blocks] of agg.byCategory) {
+    summaryData.push([name, blocks, blocks * 15, (blocks * 15) / 60]);
+  }
+
+  const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
+  summaryWs['!cols'] = [{wch:32},{wch:11},{wch:11},{wch:11}];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, summaryWs, 'Overzicht');
+  XLSX.utils.book_append_sheet(wb, detailWs, 'Detail');
+
+  const parts = [`${from}_${to}`];
+  if (rap.activity) parts.push('act-' + rap.activity.replace(/[^a-z0-9]/gi, '').slice(0, 20));
+  if (rap.categories.length < allCatNames.length) parts.push('cat-' + rap.categories.join('-').replace(/[^a-z0-9-]/gi, ''));
+  const filename = `tijdregister_${parts.join('_')}.xlsx`;
+
+  XLSX.writeFile(wb, filename);
+}
+
+function initRapportage() {
+  const catContainer = document.getElementById('rap-cats');
+  if (!catContainer) return;
+
+  // Populate category pills from current state
+  const catNames = getCategoryNames();
+  rap.categories = [...catNames];
+  catContainer.innerHTML = catNames.map(c =>
+    `<span class="rap-cat-pill active" data-cat="${escapeHtml(c)}">${escapeHtml(c)}</span>`
+  ).join('');
+  catContainer.querySelectorAll('.rap-cat-pill').forEach(p => {
+    p.addEventListener('click', () => {
+      p.classList.toggle('active');
+      rap.categories = [...catContainer.querySelectorAll('.rap-cat-pill.active')].map(e => e.dataset.cat);
+      renderRapportage();
+    });
+  });
+
+  document.getElementById('rap-period').addEventListener('change', e => {
+    rap.period = e.target.value;
+    document.querySelectorAll('.rap-custom').forEach(el => el.classList.toggle('hidden', rap.period !== 'custom'));
+    if (rap.period === 'custom') {
+      const today = fmtDate(new Date());
+      if (!rap.from) { rap.from = today; document.getElementById('rap-from').value = today; }
+      if (!rap.to) { rap.to = today; document.getElementById('rap-to').value = today; }
+    }
+    renderRapportage();
+  });
+
+  document.getElementById('rap-from').addEventListener('change', e => {
+    rap.from = e.target.value; renderRapportage();
+  });
+  document.getElementById('rap-to').addEventListener('change', e => {
+    rap.to = e.target.value; renderRapportage();
+  });
+
+  let activityTimer;
+  document.getElementById('rap-activity').addEventListener('input', e => {
+    clearTimeout(activityTimer);
+    activityTimer = setTimeout(() => {
+      rap.activity = e.target.value;
+      renderRapportage();
+    }, 200);
+  });
+
+  document.getElementById('rap-export').addEventListener('click', exportRapportageToExcel);
+}
+
 function init() {
   loadState();
   loadCl();
@@ -2980,6 +3433,9 @@ function init() {
   document.getElementById('btn-logout').addEventListener('click', () => {
     if (confirm('Uitloggen?')) logoutUser();
   });
+
+  initRapportage();
+  loadSheetJS().catch(e => console.warn('SheetJS preload mislukt', e));
 
   // Bootstrap: check session, route to login or app
   bootstrap();
