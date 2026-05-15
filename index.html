@@ -3152,61 +3152,165 @@ async function exportRapportageToExcel() {
   }
 
   const { entries, from, to } = filterEntries();
-  if (entries.length === 0) {
-    alert('Geen blokken om te exporteren met huidige filter.');
+  if (!from || !to) {
+    alert('Geen geldige periode geselecteerd.');
     return;
   }
-  const agg = aggregateEntries(entries);
 
-  const detailData = [
-    ['Datum', 'Tijd', 'Categorie', 'Activiteit', 'Notitie', 'Duur (min)', 'Duur (uur)']
-  ];
-  const sorted = [...entries].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
-  for (const e of sorted) {
-    detailData.push([e.date, e.time, e.category, e.activity || '', e.note || '', 15, 0.25]);
+  // Alle dagen in periode (inclusief lege)
+  const dates = [];
+  const dateCur = parseDate(from);
+  const endDate = parseDate(to);
+  while (dateCur <= endDate) {
+    dates.push(fmtDate(dateCur));
+    dateCur.setDate(dateCur.getDate() + 1);
   }
-  detailData.push([]);
-  detailData.push(['', '', '', '', 'TOTAAL', entries.length * 15, (entries.length * 15) / 60]);
+  if (dates.length === 0) {
+    alert('Geen dagen in periode.');
+    return;
+  }
+  if (dates.length > 365) {
+    if (!confirm(`Periode beslaat ${dates.length} dagen — Excel wordt erg breed. Doorgaan?`)) return;
+  }
+
+  // Tijdslots 07:00 t/m 23:45 (68 stuks)
+  const slots = [];
+  for (let h = 7; h < 24; h++) {
+    for (let m = 0; m < 60; m += 15) {
+      slots.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+    }
+  }
+
+  // Snelle lookup: date_time -> entry
+  const lookup = {};
+  for (const e of entries) lookup[e.date + '_' + e.time] = e;
+
+  // === DETAIL SHEET ===
+  const header = ['Tijd'];
+  for (const d of dates) {
+    header.push(`${d} Activiteit`);
+    header.push(`${d} Notitie`);
+  }
+
+  const detailData = [header];
+  for (const slot of slots) {
+    const row = [slot];
+    for (const date of dates) {
+      const entry = lookup[date + '_' + slot];
+      row.push(entry?.activity || '');
+      row.push(entry?.note || '');
+    }
+    detailData.push(row);
+  }
 
   const detailWs = XLSX.utils.aoa_to_sheet(detailData);
-  detailWs['!cols'] = [{wch:12},{wch:8},{wch:14},{wch:28},{wch:32},{wch:11},{wch:11}];
 
-  const allCatNames = getCategoryNames();
-  const summaryData = [
-    ['Tijdregister export'],
-    [],
-    ['Periode', `${from} t/m ${to}`],
-    ['Categorieën', rap.categories.join(', ')],
-    ['Activiteit-filter', rap.activity || '(geen)'],
-    ['Gegenereerd', new Date().toISOString().slice(0,16).replace('T',' ')],
-    [],
-    ['Totaal blokken', entries.length],
-    ['Totaal tijd (min)', entries.length * 15],
-    ['Totaal tijd (uur)', (entries.length * 15) / 60],
-    ['Aantal dagen', agg.dayCount],
-    ['Gemiddeld per dag (min)', Math.round(agg.avgPerDay)],
-    [],
-    ['Per activiteit', 'Blokken', 'Min', 'Uur'],
-  ];
-  for (const [name, blocks] of agg.byActivity) {
-    summaryData.push([name, blocks, blocks * 15, (blocks * 15) / 60]);
+  const detailCols = [{ wch: 7 }];
+  for (let i = 0; i < dates.length; i++) {
+    detailCols.push({ wch: 22 }); // Activiteit
+    detailCols.push({ wch: 28 }); // Notitie
   }
-  summaryData.push([]);
-  summaryData.push(['Per categorie', 'Blokken', 'Min', 'Uur']);
-  for (const [name, blocks] of agg.byCategory) {
-    summaryData.push([name, blocks, blocks * 15, (blocks * 15) / 60]);
+  detailWs['!cols'] = detailCols;
+  detailWs['!freeze'] = { xSplit: 1, ySplit: 1 };
+
+  // === OVERZICHT SHEET met formules ===
+  function colLetter(n) {
+    let s = '';
+    while (n > 0) {
+      const mod = (n - 1) % 26;
+      s = String.fromCharCode(65 + mod) + s;
+      n = Math.floor((n - 1) / 26);
+    }
+    return s;
+  }
+  // Activiteit-kolom voor dag i (0-indexed): kolom 2 + i*2
+  const dayActCol = (i) => colLetter(2 + i * 2);
+
+  const DETAIL_FIRST_ROW = 2;
+  const DETAIL_LAST_ROW = 1 + slots.length; // 69 voor 68 slots
+
+  function activityCountFormula(actName) {
+    const safe = String(actName).replace(/"/g, '""');
+    return dates.map((_, i) => {
+      const col = dayActCol(i);
+      return `COUNTIF(Detail!${col}${DETAIL_FIRST_ROW}:${col}${DETAIL_LAST_ROW},"${safe}")`;
+    }).join('+');
   }
 
-  const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
-  summaryWs['!cols'] = [{wch:32},{wch:11},{wch:11},{wch:11}];
+  const summary = [];
+  summary.push(['Tijdregister export']);
+  summary.push([]);
+  summary.push(['Periode', `${from} t/m ${to}`]);
+  summary.push(['Categorieën', rap.categories.join(', ')]);
+  summary.push(['Activiteit-filter', rap.activity || '(geen)']);
+  summary.push(['Gegenereerd', new Date().toISOString().slice(0,16).replace('T',' ')]);
+  summary.push([]);
+
+  // Per dag met formules
+  summary.push(['Per dag', 'Blokken', 'Min', 'Uur']);
+  const perDayHeaderRow = summary.length;
+  for (let i = 0; i < dates.length; i++) {
+    const col = dayActCol(i);
+    const range = `Detail!${col}${DETAIL_FIRST_ROW}:${col}${DETAIL_LAST_ROW}`;
+    summary.push([
+      dates[i],
+      { t: 'n', f: `COUNTA(${range})` },
+      { t: 'n', f: `COUNTA(${range})*15` },
+      { t: 'n', f: `COUNTA(${range})*0.25` }
+    ]);
+  }
+  const firstDayRow = perDayHeaderRow + 1;
+  const lastDayRow = perDayHeaderRow + dates.length;
+  summary.push([
+    'TOTAAL',
+    { t: 'n', f: `SUM(B${firstDayRow}:B${lastDayRow})` },
+    { t: 'n', f: `SUM(C${firstDayRow}:C${lastDayRow})` },
+    { t: 'n', f: `SUM(D${firstDayRow}:D${lastDayRow})` }
+  ]);
+  summary.push([]);
+
+  // Per activiteit met dynamische COUNTIF chain
+  const activitySet = new Set();
+  for (const e of entries) {
+    if (e.activity) activitySet.add(e.activity);
+  }
+  const activities = [...activitySet].sort();
+
+  summary.push(['Per activiteit', 'Blokken', 'Min', 'Uur']);
+  for (const act of activities) {
+    const f = activityCountFormula(act);
+    summary.push([
+      act,
+      { t: 'n', f },
+      { t: 'n', f: `(${f})*15` },
+      { t: 'n', f: `(${f})*0.25` }
+    ]);
+  }
+  summary.push([]);
+
+  // Per categorie (statisch — Detail heeft geen categorie-kolom)
+  const byCat = {};
+  for (const e of entries) byCat[e.category] = (byCat[e.category] || 0) + 1;
+  const catEntries = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
+
+  summary.push(['Per categorie (snapshot bij export)', 'Blokken', 'Min', 'Uur']);
+  for (const [cat, n] of catEntries) {
+    summary.push([cat, n, n * 15, n * 0.25]);
+  }
+
+  const summaryWs = XLSX.utils.aoa_to_sheet(summary);
+  summaryWs['!cols'] = [{ wch: 32 }, { wch: 11 }, { wch: 11 }, { wch: 11 }];
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, summaryWs, 'Overzicht');
   XLSX.utils.book_append_sheet(wb, detailWs, 'Detail');
 
+  const allCatNames = getCategoryNames();
   const parts = [`${from}_${to}`];
   if (rap.activity) parts.push('act-' + rap.activity.replace(/[^a-z0-9]/gi, '').slice(0, 20));
-  if (rap.categories.length < allCatNames.length) parts.push('cat-' + rap.categories.join('-').replace(/[^a-z0-9-]/gi, ''));
+  if (allCatNames.length && rap.categories.length < allCatNames.length) {
+    parts.push('cat-' + rap.categories.join('-').replace(/[^a-z0-9-]/gi, ''));
+  }
   const filename = `tijdregister_${parts.join('_')}.xlsx`;
 
   XLSX.writeFile(wb, filename);
