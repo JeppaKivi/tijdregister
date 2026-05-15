@@ -1350,25 +1350,35 @@ function syncEnd(err) {
 }
 
 // Initial fetch from Supabase
+async function fetchAllPages(sb, table) {
+  const PAGE = 1000;
+  let rows = [], offset = 0;
+  while (true) {
+    const { data, error } = await sb.from(table).select('*').range(offset, offset + PAGE - 1);
+    if (error) throw error;
+    rows = rows.concat(data || []);
+    if ((data || []).length < PAGE) break;
+    offset += PAGE;
+  }
+  return rows;
+}
+
 async function cloudFetchAll() {
   const sb = await ensureSb();
   syncStart();
   try {
-    const [entriesRes, itemsRes, logRes] = await Promise.all([
-      sb.from('tracker_entries').select('*'),
-      sb.from('checklist_items').select('*'),
-      sb.from('checklist_log').select('*')
+    const [entriesData, itemsData, logData] = await Promise.all([
+      fetchAllPages(sb, 'tracker_entries'),
+      fetchAllPages(sb, 'checklist_items'),
+      fetchAllPages(sb, 'checklist_log')
     ]);
-    if (entriesRes.error) throw entriesRes.error;
-    if (itemsRes.error) throw itemsRes.error;
-    if (logRes.error) throw logRes.error;
 
     // Reset state
     state.entries = {};
     state.activities = {};
     for (const c of state.categories) state.activities[c.name] = [];
 
-    for (const e of entriesRes.data || []) {
+    for (const e of entriesData) {
       if (!state.entries[e.date]) state.entries[e.date] = {};
       state.entries[e.date][e.time] = { category: e.category, activity: e.activity || '', note: e.note || '' };
       if (e.category && e.activity) {
@@ -1378,9 +1388,9 @@ async function cloudFetchAll() {
       }
     }
 
-    cl.items = (itemsRes.data || []).map(r => ({ ...(r.data || {}), id: r.item_id }));
+    cl.items = itemsData.map(r => ({ ...(r.data || {}), id: r.item_id }));
     cl.log = {};
-    for (const l of logRes.data || []) {
+    for (const l of logData) {
       if (!cl.log[l.item_id]) cl.log[l.item_id] = {};
       cl.log[l.item_id][l.date] = l.value;
     }
