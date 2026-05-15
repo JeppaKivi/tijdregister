@@ -558,6 +558,31 @@
   }
   .cl-control button.check.checked { background: var(--c-boek); color: var(--paper); border-color: var(--c-boek); }
   .cl-control button.check:hover { transform: translateY(-1px); }
+  .cl-control button.check-no {
+    height: 32px;
+    min-width: 60px;
+    padding: 0 12px;
+    border: 1px solid var(--rule);
+    background: transparent;
+    color: var(--ink-faint);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-left: 4px;
+    transition: all 0.1s;
+  }
+  .cl-control button.check-no:hover { color: var(--c-inefficient); border-color: var(--c-inefficient); }
+  .cl-control button.check-no.checked { background: var(--c-inefficient); color: var(--paper); border-color: var(--c-inefficient); }
+  .cl-hidden-info {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    font-style: italic;
+    padding: 8px 12px;
+    border-top: 1px dashed var(--rule);
+    margin-top: 8px;
+  }
 
   .cl-control .week-counter {
     font-family: 'JetBrains Mono', monospace;
@@ -1375,16 +1400,14 @@ async function cloudFetchAll() {
 
     // Reset state
     state.entries = {};
-    state.activities = {};
-    for (const c of state.categories) state.activities[c.name] = [];
+    state.activities = { 'Inefficiënt':[], Zelf:[], Boek:[], SMART:[], Bedrijf:[] };
 
     for (const e of entriesData) {
       if (!state.entries[e.date]) state.entries[e.date] = {};
       state.entries[e.date][e.time] = { category: e.category, activity: e.activity || '', note: e.note || '' };
       if (e.category && e.activity) {
-        if (!state.activities[e.category]) state.activities[e.category] = [];
         const list = state.activities[e.category];
-        if (!list.includes(e.activity)) list.push(e.activity);
+        if (list && !list.includes(e.activity)) list.push(e.activity);
       }
     }
 
@@ -1464,18 +1487,74 @@ async function cloudDeleteItem(itemId) {
   syncEnd(r1.error || r2.error);
 }
 
-// Real-time: refetch on any change to my data
+// Real-time: update local state per changed row (no full refetch)
 async function startRealtime() {
   const sb = await ensureSb();
-  sb.channel('user-data')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'tracker_entries' }, () => {
-      cloudFetchAll().then(() => updateView()).catch(()=>{});
+  const existing = sb.getChannels();
+  for (const ch of existing) {
+    try { await sb.removeChannel(ch); } catch(e) {}
+  }
+
+  sb.channel('user-data-v2')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'tracker_entries' }, (payload) => {
+      const e = payload.new; if (!e) return;
+      if (!state.entries[e.date]) state.entries[e.date] = {};
+      state.entries[e.date][e.time] = { category: e.category, activity: e.activity || '', note: e.note || '' };
+      if (e.category && e.activity) {
+        const list = state.activities[e.category];
+        if (list && !list.includes(e.activity)) list.push(e.activity);
+      }
+      updateView();
     })
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'checklist_items' }, () => {
-      cloudFetchAll().then(() => updateView()).catch(()=>{});
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'tracker_entries' }, (payload) => {
+      const e = payload.new; if (!e) return;
+      if (!state.entries[e.date]) state.entries[e.date] = {};
+      state.entries[e.date][e.time] = { category: e.category, activity: e.activity || '', note: e.note || '' };
+      updateView();
     })
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'checklist_log' }, () => {
-      cloudFetchAll().then(() => updateView()).catch(()=>{});
+    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'tracker_entries' }, (payload) => {
+      const e = payload.old; if (!e || !state.entries[e.date]) return;
+      delete state.entries[e.date][e.time];
+      if (Object.keys(state.entries[e.date]).length === 0) delete state.entries[e.date];
+      updateView();
+    })
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'checklist_log' }, (payload) => {
+      const row = payload.new; if (!row) return;
+      if (!cl.log[row.item_id]) cl.log[row.item_id] = {};
+      cl.log[row.item_id][row.date] = row.value;
+      updateView();
+    })
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'checklist_log' }, (payload) => {
+      const row = payload.new; if (!row) return;
+      if (!cl.log[row.item_id]) cl.log[row.item_id] = {};
+      cl.log[row.item_id][row.date] = row.value;
+      updateView();
+    })
+    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'checklist_log' }, (payload) => {
+      const row = payload.old; if (!row || !cl.log[row.item_id]) return;
+      delete cl.log[row.item_id][row.date];
+      if (Object.keys(cl.log[row.item_id]).length === 0) delete cl.log[row.item_id];
+      updateView();
+    })
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'checklist_items' }, (payload) => {
+      const row = payload.new; if (!row) return;
+      const idx = cl.items.findIndex(i => i.id === row.item_id);
+      const newItem = { ...(row.data || {}), id: row.item_id };
+      if (idx >= 0) cl.items[idx] = newItem; else cl.items.push(newItem);
+      updateView();
+    })
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'checklist_items' }, (payload) => {
+      const row = payload.new; if (!row) return;
+      const idx = cl.items.findIndex(i => i.id === row.item_id);
+      const newItem = { ...(row.data || {}), id: row.item_id };
+      if (idx >= 0) cl.items[idx] = newItem; else cl.items.push(newItem);
+      updateView();
+    })
+    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'checklist_items' }, (payload) => {
+      const row = payload.old; if (!row) return;
+      cl.items = cl.items.filter(i => i.id !== row.item_id);
+      delete cl.log[row.item_id];
+      updateView();
     })
     .subscribe();
 }
@@ -2261,6 +2340,7 @@ function getItemValue(itemId, dateStr) {
 }
 function setItemValue(itemId, dateStr, value) {
   if (!cl.log[itemId]) cl.log[itemId] = {};
+  // Wissen: alleen op echt "lege" waarden, NIET op 'nee'
   if (value === null || value === undefined || value === '' || value === 0 || value === false) {
     delete cl.log[itemId][dateStr];
     if (Object.keys(cl.log[itemId]).length === 0) delete cl.log[itemId];
@@ -2274,7 +2354,9 @@ function setItemValue(itemId, dateStr, value) {
 function getDailyStatus(item, dateStr) {
   const v = getItemValue(item.id, dateStr);
   if (item.type === 'DAILY_CHECK' || item.type === 'PERIODIC') {
-    return v === true ? 'hit' : 'pending';
+    if (v === true) return 'hit';
+    if (v === 'nee') return 'miss';
+    return 'pending';
   }
   if (item.type === 'DAILY_VALUE') {
     const actual = Number(v) || 0;
@@ -2374,7 +2456,31 @@ function renderChecklistDay() {
       <span class="count">${items.length} items ${collapsed?'· ingeklapt':''}</span>
     </div>`;
     html += `<div class="cl-items">`;
-    for (const item of items) html += renderClItem(item, dateStr);
+    const isToday = dateStr === fmtDate(new Date());
+    for (const item of items) {
+      const status = getDailyStatus(item, dateStr);
+      let hide = false;
+      if (isToday) {
+        if (item.type === 'DAILY_CHECK' || item.type === 'PERIODIC') {
+          if (status === 'hit' || status === 'miss') hide = true;
+        } else if (item.type === 'DAILY_VALUE') {
+          if (status === 'hit') hide = true;
+        }
+      }
+      if (!hide) html += renderClItem(item, dateStr);
+    }
+    if (isToday) {
+      const allItems = cl.items.filter(i => i.group === g);
+      const hiddenCount = allItems.filter(it => {
+        const st = getDailyStatus(it, dateStr);
+        if (it.type === 'DAILY_CHECK' || it.type === 'PERIODIC') return st === 'hit' || st === 'miss';
+        if (it.type === 'DAILY_VALUE') return st === 'hit';
+        return false;
+      }).length;
+      if (hiddenCount > 0) {
+        html += `<div class="cl-hidden-info">${hiddenCount} voltooid voor vandaag (zie week- of maandoverzicht)</div>`;
+      }
+    }
     html += `<div class="cl-add" data-group="${g}" data-action="add">+ item toevoegen aan ${GROUP_LABELS[g].toLowerCase()}</div>`;
     html += `</div></div>`;
   }
@@ -2431,8 +2537,11 @@ function renderClItem(item, dateStr) {
       <button class="step" data-id="${item.id}" data-act="inc" data-step="${step}">+</button>
       <span class="unit">${item.unit||''}</span>`;
   } else if (item.type === 'DAILY_CHECK') {
-    const checked = v === true;
-    control = `<button class="check ${checked?'checked':''}" data-id="${item.id}" data-act="toggle">${checked?'✓ Gedaan':'☐ Vandaag'}</button>`;
+    const yesActive = v === true;
+    const noActive = v === 'nee';
+    control = `
+      <button class="check ${yesActive?'checked':''}" data-id="${item.id}" data-act="set-ja">${yesActive?'✓ Ja':'Ja'}</button>
+      <button class="check-no ${noActive?'checked':''}" data-id="${item.id}" data-act="set-nee">${noActive?'✗ Nee':'Nee'}</button>`;
   } else if (item.type === 'WEEKLY_LIMIT') {
     const cur = Number(v) || 0;
     const wkStart = startOfWeek(cursor);
@@ -2446,7 +2555,8 @@ function renderClItem(item, dateStr) {
       <button class="step" data-id="${item.id}" data-act="inc" data-step="1">+</button>
       <span class="week-counter ${cls}">${wk.total}/${item.target} wk</span>`;
   } else if (item.type === 'PERIODIC') {
-    const checked = v === true;
+    const yesActive = v === true;
+    const noActive = v === 'nee';
     const last = lastDoneDate(item.id);
     let dueInfo = '';
     let dueCls = '';
@@ -2461,7 +2571,8 @@ function renderClItem(item, dateStr) {
       else dueInfo = `over ${remaining}d`;
     }
     control = `
-      <button class="check ${checked?'checked':''}" data-id="${item.id}" data-act="toggle">${checked?'✓ Vandaag':'☐ Vandaag'}</button>
+      <button class="check ${yesActive?'checked':''}" data-id="${item.id}" data-act="set-ja">${yesActive?'✓ Ja':'Ja'}</button>
+      <button class="check-no ${noActive?'checked':''}" data-id="${item.id}" data-act="set-nee">${noActive?'✗ Nee':'Nee'}</button>
       <span class="due-info ${dueCls}">${dueInfo}</span>`;
   }
   // step -> +/- helper data attribute (so dec=−step, inc=+step) we'll handle in handleClAction
@@ -2483,14 +2594,18 @@ function handleClAction(itemId, act, el) {
   const item = cl.items.find(i => i.id === itemId);
   if (!item) return;
   const dateStr = fmtDate(cursor);
-  const cur = Number(getItemValue(itemId, dateStr)) || 0;
+  const cur = getItemValue(itemId, dateStr);
 
-  if (act === 'toggle') {
-    const v = getItemValue(itemId, dateStr);
-    setItemValue(itemId, dateStr, v === true ? false : true);
+  if (act === 'set-ja') {
+    setItemValue(itemId, dateStr, cur === true ? null : true);
+  } else if (act === 'set-nee') {
+    setItemValue(itemId, dateStr, cur === 'nee' ? null : 'nee');
+  } else if (act === 'toggle') {
+    setItemValue(itemId, dateStr, cur === true ? false : true);
   } else if (act === 'step') {
+    const curNum = Number(cur) || 0;
     const step = parseFloat(el.dataset.step) * parseInt(el.dataset.dir);
-    const next = Math.max(0, +(cur + step).toFixed(2));
+    const next = Math.max(0, +(curNum + step).toFixed(2));
     setItemValue(itemId, dateStr, next);
   }
   renderChecklistDay();
