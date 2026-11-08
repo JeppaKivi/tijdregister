@@ -536,8 +536,8 @@
     .col-time { font-size: 10px; padding: 4px 4px !important; }
     .col-cat { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .day-grid .col-note { display: none !important; }
-    .modal { padding: 16px; }
-    .cat-buttons { grid-template-columns: repeat(3, 1fr); }
+    .modal { padding: 16px; max-height: 88vh; }
+    .cat-buttons { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
     .cat-btn { padding: 10px 4px; font-size: 11px; }
     #month-view td { height: 80px !important; padding: 4px !important; }
     #month-view td > div:first-child { font-size: 10px !important; }
@@ -562,10 +562,13 @@
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     padding: 22px;
-    width: 480px;
+    width: 720px;
     max-width: 94vw;
-    max-height: 90vh;
+    max-height: 85vh;
     overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
   .modal h3 { font-size: 20px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
   .modal .modal-time { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); margin-bottom: 16px; }
@@ -578,9 +581,9 @@
     color: var(--ink-faint);
     margin-bottom: 6px;
   }
-  .cat-buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .cat-buttons { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 6px; }
   .cat-btn {
-    padding: 11px 4px;
+    padding: 10px 6px;
     border: 1px solid var(--line);
     border-radius: var(--radius);
     background: var(--surface);
@@ -590,11 +593,20 @@
     font-size: 12px;
     transition: all 0.1s;
     position: relative;
+    min-width: 0;
+    overflow-wrap: break-word;
   }
   .cat-btn:hover { border-color: var(--navy); }
   .cat-btn.selected { color: #fff; }
   .cat-btn.cat-btn-add { border-style: dashed; color: var(--ink-faint); font-style: italic; font-weight: 400; }
   .cat-btn.cat-btn-add:hover { color: var(--navy); border-color: var(--navy); border-style: solid; }
+  .cat-btn.cat-btn-more {
+    border-style: dashed;
+    color: var(--steel);
+    background: var(--surface-2);
+    font-weight: 500;
+  }
+  .cat-btn.cat-btn-more:hover { color: var(--navy); border-color: var(--navy); }
 
   .activity-input-wrap input {
     width: 100%;
@@ -1262,11 +1274,38 @@ function computeUsage() {
   }
   return usage;
 }
+// Blokken per project, alleen de laatste N dagen
+function computeUsageSince(days) {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - days);
+  const cutStr = fmtDate(cutoff);
+  const usage = {};
+  for (const [date, blocks] of Object.entries(state.entries)) {
+    if (date < cutStr) continue;
+    for (const e of Object.values(blocks)) {
+      const proj = entryProject(e);
+      if (proj) usage[proj] = (usage[proj] || 0) + 1;
+    }
+  }
+  return usage;
+}
+// Splitsing voor het keuzescherm: recent (laatste 30 dagen, meest gebruikt eerst)
+// en de rest (alfabetisch op all-time gebruik), beide zonder gearchiveerde projecten
+function recentFirstProjects() {
+  const recentUsage = computeUsageSince(30);
+  const allUsage = computeUsage();
+  const active = state.projects.filter(p => !p.archived);
+  const recent = active
+    .filter(p => (recentUsage[p.name] || 0) > 0)
+    .sort((a, b) => (recentUsage[b.name] || 0) - (recentUsage[a.name] || 0));
+  const rest = active
+    .filter(p => !((recentUsage[p.name] || 0) > 0))
+    .sort((a, b) => (allUsage[b.name] || 0) - (allUsage[a.name] || 0));
+  return { recent, rest };
+}
 function sortedActiveProjects() {
-  const usage = computeUsage();
-  return state.projects
-    .filter(p => !p.archived)
-    .sort((a, b) => (usage[b.name] || 0) - (usage[a.name] || 0));
+  const { recent, rest } = recentFirstProjects();
+  return [...recent, ...rest];
 }
 function tint(color) { return `color-mix(in srgb, ${color} 14%, white)`; }
 
@@ -1745,19 +1784,49 @@ function renderStats() {
 /* ============================================
    BLOK MODAL
 ============================================ */
+let modalShowAll = false;
+
 function renderProjectButtons() {
   const wrap = document.getElementById('cat-buttons');
   if (!wrap) return;
   wrap.innerHTML = '';
-  for (const p of sortedActiveProjects()) {
+  const { recent, rest } = recentFirstProjects();
+  const selected = modal.draft?.category || '';
+
+  // Het geselecteerde project altijd tonen, ook als het in "overige" zit
+  const selectedInRest = rest.find(p => p.name === selected);
+  const visible = (!modalShowAll && selectedInRest) ? [...recent, selectedInRest] : recent;
+  const hidden = modalShowAll ? [] : rest.filter(p => p.name !== selected);
+
+  const makeBtn = (p) => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'cat-btn';
+    btn.className = 'cat-btn' + (p.name === selected ? ' selected' : '');
     btn.dataset.cat = p.name;
     btn.textContent = p.name;
     btn.addEventListener('click', () => selectProject(p.name));
-    wrap.appendChild(btn);
+    return btn;
+  };
+
+  for (const p of visible) wrap.appendChild(makeBtn(p));
+  if (modalShowAll) for (const p of rest) wrap.appendChild(makeBtn(p));
+
+  if (hidden.length > 0) {
+    const more = document.createElement('button');
+    more.type = 'button';
+    more.className = 'cat-btn cat-btn-more';
+    more.textContent = `overige (${hidden.length}) ▾`;
+    more.addEventListener('click', () => { modalShowAll = true; renderProjectButtons(); });
+    wrap.appendChild(more);
+  } else if (modalShowAll && rest.length > 0) {
+    const less = document.createElement('button');
+    less.type = 'button';
+    less.className = 'cat-btn cat-btn-more';
+    less.textContent = 'minder ▴';
+    less.addEventListener('click', () => { modalShowAll = false; renderProjectButtons(); });
+    wrap.appendChild(less);
   }
+
   const addBtn = document.createElement('button');
   addBtn.type = 'button';
   addBtn.className = 'cat-btn cat-btn-add';
@@ -1790,10 +1859,7 @@ function selectProject(name) {
   if (!modal.draft) return;
   modal.draft.category = name;
   modal.draft.activity = name;
-  document.querySelectorAll('.cat-btn').forEach(b => {
-    if (b.classList.contains('cat-btn-add')) return;
-    b.classList.toggle('selected', b.dataset.cat === name);
-  });
+  renderProjectButtons();
   document.getElementById('note-input').focus();
 }
 
@@ -1803,15 +1869,13 @@ function openModal(dateStr, time) {
   // (oude activiteit, of oude categorienaam als er geen activiteit was)
   const proj = entryProject(entry);
   modal = { date: dateStr, time, draft: { category: proj, activity: proj, note: entry.note || '' } };
+  modalShowAll = false;
 
   const d = parseDate(dateStr);
   document.getElementById('modal-title').textContent = `${time}`;
   document.getElementById('modal-subtitle').textContent = fmtDateLong(d);
 
-  document.querySelectorAll('.cat-btn').forEach(b => {
-    if (b.classList.contains('cat-btn-add')) return;
-    b.classList.toggle('selected', b.dataset.cat === proj);
-  });
+  renderProjectButtons();
   document.getElementById('note-input').value = modal.draft.note;
 
   document.getElementById('modal-backdrop').classList.add('open');
