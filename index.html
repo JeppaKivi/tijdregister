@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Tijdregister</title>
+<title>Tijd</title>
 
 <!-- Supabase configuratie -->
 <script>
@@ -16,12 +16,12 @@
   window.dispatchEvent(new Event('supabase-ready'));
 </script>
 
-<!-- iOS PWA: when added to Home Screen, runs fullscreen with custom icon -->
+<!-- iOS PWA -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Tijdregister">
-<meta name="theme-color" content="#faf7f2">
+<meta name="apple-mobile-web-app-title" content="Tijd">
+<meta name="theme-color" content="#16304F">
 <link rel="apple-touch-icon" sizes="1024x1024" href="tijdregister-app-icon-1024.png">
 <link rel="apple-touch-icon" sizes="512x512" href="tijdregister-app-icon-512.png">
 <link rel="apple-touch-icon" sizes="256x256" href="tijdregister-app-icon-256.png">
@@ -30,163 +30,161 @@
 <link rel="icon" type="image/svg+xml" href="tijdregister-logo-16.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --paper: #faf7f2;
-    --paper-2: #f3ede2;
-    --ink: #1a1614;
-    --ink-soft: #4a423d;
-    --ink-faint: #8b837c;
-    --rule: #d9d1c5;
-    --rule-soft: #e8e0d3;
-
-    --c-inefficient: #b34a35;
-    --c-inefficient-bg: #f0d4cb;
-    --c-zelf: #c97e3a;
-    --c-zelf-bg: #f0dcc1;
-    --c-boek: #5a7a3e;
-    --c-boek-bg: #d8e4c8;
-    --c-smart: #4a7a5e;
-    --c-smart-bg: #cce0d4;
-    --c-bedrijf: #6a8a3e;
-    --c-bedrijf-bg: #dde6c8;
-
-    --shadow: 0 1px 0 rgba(26,22,20,0.04), 0 8px 24px -12px rgba(26,22,20,0.18);
+    --navy: #16304F;
+    --navy-deep: #0E2139;
+    --steel: #42587A;
+    --line: #D4DBE5;
+    --line-soft: #E6EAF0;
+    --bg: #F4F6F9;
+    --surface: #FFFFFF;
+    --surface-2: #F8FAFC;
+    --ink: #1C2530;
+    --ink-faint: #7C8899;
+    --accent: #2E6FD8;
+    --ok: #2E8540;
+    --warn: #C9842A;
+    --err: #B3362C;
+    --mono: ui-monospace, 'SF Mono', Consolas, 'Cascadia Mono', monospace;
+    --radius: 3px;
+    --shadow: 0 1px 2px rgba(14,33,57,0.06), 0 8px 24px -16px rgba(14,33,57,0.25);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   html, body {
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
     font-size: 14px;
     line-height: 1.4;
     -webkit-font-smoothing: antialiased;
   }
 
-  body {
-    min-height: 100vh;
-    background-image:
-      radial-gradient(circle at 20% 10%, rgba(184,133,58,0.04), transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(42,74,107,0.03), transparent 50%);
-  }
-
-  .app {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 32px 40px 80px;
-    padding-top: max(32px, calc(env(safe-area-inset-top) + 16px));
-  }
-
-  /* === HEADER === */
-  header.masthead {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    border-bottom: 2px solid var(--ink);
-    padding-bottom: 16px;
-    margin-bottom: 28px;
-  }
-  .masthead .brand {
+  /* === TOPBAR === */
+  .topbar {
+    background: var(--navy);
+    color: #fff;
+    padding: 0 24px;
+    padding-top: env(safe-area-inset-top);
+    height: calc(52px + env(safe-area-inset-top));
     display: flex;
     align-items: center;
-    gap: 14px;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.08), 0 2px 8px rgba(14,33,57,0.35);
   }
-  .masthead .brand-logo {
-    height: 48px;
-    width: auto;
-    display: block;
+  .topbar .app-name {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
   }
-  .masthead h1 {
-    font-family: 'Fraunces', serif;
-    font-weight: 600;
-    font-size: 38px;
-    letter-spacing: -0.02em;
-    line-height: 1;
+  .topbar .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 12px;
   }
-  .masthead h1 em {
-    font-style: italic;
-    font-weight: 400;
-    color: var(--ink-soft);
+  .sync-status { font-family: var(--mono); font-size: 11px; color: #7FD49B; }
+  .sync-status.syncing { color: #F0C878; }
+  .sync-status.error { color: #F09B8F; }
+  .sync-status.offline { color: rgba(255,255,255,0.5); }
+  .link-btn {
+    background: none; border: none; padding: 0;
+    color: rgba(255,255,255,0.75);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    text-decoration: underline;
+    cursor: pointer;
   }
-  .masthead .meta {
-    text-align: right;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--ink-faint);
+  .link-btn:hover { color: #fff; }
+
+  .app {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 20px 24px 80px;
   }
-  .masthead .meta strong {
-    display: block;
+
+  /* === TABS === */
+  nav.section-nav {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 18px;
+    border-bottom: 2px solid var(--navy);
+  }
+  nav.section-nav button {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-bottom: none;
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding: 10px 26px;
+    font-family: 'Inter', sans-serif;
     font-size: 13px;
-    color: var(--ink);
-    letter-spacing: 0.05em;
-    font-weight: 500;
-    margin-top: 2px;
+    font-weight: 600;
+    color: var(--steel);
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  nav.section-nav button:hover { color: var(--navy); background: var(--surface-2); }
+  nav.section-nav button.active {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: #fff;
   }
 
   /* === CONTROL BAR === */
   .controls {
     display: flex;
     align-items: center;
-    gap: 16px;
-    margin-bottom: 24px;
+    gap: 12px;
+    margin-bottom: 18px;
     flex-wrap: wrap;
   }
   .nav-group, .view-group, .util-group {
     display: flex;
     gap: 0;
-    border: 1px solid var(--ink);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--surface);
   }
   .util-group { margin-left: auto; }
 
-  button.btn, .nav-group button, .view-group button, .util-group button {
-    background: var(--paper);
+  .nav-group button, .view-group button, .util-group button {
+    background: var(--surface);
     border: none;
-    border-right: 1px solid var(--ink);
+    border-right: 1px solid var(--line);
     padding: 8px 14px;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 12px;
     font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ink);
+    color: var(--steel);
     cursor: pointer;
     transition: background 0.12s;
   }
-  .nav-group button:last-child, .view-group button:last-child, .util-group button:last-child {
-    border-right: none;
-  }
-  button.btn:hover, .nav-group button:hover, .view-group button:hover, .util-group button:hover {
-    background: var(--ink);
-    color: var(--paper);
-  }
-  .view-group button.active, .nav-group button.active {
-    background: var(--ink);
-    color: var(--paper);
-  }
+  .nav-group button:last-child, .view-group button:last-child, .util-group button:last-child { border-right: none; }
+  .nav-group button:hover, .view-group button:hover, .util-group button:hover { background: var(--navy); color: #fff; }
+  .view-group button.active { background: var(--navy); color: #fff; }
 
   .date-display {
-    font-family: 'Fraunces', serif;
-    font-size: 22px;
-    font-weight: 500;
-    padding: 0 16px;
-    min-width: 280px;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--navy);
+    padding: 0 10px;
+    min-width: 240px;
   }
-  .date-display .day-name {
-    color: var(--ink-soft);
-    font-style: italic;
-    margin-right: 8px;
-  }
+  .date-display .day-name { color: var(--steel); font-weight: 400; margin-right: 6px; }
 
   input[type="date"] {
-    border: 1px solid var(--ink);
-    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
     padding: 7px 10px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--mono);
     font-size: 12px;
     color: var(--ink);
   }
@@ -195,598 +193,505 @@
   .grid-layout {
     display: grid;
     grid-template-columns: 1fr 320px;
-    gap: 28px;
+    gap: 20px;
     align-items: flex-start;
   }
   @media (max-width: 1100px) {
     .grid-layout { grid-template-columns: 1fr; }
   }
 
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--navy);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  /* === KLEMBORD BAR === */
+  .clipboard-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--navy);
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    font-size: 12px;
+  }
+  .clipboard-bar .cb-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.6); }
+  .clipboard-bar .cb-content { font-weight: 600; }
+  .clipboard-bar button {
+    margin-left: auto;
+    background: rgba(255,255,255,0.12);
+    border: none;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: var(--radius);
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .clipboard-bar button:hover { background: rgba(255,255,255,0.25); }
+
   /* === DAY VIEW === */
   .day-grid {
-    border: 1px solid var(--ink);
-    background: var(--paper);
+    max-height: 72vh;
+    overflow-y: auto;
   }
   .day-grid .row {
     display: grid;
-    grid-template-columns: 60px 100px 1fr 1.2fr;
-    border-bottom: 1px solid var(--rule-soft);
-    min-height: 36px;
+    grid-template-columns: 58px 110px 1fr 1.1fr 64px;
+    border-bottom: 1px solid var(--line-soft);
+    min-height: 34px;
   }
   .day-grid .row:last-child { border-bottom: none; }
-  .day-grid .row.hour-start { border-top: 1px solid var(--rule); }
-  .day-grid .row.now { background: rgba(184,133,58,0.10); }
+  .day-grid .row.hour-start { border-top: 1px solid var(--line); }
+  .day-grid .row.now { background: rgba(46,111,216,0.08); }
 
   .day-grid .row > div {
-    padding: 8px 12px;
+    padding: 7px 10px;
     display: flex;
     align-items: center;
-    border-right: 1px solid var(--rule-soft);
+    border-right: 1px solid var(--line-soft);
   }
   .day-grid .row > div:last-child { border-right: none; }
 
   .col-time {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
+    font-family: var(--mono);
+    font-size: 11px;
     color: var(--ink-faint);
-    background: var(--paper-2);
+    background: var(--surface-2);
+    justify-content: flex-end;
   }
-  .col-cat { font-weight: 500; cursor: pointer; }
+  .col-cat { font-weight: 600; font-size: 12px; cursor: pointer; }
   .col-cat:empty::before { content: '—'; color: var(--ink-faint); font-weight: 400; }
   .col-act { cursor: pointer; }
   .col-act:empty::before { content: 'klik om in te vullen'; color: var(--ink-faint); font-style: italic; font-size: 12px; }
-  .col-note { cursor: pointer; color: var(--ink-soft); font-size: 13px; }
+  .col-note { cursor: pointer; color: var(--steel); font-size: 12px; }
   .col-note:empty::before { content: '+ notitie'; color: var(--ink-faint); opacity: 0.5; font-size: 11px; }
+  .col-actions { gap: 4px; justify-content: flex-end; padding-right: 8px !important; }
 
-  /* Doortrek-tijdvak: klik op het donkergrijze tijdvak om inhoud van vorig kwartier over te nemen */
+  .mini-btn {
+    width: 24px; height: 24px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--steel);
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.1s;
+  }
+  .mini-btn:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .mini-btn.paste { border-color: var(--accent); color: var(--accent); }
+  .mini-btn.paste:hover { background: var(--accent); color: #fff; }
+
+  /* Doortrek-tijdvak: klik op donker tijdvak om vorig kwartier over te nemen */
   .col-time.can-copy {
-    background: #4a423d;
-    color: #faf7f2;
+    background: var(--steel);
+    color: #fff;
     cursor: pointer;
     transition: background 0.12s;
   }
-  .col-time.can-copy:hover { background: #1a1614; }
-
-  .day-grid .row[data-cat="Inefficiënt"] .col-cat { background: var(--c-inefficient-bg); color: var(--c-inefficient); }
-  .day-grid .row[data-cat="Zelf"] .col-cat { background: var(--c-zelf-bg); color: var(--c-zelf); }
-  .day-grid .row[data-cat="Boek"] .col-cat { background: var(--c-boek-bg); color: var(--c-boek); }
-  .day-grid .row[data-cat="SMART"] .col-cat { background: var(--c-smart-bg); color: var(--c-smart); }
-  .day-grid .row[data-cat="Bedrijf"] .col-cat { background: var(--c-bedrijf-bg); color: var(--c-bedrijf); }
+  .col-time.can-copy:hover { background: var(--navy); }
 
   /* === WEEK VIEW === */
-  .week-grid {
-    border: 1px solid var(--ink);
-    background: var(--paper);
-    overflow-x: auto;
-  }
+  .week-grid { max-height: 72vh; overflow: auto; }
   .week-grid table {
     width: 100%;
     border-collapse: collapse;
     font-size: 11px;
   }
   .week-grid th, .week-grid td {
-    border-right: 1px solid var(--rule-soft);
-    border-bottom: 1px solid var(--rule-soft);
+    border-right: 1px solid var(--line-soft);
+    border-bottom: 1px solid var(--line-soft);
     padding: 4px 6px;
     text-align: left;
     vertical-align: top;
-    height: 28px;
+    height: 26px;
     min-width: 110px;
   }
   .week-grid th {
-    background: var(--paper-2);
-    border-bottom: 2px solid var(--ink);
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-weight: 500;
-    font-size: 13px;
+    background: var(--surface-2);
+    border-bottom: 2px solid var(--navy);
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--navy);
+    position: sticky;
+    top: 0;
+    z-index: 2;
   }
   .week-grid th.col-time-h, .week-grid td.col-time-h {
-    min-width: 50px;
-    width: 50px;
-    font-family: 'JetBrains Mono', monospace;
+    min-width: 48px;
+    width: 48px;
+    font-family: var(--mono);
     font-size: 10px;
     color: var(--ink-faint);
-    background: var(--paper-2);
+    background: var(--surface-2);
+    text-align: right;
   }
   .week-grid td.cell { cursor: pointer; }
-  .week-grid td.cell:hover { outline: 2px solid var(--ink); outline-offset: -2px; }
-  .week-grid td.hour-mark { border-top: 1px solid var(--rule); }
-  .week-grid td.now-cell { box-shadow: inset 0 0 0 2px var(--c-bedrijf); }
-
-  .week-grid td[data-cat="Inefficiënt"] { background: var(--c-inefficient-bg); color: var(--c-inefficient); font-weight: 500; }
-  .week-grid td[data-cat="Zelf"] { background: var(--c-zelf-bg); color: var(--c-zelf); font-weight: 500; }
-  .week-grid td[data-cat="Boek"] { background: var(--c-boek-bg); color: var(--c-boek); font-weight: 500; }
-  .week-grid td[data-cat="SMART"] { background: var(--c-smart-bg); color: var(--c-smart); font-weight: 500; }
-  .week-grid td[data-cat="Bedrijf"] { background: var(--c-bedrijf-bg); color: var(--c-bedrijf); font-weight: 500; }
-
-  .week-grid th.today { background: var(--ink); color: var(--paper); }
+  .week-grid td.cell:hover { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .week-grid td.hour-mark { border-top: 1px solid var(--line); }
+  .week-grid td.now-cell { box-shadow: inset 0 0 0 2px var(--accent); }
+  .week-grid th.today { background: var(--navy); color: #fff; }
 
   /* === STATS PANEL === */
-  .stats {
-    border: 1px solid var(--ink);
-    padding: 20px;
-    background: var(--paper);
-  }
+  .stats { padding: 18px; }
   .stats h2 {
-    font-family: 'Fraunces', serif;
-    font-size: 16px;
-    font-weight: 500;
-    font-style: italic;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--navy);
     margin-bottom: 12px;
     padding-bottom: 8px;
-    border-bottom: 1px solid var(--rule);
+    border-bottom: 1px solid var(--line);
   }
   .stats .scope {
     display: flex;
-    border: 1px solid var(--ink);
-    margin-bottom: 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 14px;
   }
   .stats .scope button {
     flex: 1;
-    background: var(--paper);
+    background: var(--surface);
     border: none;
-    border-right: 1px solid var(--ink);
+    border-right: 1px solid var(--line);
     padding: 6px;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    font-weight: 500;
     cursor: pointer;
-    color: var(--ink);
+    color: var(--steel);
   }
   .stats .scope button:last-child { border-right: none; }
-  .stats .scope button.active { background: var(--ink); color: var(--paper); }
+  .stats .scope button.active { background: var(--navy); color: #fff; }
 
-  .stat-bar {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px dashed var(--rule);
-  }
+  .stat-bar { padding: 8px 0; border-bottom: 1px dashed var(--line-soft); }
   .stat-bar:last-of-type { border-bottom: none; }
-  .stat-bar .label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 500;
-  }
-  .stat-bar .swatch {
-    width: 10px;
-    height: 10px;
-    border-radius: 1px;
-  }
-  .stat-bar .value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-  }
-  .stat-bar .value .min {
-    color: var(--ink-faint);
-    font-size: 11px;
-    margin-left: 4px;
-  }
+  .stat-bar .label { display: flex; align-items: center; gap: 8px; font-weight: 500; font-size: 13px; }
+  .stat-bar .swatch { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+  .stat-bar .value { font-family: var(--mono); font-size: 12px; }
+  .stat-bar .value .min { color: var(--ink-faint); font-size: 10px; margin-left: 4px; }
 
   .stat-total {
-    margin-top: 16px;
-    padding-top: 12px;
-    border-top: 2px solid var(--ink);
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 2px solid var(--navy);
     display: flex;
     justify-content: space-between;
     align-items: baseline;
   }
-  .stat-total .label {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-size: 14px;
-  }
-  .stat-total .value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 16px;
-    font-weight: 500;
-  }
+  .stat-total .label { font-size: 12px; font-weight: 600; color: var(--navy); }
+  .stat-total .value { font-family: var(--mono); font-size: 14px; font-weight: 600; }
 
-  /* progress bar */
-  .bar-track {
-    height: 4px;
-    background: var(--rule-soft);
-    border-radius: 2px;
-    margin-top: 4px;
-    overflow: hidden;
-  }
-  .bar-fill {
-    height: 100%;
-    transition: width 0.3s;
-  }
-  .bar-fill.inefficient { background: var(--c-inefficient); }
-  .bar-fill.zelf { background: var(--c-zelf); }
-  .bar-fill.boek { background: var(--c-boek); }
-  .bar-fill.smart { background: var(--c-smart); }
-  .bar-fill.bedrijf { background: var(--c-bedrijf); }
+  .bar-track { height: 4px; background: var(--line-soft); border-radius: 2px; margin-top: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; transition: width 0.3s; }
 
-  /* === SECTION NAV (Tracker vs Checklist) === */
-  nav.section-nav {
-    display: flex;
-    gap: 0;
-    margin-bottom: 24px;
-    border-bottom: 1px solid var(--rule);
-  }
-  nav.section-nav button {
-    background: transparent;
-    border: none;
-    border-bottom: 3px solid transparent;
-    padding: 12px 22px;
-    font-family: 'Fraunces', serif;
-    font-size: 17px;
-    font-weight: 500;
-    color: var(--ink-faint);
-    cursor: pointer;
-    transition: all 0.15s;
-    margin-bottom: -1px;
-  }
-  nav.section-nav button:hover { color: var(--ink); }
-  nav.section-nav button.active {
-    color: var(--ink);
-    border-bottom-color: var(--ink);
-  }
-
-  /* === CHECKLIST: DAY VIEW === */
-  .cl-day {
+  /* === ANALYSE === */
+  .ana-filters {
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: 14px;
+    padding: 18px 20px;
+    margin-bottom: 18px;
   }
-  .cl-group {
-    border: 1px solid var(--ink);
-    background: var(--paper);
-  }
-  .cl-group-header {
-    padding: 14px 18px;
-    border-bottom: 2px solid var(--ink);
-    background: var(--paper-2);
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    cursor: pointer;
-    user-select: none;
-  }
-  .cl-group-header h3 {
-    font-family: 'Fraunces', serif;
-    font-size: 20px;
-    font-weight: 500;
-    font-style: italic;
-  }
-  .cl-group-header .count {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--ink-faint);
+  .ana-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end; }
+  .ana-field { display: flex; flex-direction: column; gap: 6px; min-width: 160px; }
+  .ana-field.ana-grow { flex: 1; min-width: 240px; }
+  .ana-field label {
+    font-family: var(--mono);
+    font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-  }
-  .cl-group.collapsed .cl-items { display: none; }
-  .cl-items { display: flex; flex-direction: column; }
-
-  .cl-item {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 12px;
-    align-items: center;
-    padding: 14px 18px;
-    border-bottom: 1px solid var(--rule-soft);
-  }
-  .cl-item:last-child { border-bottom: none; }
-  .cl-item .info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-  .cl-item .name {
-    font-weight: 500;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .cl-item .target {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
     color: var(--ink-faint);
   }
-  .cl-item .penalty {
-    font-style: italic;
-    color: var(--c-inefficient);
-    font-size: 11px;
-    margin-top: 2px;
-  }
-
-  .status-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--rule);
-    flex-shrink: 0;
-  }
-  .status-dot.hit { background: var(--c-boek); }
-  .status-dot.partial { background: var(--c-zelf); }
-  .status-dot.miss { background: var(--c-inefficient); }
-
-  .cl-control {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .cl-control button.step {
-    width: 32px;
-    height: 32px;
-    border: 1px solid var(--ink);
-    background: var(--paper);
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 16px;
-    font-weight: 500;
-  }
-  .cl-control button.step:hover { background: var(--ink); color: var(--paper); }
-  .cl-control input.value {
-    width: 60px;
-    height: 32px;
-    border: 1px solid var(--ink);
-    background: var(--paper);
-    text-align: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
+  .ana-field input[type="text"],
+  .ana-field input[type="date"],
+  .ana-field select {
+    padding: 9px 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
     color: var(--ink);
-    padding: 0 4px;
-  }
-  .cl-control .unit {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--ink-faint);
-    min-width: 40px;
-  }
-
-  .cl-control button.check {
-    height: 32px;
-    min-width: 90px;
-    padding: 0 16px;
-    border: 1px solid var(--ink);
-    background: var(--paper);
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 13px;
-    font-weight: 500;
-    transition: all 0.1s;
   }
-  .cl-control button.check.checked { background: var(--c-boek); color: var(--paper); border-color: var(--c-boek); }
-  .cl-control button.check:hover { transform: translateY(-1px); }
-  .cl-control button.check-no {
-    height: 32px;
-    min-width: 60px;
-    padding: 0 12px;
-    border: 1px solid var(--rule);
-    background: transparent;
-    color: var(--ink-faint);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
+  .ana-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ana-pill {
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
     cursor: pointer;
-    margin-left: 4px;
-    transition: all 0.1s;
-  }
-  .cl-control button.check-no:hover { color: var(--c-inefficient); border-color: var(--c-inefficient); }
-  .cl-control button.check-no.checked { background: var(--c-inefficient); color: var(--paper); border-color: var(--c-inefficient); }
-  .cl-hidden-info {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--ink-faint);
-    font-style: italic;
-    padding: 8px 12px;
-    border-top: 1px dashed var(--rule);
-    margin-top: 8px;
-  }
-
-  .cl-control .week-counter {
-    font-family: 'JetBrains Mono', monospace;
     font-size: 12px;
-    color: var(--ink-soft);
-    padding: 4px 8px;
-    background: var(--paper-2);
-    border: 1px solid var(--rule);
-    min-width: 60px;
-    text-align: center;
-  }
-  .cl-control .week-counter.over { background: var(--c-inefficient-bg); color: var(--c-inefficient); border-color: var(--c-inefficient); }
-  .cl-control .week-counter.warning { background: var(--c-zelf-bg); color: var(--c-zelf); border-color: var(--c-zelf); }
-  .cl-control .week-counter.ok { background: var(--c-boek-bg); color: var(--c-boek); border-color: var(--c-boek); }
-
-  .cl-control .due-info {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--ink-soft);
-    text-align: right;
-  }
-  .cl-control .due-info.overdue { color: var(--c-inefficient); }
-  .cl-control .due-info.due-soon { color: var(--c-zelf); }
-
-  .cl-item-edit {
-    margin-left: 4px;
-    background: transparent;
-    border: 1px solid var(--rule);
-    width: 24px;
-    height: 24px;
-    cursor: pointer;
-    font-size: 11px;
+    font-weight: 500;
+    user-select: none;
+    background: var(--surface);
     color: var(--ink-faint);
   }
-  .cl-item-edit:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-
-  .cl-add {
-    padding: 14px 18px;
-    border-top: 1px dashed var(--rule);
-    background: var(--paper-2);
-    text-align: center;
+  .ana-pill.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .ana-export-btn, .btn-navy {
+    padding: 9px 18px;
+    background: var(--navy);
+    color: #fff;
+    border: 1px solid var(--navy);
+    border-radius: var(--radius);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
     cursor: pointer;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
+  }
+  .ana-export-btn:hover, .btn-navy:hover { background: var(--navy-deep); }
+
+  .ana-totals {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .ana-totals .stat-card {
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--navy);
+    border-radius: var(--radius);
+  }
+  .ana-totals .stat-label {
+    font-family: var(--mono);
+    font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--ink-faint);
+    margin-bottom: 4px;
   }
-  .cl-add:hover { background: var(--ink); color: var(--paper); }
+  .ana-totals .stat-value { font-size: 24px; font-weight: 700; color: var(--navy); line-height: 1.1; }
 
-  /* === CHECKLIST: WEEK VIEW === */
-  .cl-week {
-    border: 1px solid var(--ink);
-    background: var(--paper);
-    overflow-x: auto;
+  .ana-meta { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); margin-bottom: 16px; }
+
+  .ana-charts {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
   }
-  .cl-week table {
+  @media (max-width: 900px) { .ana-charts { grid-template-columns: 1fr; } }
+  .chart-card { padding: 16px; }
+  .chart-card h3 {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--navy);
+    margin-bottom: 10px;
+  }
+  .chart-wrap { position: relative; height: 280px; }
+
+  .ana-results h3 {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--navy);
+    margin: 22px 0 8px;
+  }
+  .ana-results table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 12px;
+    font-size: 13px;
+    background: var(--surface);
+    border: 1px solid var(--line);
   }
-  .cl-week th, .cl-week td {
-    border-right: 1px solid var(--rule-soft);
-    border-bottom: 1px solid var(--rule-soft);
-    padding: 8px 6px;
-    text-align: center;
-    vertical-align: middle;
-  }
-  .cl-week th {
-    background: var(--paper-2);
-    border-bottom: 2px solid var(--ink);
-    font-family: 'JetBrains Mono', monospace;
+  .ana-results th {
+    text-align: left;
+    padding: 8px 12px;
+    font-family: var(--mono);
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: var(--ink-soft);
-  }
-  .cl-week th.today { background: var(--ink); color: var(--paper); }
-  .cl-week th.col-name, .cl-week td.col-name {
-    text-align: left;
-    padding-left: 14px;
-    min-width: 180px;
-    max-width: 240px;
-    font-family: 'DM Sans', sans-serif;
-  }
-  .cl-week td.col-name {
-    font-weight: 500;
-    font-size: 12px;
-  }
-  .cl-week td.col-name .target-sub {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
     color: var(--ink-faint);
-    font-weight: 400;
+    background: var(--surface-2);
+    border-bottom: 2px solid var(--navy);
   }
-  .cl-week tr.group-row td {
-    background: var(--paper-2);
-    text-align: left;
-    padding: 8px 14px;
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-size: 13px;
-    border-bottom: 2px solid var(--rule);
-    border-top: 2px solid var(--rule);
-  }
-  .cl-week td.day-cell { font-family: 'JetBrains Mono', monospace; font-size: 11px; min-width: 50px; }
-  .cl-week td.day-cell.hit { background: var(--c-boek-bg); color: var(--c-boek); font-weight: 500; }
-  .cl-week td.day-cell.partial { background: var(--c-zelf-bg); color: var(--c-zelf); }
-  .cl-week td.day-cell.miss { background: var(--c-inefficient-bg); color: var(--c-inefficient); }
-  .cl-week td.summary {
-    text-align: right;
-    padding-right: 14px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    min-width: 110px;
-    background: var(--paper-2);
-    border-left: 2px solid var(--ink);
-    font-weight: 500;
-  }
-  .cl-week td.summary.ok { color: var(--c-boek); }
-  .cl-week td.summary.warning { color: var(--c-zelf); }
-  .cl-week td.summary.miss { color: var(--c-inefficient); }
+  .ana-results td { padding: 7px 12px; border-bottom: 1px solid var(--line-soft); }
+  .ana-results tr:hover td { background: var(--surface-2); }
+  .ana-results .num { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--mono); font-size: 12px; }
+  .ana-empty { text-align: center; padding: 60px 20px; color: var(--ink-faint); font-style: italic; }
 
-  /* === CHECKLIST: MONTH VIEW === */
-  .cl-month {
-    border: 1px solid var(--ink);
-    background: var(--paper);
+  /* === MOBILE === */
+  @media (max-width: 700px) {
+    .app { padding: 14px 12px 60px; }
+    .topbar { padding-left: 14px; padding-right: 14px; }
+    nav.section-nav button { padding: 9px 18px; font-size: 12px; }
+    .controls { gap: 8px; }
+    .controls > * { font-size: 11px; }
+    .date-display { font-size: 15px; min-width: 0; padding: 4px 6px; flex: 1 1 100%; order: 99; }
+    .util-group { margin-left: 0; }
+    .day-grid .row { grid-template-columns: 48px 80px 1fr 52px; min-height: 30px; }
+    .day-grid .row > div { padding: 4px 6px; font-size: 12px; }
+    .col-time { font-size: 10px; padding: 4px 4px !important; }
+    .col-cat { font-size: 11px; }
+    .col-act { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .day-grid .col-note { display: none !important; }
+    .modal { padding: 16px; }
+    .cat-buttons { grid-template-columns: repeat(3, 1fr); }
+    .cat-btn { padding: 10px 4px; font-size: 11px; }
+    #month-view td { height: 80px !important; padding: 4px !important; }
+    #month-view td > div:first-child { font-size: 10px !important; }
   }
-  .cl-month-row {
-    display: grid;
-    grid-template-columns: 1fr auto auto auto;
-    gap: 16px;
-    padding: 12px 18px;
-    border-bottom: 1px solid var(--rule-soft);
+
+  /* === MODAL === */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(14,33,57,0.5);
+    display: none;
     align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 16px;
   }
-  .cl-month-row:last-child { border-bottom: none; }
-  .cl-month-row.group-header {
-    background: var(--paper-2);
-    border-bottom: 2px solid var(--ink);
-    border-top: 2px solid var(--rule);
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-top: 4px solid var(--navy);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 22px;
+    width: 480px;
+    max-width: 94vw;
+    max-height: 90vh;
+    overflow-y: auto;
   }
-  .cl-month-row.group-header h3 {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-weight: 500;
-    font-size: 16px;
-  }
-  .cl-month-row.group-header .col-h {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ink-faint);
-    text-align: right;
-  }
-  .cl-month-row .name { font-weight: 500; }
-  .cl-month-row .target-sub {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    color: var(--ink-faint);
-    margin-left: 8px;
-  }
-  .cl-month-row .stat {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    text-align: right;
-    min-width: 80px;
-  }
-  .cl-month-row .stat.label {
-    font-size: 10px;
-    color: var(--ink-faint);
-  }
-
-  /* === ITEM EDIT MODAL === */
-  .item-modal-section { margin-bottom: 14px; }
-  .item-modal-section label {
-    display: block;
-    font-family: 'JetBrains Mono', monospace;
+  .modal h3 { font-size: 20px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+  .modal .modal-time { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); margin-bottom: 16px; }
+  .modal-section { margin-bottom: 16px; }
+  .modal-label {
+    font-family: var(--mono);
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--ink-faint);
     margin-bottom: 6px;
   }
-  .item-modal-section input, .item-modal-section select {
+  .cat-buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .cat-btn {
+    padding: 11px 4px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    transition: all 0.1s;
+    position: relative;
+  }
+  .cat-btn:hover { border-color: var(--navy); }
+  .cat-btn.selected { color: #fff; }
+  .cat-btn.cat-btn-add { border-style: dashed; color: var(--ink-faint); font-style: italic; font-weight: 400; }
+  .cat-btn.cat-btn-add:hover { color: var(--navy); border-color: var(--navy); border-style: solid; }
+
+  .activity-input-wrap input {
     width: 100%;
-    padding: 9px 12px;
-    border: 1px solid var(--ink);
-    background: var(--paper);
-    font-family: 'DM Sans', sans-serif;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    font-family: 'Inter', sans-serif;
     font-size: 14px;
     color: var(--ink);
   }
-  .item-modal-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+  .activity-input-wrap input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+
+  .suggestions { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+  .suggestion-chip {
+    padding: 4px 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.1s;
   }
+  .suggestion-chip:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+  .modal-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+  .modal-actions button {
+    padding: 9px 18px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--steel);
+  }
+  .modal-actions button.primary { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .modal-actions button.primary:hover { background: var(--navy-deep); }
+  .modal-actions button.danger { color: var(--err); border-color: var(--err); margin-left: auto; }
+
+  /* === PROJECTEN BEHEER === */
+  .proj-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .proj-row:last-child { border-bottom: none; }
+  .proj-row .swatch { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; }
+  .proj-row .proj-name { font-weight: 600; flex: 1; }
+  .proj-row.archived .proj-name { color: var(--ink-faint); font-weight: 400; text-decoration: line-through; }
+  .proj-row button {
+    padding: 4px 10px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    font-size: 11px;
+    cursor: pointer;
+    color: var(--steel);
+  }
+  .proj-row button:hover { border-color: var(--navy); color: var(--navy); }
+  .proj-note { font-size: 11px; color: var(--ink-faint); margin-top: 12px; line-height: 1.5; }
+
+  /* === TOAST === */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--navy);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    box-shadow: var(--shadow);
+    z-index: 200;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
 
   /* === LOGIN OVERLAY === */
   .auth-overlay {
     position: fixed; inset: 0;
-    background: var(--paper);
+    background: var(--bg);
     display: flex; align-items: center; justify-content: center;
     z-index: 10000;
     padding: 20px;
@@ -794,28 +699,18 @@
   .auth-overlay.hidden { display: none; }
   .auth-card {
     width: 100%; max-width: 420px;
-    border: 1px solid var(--ink);
-    background: var(--paper);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-top: 4px solid var(--navy);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
     padding: 36px 32px;
   }
-  .auth-brand h1 {
-    font-family: 'Fraunces', serif;
-    font-size: 36px;
-    font-weight: 500;
-    font-style: italic;
-    margin: 0 0 4px;
-  }
-  .auth-brand .subtitle {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--ink-faint);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin: 0 0 28px;
-  }
+  .auth-brand h1 { font-size: 32px; font-weight: 700; color: var(--navy); margin: 0 0 4px; }
+  .auth-brand .subtitle { font-size: 12px; color: var(--ink-faint); margin: 0 0 26px; }
   .auth-card label {
     display: block;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--mono);
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -825,423 +720,58 @@
   .auth-card input {
     width: 100%;
     padding: 12px 14px;
-    border: 1px solid var(--ink);
-    background: var(--paper);
-    font-family: 'DM Sans', sans-serif;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    font-family: 'Inter', sans-serif;
     font-size: 16px;
     color: var(--ink);
     margin-bottom: 14px;
-    box-sizing: border-box;
   }
-  .auth-card input:focus { outline: 2px solid var(--c-bedrijf); outline-offset: -1px; }
-  .auth-card #auth-code {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 22px;
-    letter-spacing: 0.18em;
-    text-align: center;
-  }
+  .auth-card input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .auth-card #auth-code { font-family: var(--mono); font-size: 22px; letter-spacing: 0.18em; text-align: center; }
   .auth-primary {
     width: 100%;
     padding: 13px;
-    background: var(--ink);
-    color: var(--paper);
-    border: 1px solid var(--ink);
-    font-family: 'DM Sans', sans-serif;
+    background: var(--navy);
+    color: #fff;
+    border: 1px solid var(--navy);
+    border-radius: var(--radius);
+    font-family: 'Inter', sans-serif;
     font-size: 14px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    font-weight: 600;
     cursor: pointer;
     margin-bottom: 8px;
   }
-  .auth-primary:hover { background: var(--ink-soft); }
+  .auth-primary:hover { background: var(--navy-deep); }
   .auth-primary:disabled { opacity: 0.5; cursor: not-allowed; }
   .auth-secondary {
     width: 100%;
     padding: 10px;
     background: transparent;
     color: var(--ink-faint);
-    border: 1px solid var(--rule);
-    font-family: 'DM Sans', sans-serif;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
     font-size: 12px;
     cursor: pointer;
   }
-  .auth-secondary:hover { color: var(--ink); border-color: var(--ink); }
-  .auth-hint {
-    font-size: 12px;
-    color: var(--ink-faint);
-    margin-top: 12px;
-    line-height: 1.4;
-  }
-  .auth-confirm {
-    font-size: 13px;
-    color: var(--ink-soft);
-    margin-bottom: 18px;
-    line-height: 1.5;
-  }
+  .auth-secondary:hover { color: var(--navy); border-color: var(--navy); }
+  .auth-hint { font-size: 12px; color: var(--ink-faint); margin-top: 12px; line-height: 1.4; }
+  .auth-confirm { font-size: 13px; color: var(--steel); margin-bottom: 18px; line-height: 1.5; }
   .auth-status {
-    margin-top: 16px;
+    margin-top: 14px;
     padding: 10px 12px;
-    font-family: 'JetBrains Mono', monospace;
+    border-radius: var(--radius);
+    font-family: var(--mono);
     font-size: 12px;
     min-height: 18px;
   }
-  .auth-status.error { background: var(--c-inefficient-bg); color: var(--c-inefficient); }
-  .auth-status.success { background: var(--c-boek-bg); color: var(--c-boek); }
-  .auth-status.info { background: var(--paper-2); color: var(--ink-soft); }
+  .auth-status.error { background: #F7DEDA; color: var(--err); }
+  .auth-status.success { background: #DCEEE1; color: var(--ok); }
+  .auth-status.info { background: var(--surface-2); color: var(--steel); }
 
-  /* === USER INFO IN MASTHEAD === */
-  .user-info { font-size: 11px; color: var(--ink-faint); }
-  .link-btn {
-    background: none; border: none; padding: 0;
-    color: var(--ink-faint);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    text-decoration: underline;
-    cursor: pointer;
-  }
-  .link-btn:hover { color: var(--c-inefficient); }
-  .sync-status {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--c-boek);
-  }
-  .sync-status.syncing { color: var(--c-zelf); }
-  .sync-status.error { color: var(--c-inefficient); }
-  .sync-status.offline { color: var(--ink-faint); }
+  .hint { font-size: 11px; color: var(--ink-faint); font-family: var(--mono); margin-top: 20px; }
 
-  /* === RAPPORTAGE === */
-  .rap-filters {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 20px 24px;
-    border: 1px solid var(--rule);
-    background: var(--paper-2);
-    margin-bottom: 24px;
-  }
-  .rap-row {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-    align-items: flex-end;
-  }
-  .rap-field {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    min-width: 160px;
-  }
-  .rap-field.rap-grow { flex: 1; min-width: 240px; }
-  .rap-field label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ink-faint);
-  }
-  .rap-field input[type="text"],
-  .rap-field input[type="date"],
-  .rap-field select {
-    padding: 10px 12px;
-    border: 1px solid var(--ink);
-    background: var(--paper);
-    color: var(--ink);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    box-sizing: border-box;
-  }
-  .rap-cats {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-  .rap-cat-pill {
-    padding: 6px 12px;
-    border: 1px solid var(--rule);
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    user-select: none;
-    background: var(--paper);
-    color: var(--ink-faint);
-  }
-  .rap-cat-pill.active {
-    background: var(--ink);
-    color: var(--paper);
-    border-color: var(--ink);
-  }
-  .rap-export-btn {
-    padding: 10px 18px;
-    background: var(--ink);
-    color: var(--paper);
-    border: 1px solid var(--ink);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-  }
-  .rap-export-btn:hover { background: var(--ink-soft); }
-  .rap-totals {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 12px;
-    margin-bottom: 24px;
-  }
-  .rap-totals .stat-card {
-    padding: 14px 16px;
-    border: 1px solid var(--ink);
-    background: var(--paper);
-  }
-  .rap-totals .stat-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ink-faint);
-    margin-bottom: 4px;
-  }
-  .rap-totals .stat-value {
-    font-family: 'Fraunces', serif;
-    font-size: 26px;
-    font-weight: 500;
-    line-height: 1.1;
-  }
-  .rap-meta {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--ink-faint);
-    margin-bottom: 20px;
-  }
-  .rap-results h3 {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-size: 18px;
-    font-weight: 400;
-    margin: 24px 0 8px;
-  }
-  .rap-results table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-  }
-  .rap-results th {
-    text-align: left;
-    padding: 8px 12px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ink-faint);
-    border-bottom: 1px solid var(--ink);
-  }
-  .rap-results td {
-    padding: 8px 12px;
-    border-bottom: 1px solid var(--rule);
-  }
-  .rap-results tr:hover td { background: var(--paper-2); }
-  .rap-results .num { text-align: right; font-variant-numeric: tabular-nums; }
-  .rap-empty {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--ink-faint);
-    font-style: italic;
-  }
-
-  /* === MOBILE RESPONSIVE === */
-  @media (max-width: 700px) {
-    .app { padding: 18px 14px 60px; }
-    .masthead { flex-direction: column; align-items: flex-start; gap: 8px; }
-    .masthead h1 { font-size: 24px; }
-    .masthead .brand { gap: 10px; }
-    .masthead .brand-logo { height: 36px; }
-    .masthead .meta { text-align: left; }
-    nav.section-nav button { padding: 10px 16px; font-size: 15px; }
-    .controls { gap: 8px; }
-    .controls > * { font-size: 11px; }
-    .date-display { font-size: 17px; min-width: 0; padding: 4px 8px; flex: 1 1 100%; order: 99; }
-    .util-group { margin-left: 0; }
-
-    /* Mobiel: app iets meer ademruimte ook horizontaal */
-    .app { padding-left: 12px; padding-right: 12px; }
-
-    /* Day view tracker: tijd + categorie + omschrijving op 1 regel, notitie verborgen */
-    .day-grid .row { grid-template-columns: 50px 78px 1fr; min-height: 30px; }
-    .day-grid .row > div { padding: 4px 6px; font-size: 12px; }
-    .col-time { font-size: 11px; padding: 4px 4px !important; }
-    .col-cat { font-size: 11px; }
-    .col-act { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .day-grid .col-note { display: none !important; }
-
-    /* Checklist day items: stack control under info on mobile */
-    .cl-item { grid-template-columns: 1fr; }
-    .cl-control { justify-content: flex-start; flex-wrap: wrap; }
-
-    /* Modal */
-    .modal { padding: 18px; }
-    .cat-buttons { grid-template-columns: repeat(3, 1fr); }
-    .cat-btn { padding: 10px 4px; font-size: 11px; }
-
-    /* Month view: smaller cells */
-    #month-view td { height: 80px !important; padding: 4px !important; }
-    #month-view td > div:first-child { font-size: 10px !important; }
-  }
-
-  /* === MODAL === */
-  .modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(26,22,20,0.4);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-  }
-  .modal-backdrop.open { display: flex; }
-  .modal {
-    background: var(--paper);
-    border: 1px solid var(--ink);
-    box-shadow: var(--shadow);
-    padding: 24px;
-    width: 480px;
-    max-width: 90vw;
-  }
-  .modal h3 {
-    font-family: 'Fraunces', serif;
-    font-size: 22px;
-    font-weight: 500;
-    margin-bottom: 4px;
-  }
-  .modal .modal-time {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: var(--ink-faint);
-    margin-bottom: 18px;
-  }
-  .modal-section { margin-bottom: 18px; }
-  .modal-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--ink-faint);
-    margin-bottom: 6px;
-  }
-  .cat-buttons {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 6px;
-  }
-  .cat-btn {
-    padding: 12px 4px;
-    border: 1px solid var(--ink);
-    background: var(--paper);
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    font-size: 12px;
-    transition: all 0.1s;
-  }
-  .cat-btn:hover { transform: translateY(-1px); }
-  .cat-btn.selected { color: var(--paper); }
-  .cat-btn[data-cat="Inefficiënt"].selected { background: var(--c-inefficient); border-color: var(--c-inefficient); }
-  .cat-btn[data-cat="Zelf"].selected { background: var(--c-zelf); border-color: var(--c-zelf); }
-  .cat-btn[data-cat="Boek"].selected { background: var(--c-boek); border-color: var(--c-boek); }
-  .cat-btn[data-cat="SMART"].selected { background: var(--c-smart); border-color: var(--c-smart); }
-  .cat-btn[data-cat="Bedrijf"].selected { background: var(--c-bedrijf); border-color: var(--c-bedrijf); }
-
-  .cat-btn.cat-btn-add {
-    border-style: dashed;
-    color: var(--ink-faint);
-    font-style: italic;
-  }
-  .cat-btn.cat-btn-add:hover {
-    color: var(--ink);
-    border-color: var(--ink);
-    border-style: solid;
-  }
-  .cat-btn .cat-remove {
-    display: none;
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    width: 16px;
-    height: 16px;
-    border: none;
-    background: rgba(0,0,0,0.1);
-    color: var(--ink);
-    font-size: 12px;
-    line-height: 1;
-    cursor: pointer;
-    border-radius: 50%;
-    padding: 0;
-  }
-  .cat-btn { position: relative; }
-  .cat-btn:hover .cat-remove { display: flex; align-items: center; justify-content: center; }
-  .cat-btn .cat-remove:hover { background: var(--c-inefficient); color: white; }
-
-  .activity-input-wrap {
-    position: relative;
-  }
-  .activity-input-wrap input {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid var(--ink);
-    background: var(--paper);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: var(--ink);
-  }
-  .activity-input-wrap input:focus { outline: 2px solid var(--c-bedrijf); outline-offset: -1px; }
-
-  .suggestions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-top: 8px;
-  }
-  .suggestion-chip {
-    padding: 4px 10px;
-    background: var(--paper-2);
-    border: 1px solid var(--rule);
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.1s;
-  }
-  .suggestion-chip:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-
-  .modal-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 24px;
-    padding-top: 16px;
-    border-top: 1px solid var(--rule);
-  }
-  .modal-actions button {
-    padding: 10px 18px;
-    border: 1px solid var(--ink);
-    background: var(--paper);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    cursor: pointer;
-  }
-  .modal-actions button.primary { background: var(--ink); color: var(--paper); }
-  .modal-actions button.danger { color: var(--c-zelf); border-color: var(--c-zelf); margin-left: auto; }
-  .modal-actions button:hover { transform: translateY(-1px); }
-
-  /* footer / hint */
-  .hint {
-    font-size: 11px;
-    color: var(--ink-faint);
-    font-family: 'JetBrains Mono', monospace;
-    margin-top: 8px;
-  }
-
-  /* helpers */
   .hidden { display: none !important; }
 </style>
 <style id="dynamic-cat-styles"></style>
@@ -1252,7 +782,7 @@
 <div id="auth-overlay" class="auth-overlay">
   <div class="auth-card">
     <div class="auth-brand">
-      <h1>Tijdregister</h1>
+      <h1>Tijd</h1>
       <p class="subtitle">Log in om je data overal te zien</p>
     </div>
 
@@ -1275,26 +805,24 @@
   </div>
 </div>
 
-<div class="app hidden" id="app-container">
+<div class="hidden" id="app-container">
 
-  <header class="masthead">
-    <div class="brand">
-      <img src="tijdregister-logo-256.png" alt="Tijdregister" class="brand-logo">
-      <h1>Tijdregister <em>— vijftien minuten</em></h1>
-    </div>
-    <div class="meta">
-      <span class="user-info"><span id="user-email">—</span> · <button id="btn-logout" class="link-btn">uitloggen</button></span><br>
-      <span class="sync-status" id="sync-status">●&nbsp;synchroniseert</span> · <strong id="today-label">—</strong>
+  <header class="topbar">
+    <span class="app-name">Tijd</span>
+    <div class="topbar-right">
+      <span class="sync-status" id="sync-status">●&nbsp;synchroniseert</span>
+      <button id="btn-logout" class="link-btn">uitloggen</button>
     </div>
   </header>
 
+  <div class="app">
+
   <nav class="section-nav">
-    <button data-section="tracker" class="active">Tijdregister</button>
-    <button data-section="checklist">Checklist</button>
-    <button data-section="rapportage">Rapportage</button>
+    <button data-section="tracker" class="active">Tijd</button>
+    <button data-section="analyse">Analyse</button>
   </nav>
 
-  <div class="controls">
+  <div class="controls" id="tracker-controls">
     <div class="nav-group">
       <button id="btn-prev">‹ vorige</button>
       <button id="btn-today">vandaag</button>
@@ -1310,9 +838,9 @@
     </div>
 
     <div class="util-group">
+      <button id="btn-projects">Projecten</button>
       <button id="btn-export">Export</button>
       <button id="btn-import">Import</button>
-      <button id="btn-reset">Reset</button>
     </div>
     <input type="file" id="import-file" accept=".json" class="hidden" />
   </div>
@@ -1320,12 +848,13 @@
   <section id="section-tracker">
     <div class="grid-layout">
       <div>
-        <div id="day-view"></div>
-        <div id="week-view" class="hidden"></div>
-        <div id="month-view" class="hidden"></div>
+        <div id="clipboard-slot"></div>
+        <div id="day-view" class="panel"></div>
+        <div id="week-view" class="panel hidden"></div>
+        <div id="month-view" class="panel hidden"></div>
       </div>
 
-      <aside class="stats">
+      <aside class="stats panel">
         <h2>Overzicht</h2>
         <div class="scope">
           <button data-scope="day" class="active">Dag</button>
@@ -1337,18 +866,12 @@
     </div>
   </section>
 
-  <section id="section-checklist" class="hidden">
-    <div id="cl-day-view"></div>
-    <div id="cl-week-view" class="hidden"></div>
-    <div id="cl-month-view" class="hidden"></div>
-  </section>
-
-  <section id="section-rapportage" class="section hidden">
-    <div class="rap-filters">
-      <div class="rap-row">
-        <div class="rap-field">
+  <section id="section-analyse" class="hidden">
+    <div class="ana-filters panel">
+      <div class="ana-row">
+        <div class="ana-field">
           <label>Periode</label>
-          <select id="rap-period">
+          <select id="ana-period">
             <option value="today">Vandaag</option>
             <option value="this-week">Deze week</option>
             <option value="last-week">Vorige week</option>
@@ -1359,48 +882,48 @@
             <option value="custom">Aangepast</option>
           </select>
         </div>
-        <div class="rap-field rap-custom hidden">
+        <div class="ana-field ana-custom hidden">
           <label>Van</label>
-          <input type="date" id="rap-from">
+          <input type="date" id="ana-from">
         </div>
-        <div class="rap-field rap-custom hidden">
+        <div class="ana-field ana-custom hidden">
           <label>Tot</label>
-          <input type="date" id="rap-to">
+          <input type="date" id="ana-to">
         </div>
-      </div>
-      <div class="rap-row">
-        <div class="rap-field rap-grow">
-          <label>Categorieën (klik om aan/uit te zetten)</label>
-          <div id="rap-cats" class="rap-cats"></div>
-        </div>
-      </div>
-      <div class="rap-row">
-        <div class="rap-field rap-grow">
+        <div class="ana-field ana-grow">
           <label>Activiteit (zoekt op bevat)</label>
-          <input type="text" id="rap-activity" placeholder="laat leeg voor alle activiteiten">
+          <input type="text" id="ana-activity" placeholder="laat leeg voor alle activiteiten">
         </div>
-        <div class="rap-field">
+        <div class="ana-field">
           <label>&nbsp;</label>
-          <button id="rap-export" class="rap-export-btn">↓ Excel exporteren</button>
+          <button id="ana-export" class="ana-export-btn">↓ Excel exporteren</button>
+        </div>
+      </div>
+      <div class="ana-row">
+        <div class="ana-field ana-grow">
+          <label>Projecten (klik om aan/uit te zetten)</label>
+          <div id="ana-projects" class="ana-pills"></div>
         </div>
       </div>
     </div>
-    <div class="rap-results" id="rap-results"></div>
+    <div class="ana-results" id="ana-results"></div>
   </section>
 
-  <p class="hint" style="margin-top: 24px;">
-    Tip · Tijdregister: klik blok → categorie + activiteit. Toetsen 1-9 selecteren categorieën in modal. Klik "+ Nieuw" om eigen categorieën toe te voegen. Checklist: tap items om te updaten. Data in cloud — Export voor backup.
+  <p class="hint">
+    Tip · klik blok → project + activiteit · toetsen 1-9 kiezen projecten in het invulscherm · ⧉ kopieert een blok, ⇩ plakt het klembord · data staat in de cloud, Export voor backup.
   </p>
+
+  </div><!-- /.app -->
 </div>
 
-<!-- MODAL -->
+<!-- BLOK MODAL -->
 <div class="modal-backdrop" id="modal-backdrop">
   <div class="modal">
     <h3 id="modal-title">Tijdblok</h3>
     <div class="modal-time" id="modal-subtitle">—</div>
 
     <div class="modal-section">
-      <div class="modal-label">Categorie</div>
+      <div class="modal-label">Project</div>
       <div class="cat-buttons" id="cat-buttons"></div>
     </div>
 
@@ -1427,73 +950,21 @@
   </div>
 </div>
 
-<!-- ITEM EDIT MODAL (checklist) -->
-<div class="modal-backdrop" id="item-modal-backdrop">
+<!-- PROJECTEN BEHEER MODAL -->
+<div class="modal-backdrop" id="proj-modal-backdrop">
   <div class="modal">
-    <h3 id="item-modal-title">Item</h3>
-    <div class="modal-time" id="item-modal-subtitle">Bewerk of voeg toe</div>
-
-    <div class="item-modal-section">
-      <label>Naam</label>
-      <input type="text" id="item-name" placeholder="bv. Lezen" />
-    </div>
-
-    <div class="item-modal-row">
-      <div class="item-modal-section">
-        <label>Groep</label>
-        <select id="item-group">
-          <option value="goede">Goede zaken</option>
-          <option value="slechte">Slechte zaken</option>
-          <option value="sidequests">Sidequests</option>
-        </select>
-      </div>
-      <div class="item-modal-section">
-        <label>Type</label>
-        <select id="item-type">
-          <option value="DAILY_VALUE">Dagelijks doel (getal)</option>
-          <option value="DAILY_CHECK">Dagelijks check (ja/nee)</option>
-          <option value="WEEKLY_LIMIT">Week-limiet (max N/wk)</option>
-          <option value="PERIODIC">Periodiek (1x per N dagen)</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="item-modal-row" id="item-target-row">
-      <div class="item-modal-section">
-        <label>Target</label>
-        <input type="number" id="item-target" placeholder="30" />
-      </div>
-      <div class="item-modal-section">
-        <label id="item-unit-label">Eenheid</label>
-        <input type="text" id="item-unit" placeholder="min, x, L, stappen…" />
-      </div>
-    </div>
-
-    <div class="item-modal-section" id="item-direction-row">
-      <label>Richting (alleen DAILY_VALUE)</label>
-      <select id="item-direction">
-        <option value="min">Minimaal (haal target)</option>
-        <option value="max">Maximaal (overschrijd niet)</option>
-      </select>
-    </div>
-
-    <div class="item-modal-section" id="item-period-row" style="display:none;">
-      <label>Periode in dagen (alleen PERIODIC)</label>
-      <input type="number" id="item-period" placeholder="7" />
-    </div>
-
-    <div class="item-modal-section">
-      <label>Penalty / opmerking (optioneel)</label>
-      <input type="text" id="item-penalty" placeholder="bv. 10x push-up als straf" />
-    </div>
-
+    <h3>Projecten</h3>
+    <div class="modal-time">Beheer je projectenlijst</div>
+    <div id="proj-list"></div>
+    <p class="proj-note">Hernoemen geldt voor nieuwe invoer; bestaande registraties behouden hun oude naam (zichtbaar in Analyse). Archiveren haalt een project uit de keuzelijst — data en analyses blijven volledig intact.</p>
     <div class="modal-actions">
-      <button class="primary" id="item-modal-save">Opslaan</button>
-      <button id="item-modal-cancel">Annuleer</button>
-      <button class="danger" id="item-modal-delete">Verwijder</button>
+      <button class="primary" id="proj-add">+ Nieuw project</button>
+      <button id="proj-close">Sluiten</button>
     </div>
   </div>
 </div>
+
+<div class="toast" id="toast"></div>
 
 <script>
 /* ============================================
@@ -1524,7 +995,6 @@ async function sendOtp(email) {
 
 async function verifyOtp(email, code) {
   const sb = await ensureSb();
-  // Probeer 'email' (returning users / magic link), val terug op 'signup' (eerste keer)
   let { data, error } = await sb.auth.verifyOtp({ email, token: code, type: 'email' });
   if (error) {
     const r = await sb.auth.verifyOtp({ email, token: code, type: 'signup' });
@@ -1542,7 +1012,6 @@ async function logoutUser() {
   location.reload();
 }
 
-// Sync indicator
 function setSyncStatus(text, cls) {
   const el = document.getElementById('sync-status');
   if (!el) return;
@@ -1550,7 +1019,6 @@ function setSyncStatus(text, cls) {
   el.className = 'sync-status ' + (cls || '');
 }
 
-// Track in-flight sync ops to update the visual indicator
 let syncInFlight = 0;
 function syncStart() { syncInFlight++; setSyncStatus('● synchroniseert…', 'syncing'); }
 function syncEnd(err) {
@@ -1559,7 +1027,6 @@ function syncEnd(err) {
   else if (syncInFlight === 0) setSyncStatus('● gesynchroniseerd', '');
 }
 
-// Initial fetch from Supabase
 async function fetchAllPages(sb, table) {
   const PAGE = 1000;
   let rows = [], offset = 0;
@@ -1577,46 +1044,61 @@ async function cloudFetchAll() {
   const sb = await ensureSb();
   syncStart();
   try {
-    const [entriesData, itemsData, logData] = await Promise.all([
-      fetchAllPages(sb, 'tracker_entries'),
-      fetchAllPages(sb, 'checklist_items'),
-      fetchAllPages(sb, 'checklist_log')
-    ]);
+    const entriesData = await fetchAllPages(sb, 'tracker_entries');
 
-    // Reset state
+    // Reset state — activiteiten-keys worden dynamisch aangemaakt
     state.entries = {};
-    state.activities = { 'Inefficiënt':[], Zelf:[], Boek:[], SMART:[], Bedrijf:[] };
+    state.activities = {};
+    const usage = {};
 
     for (const e of entriesData) {
       if (!state.entries[e.date]) state.entries[e.date] = {};
       state.entries[e.date][e.time] = { category: e.category, activity: e.activity || '', note: e.note || '' };
-      if (e.category && e.activity) {
-        const list = state.activities[e.category];
-        if (list && !list.includes(e.activity)) list.push(e.activity);
+      if (e.category) {
+        usage[e.category] = (usage[e.category] || 0) + 1;
+        if (e.activity) {
+          if (!state.activities[e.category]) state.activities[e.category] = [];
+          if (!state.activities[e.category].includes(e.activity)) state.activities[e.category].push(e.activity);
+        }
       }
     }
 
-    cl.items = itemsData.map(r => ({ ...(r.data || {}), id: r.item_id }));
-    cl.log = {};
-    for (const l of logData) {
-      if (!cl.log[l.item_id]) cl.log[l.item_id] = {};
-      cl.log[l.item_id][l.date] = l.value;
+    // Projecten laden (nieuwe tabel) — graceful fallback als tabel nog niet bestaat
+    let projectsData = null;
+    try {
+      projectsData = await fetchAllPages(sb, 'projects');
+      state.projectsTableOk = true;
+    } catch (err) {
+      state.projectsTableOk = false;
+      console.warn('projects-tabel niet beschikbaar (migratie nog niet gedraaid?) — projecten draaien lokaal.', err?.message || err);
     }
-    if (cl.items.length === 0) await seedDefaultItems();
+
+    if (projectsData && projectsData.length > 0) {
+      state.projects = projectsData.map(r => ({ id: r.id, name: r.name, color: r.color || null, archived: !!r.archived }));
+    } else {
+      // Eerste keer: seed projecten uit distincte categorieën in bestaande data (meest gebruikt eerst)
+      const names = Object.keys(usage).sort((a, b) => usage[b] - usage[a]);
+      state.projects = names.map((n, i) => ({ id: null, name: n, color: PROJECT_PALETTE[i % PROJECT_PALETTE.length], archived: false }));
+      if (state.projectsTableOk && state.projects.length > 0) {
+        try {
+          const rows = state.projects.map(p => ({ user_id: auth.user.id, name: p.name, color: p.color, archived: false }));
+          const { data, error } = await sb.from('projects').upsert(rows, { onConflict: 'user_id,name' }).select();
+          if (!error && data) {
+            for (const r of data) {
+              const p = state.projects.find(x => x.name === r.name);
+              if (p) p.id = r.id;
+            }
+          }
+        } catch (e) { console.warn('project seed mislukt', e); }
+      }
+    }
+    // Zorg dat elk project een kleur heeft
+    state.projects.forEach((p, i) => { if (!p.color) p.color = PROJECT_PALETTE[i % PROJECT_PALETTE.length]; });
+
+    applyProjectStyles();
+    renderProjectButtons();
     syncEnd();
   } catch (err) { syncEnd(err); throw err; }
-}
-
-async function seedDefaultItems() {
-  const sb = await ensureSb();
-  const rows = DEFAULT_ITEMS.map(item => ({
-    user_id: auth.user.id,
-    item_id: item.id,
-    data: item
-  }));
-  const { error } = await sb.from('checklist_items').insert(rows);
-  if (error) console.warn('seed failed', error);
-  cl.items = DEFAULT_ITEMS.map(x => ({...x}));
 }
 
 async function cloudUpsertEntry(date, time, entry) {
@@ -1640,39 +1122,29 @@ async function cloudDeleteEntry(date, time) {
   syncEnd(error);
 }
 
-async function cloudUpsertChecklistLog(itemId, dateStr, value) {
+/* === PROJECTEN CRUD === */
+async function cloudInsertProject(p) {
+  if (!state.projectsTableOk) return;
   const sb = await ensureSb();
   syncStart();
-  let error;
-  // jsonb column: store any JSON value (number, bool, etc)
-  if (value === null || value === undefined || value === '' || value === 0 || value === false) {
-    ({ error } = await sb.from('checklist_log').delete().match({ user_id: auth.user.id, item_id: itemId, date: dateStr }));
-  } else {
-    ({ error } = await sb.from('checklist_log').upsert({
-      user_id: auth.user.id, item_id: itemId, date: dateStr, value, updated_at: new Date().toISOString()
-    }));
-  }
+  const { data, error } = await sb.from('projects')
+    .upsert({ user_id: auth.user.id, name: p.name, color: p.color, archived: !!p.archived }, { onConflict: 'user_id,name' })
+    .select();
+  if (!error && data && data[0]) p.id = data[0].id;
   syncEnd(error);
 }
 
-async function cloudUpsertItem(item) {
+async function cloudUpdateProject(p) {
+  if (!state.projectsTableOk || !p.id) return;
   const sb = await ensureSb();
   syncStart();
-  const { error } = await sb.from('checklist_items').upsert({
-    user_id: auth.user.id, item_id: item.id, data: item, updated_at: new Date().toISOString()
-  });
+  const { error } = await sb.from('projects')
+    .update({ name: p.name, color: p.color, archived: !!p.archived })
+    .eq('id', p.id);
   syncEnd(error);
 }
 
-async function cloudDeleteItem(itemId) {
-  const sb = await ensureSb();
-  syncStart();
-  const r1 = await sb.from('checklist_items').delete().match({ user_id: auth.user.id, item_id: itemId });
-  const r2 = await sb.from('checklist_log').delete().match({ user_id: auth.user.id, item_id: itemId });
-  syncEnd(r1.error || r2.error);
-}
-
-// Real-time: update local state per changed row (no full refetch)
+/* === REALTIME — payload-based (geen full refetch) === */
 async function startRealtime() {
   const sb = await ensureSb();
   const existing = sb.getChannels();
@@ -1680,14 +1152,14 @@ async function startRealtime() {
     try { await sb.removeChannel(ch); } catch(e) {}
   }
 
-  sb.channel('user-data-v2')
+  const channel = sb.channel('user-data-v2')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'tracker_entries' }, (payload) => {
       const e = payload.new; if (!e) return;
       if (!state.entries[e.date]) state.entries[e.date] = {};
       state.entries[e.date][e.time] = { category: e.category, activity: e.activity || '', note: e.note || '' };
       if (e.category && e.activity) {
-        const list = state.activities[e.category];
-        if (list && !list.includes(e.activity)) list.push(e.activity);
+        if (!state.activities[e.category]) state.activities[e.category] = [];
+        if (!state.activities[e.category].includes(e.activity)) state.activities[e.category].push(e.activity);
       }
       updateView();
     })
@@ -1702,210 +1174,86 @@ async function startRealtime() {
       delete state.entries[e.date][e.time];
       if (Object.keys(state.entries[e.date]).length === 0) delete state.entries[e.date];
       updateView();
-    })
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'checklist_log' }, (payload) => {
-      const row = payload.new; if (!row) return;
-      if (!cl.log[row.item_id]) cl.log[row.item_id] = {};
-      cl.log[row.item_id][row.date] = row.value;
-      updateView();
-    })
-    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'checklist_log' }, (payload) => {
-      const row = payload.new; if (!row) return;
-      if (!cl.log[row.item_id]) cl.log[row.item_id] = {};
-      cl.log[row.item_id][row.date] = row.value;
-      updateView();
-    })
-    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'checklist_log' }, (payload) => {
-      const row = payload.old; if (!row || !cl.log[row.item_id]) return;
-      delete cl.log[row.item_id][row.date];
-      if (Object.keys(cl.log[row.item_id]).length === 0) delete cl.log[row.item_id];
-      updateView();
-    })
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'checklist_items' }, (payload) => {
-      const row = payload.new; if (!row) return;
-      const idx = cl.items.findIndex(i => i.id === row.item_id);
-      const newItem = { ...(row.data || {}), id: row.item_id };
-      if (idx >= 0) cl.items[idx] = newItem; else cl.items.push(newItem);
-      updateView();
-    })
-    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'checklist_items' }, (payload) => {
-      const row = payload.new; if (!row) return;
-      const idx = cl.items.findIndex(i => i.id === row.item_id);
-      const newItem = { ...(row.data || {}), id: row.item_id };
-      if (idx >= 0) cl.items[idx] = newItem; else cl.items.push(newItem);
-      updateView();
-    })
-    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'checklist_items' }, (payload) => {
-      const row = payload.old; if (!row) return;
-      cl.items = cl.items.filter(i => i.id !== row.item_id);
-      delete cl.log[row.item_id];
-      updateView();
-    })
-    .subscribe();
+    });
+
+  if (state.projectsTableOk) {
+    channel
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'projects' }, (payload) => {
+        const r = payload.new; if (!r) return;
+        const existing = state.projects.find(p => p.id === r.id || p.name === r.name);
+        if (existing) { existing.id = r.id; existing.color = r.color; existing.archived = !!r.archived; }
+        else state.projects.push({ id: r.id, name: r.name, color: r.color, archived: !!r.archived });
+        applyProjectStyles(); renderProjectButtons(); updateView();
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'projects' }, (payload) => {
+        const r = payload.new; if (!r) return;
+        const p = state.projects.find(x => x.id === r.id);
+        if (p) { p.name = r.name; p.color = r.color; p.archived = !!r.archived; }
+        applyProjectStyles(); renderProjectButtons(); updateView();
+      })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'projects' }, (payload) => {
+        const r = payload.old; if (!r) return;
+        state.projects = state.projects.filter(x => x.id !== r.id);
+        applyProjectStyles(); renderProjectButtons(); updateView();
+      });
+  }
+
+  channel.subscribe();
 }
 
 /* ============================================
-   STATE & STORAGE
+   STATE
 ============================================ */
-const STORAGE_KEY = 'tijdregister-v1';
-const CATEGORIES_KEY = 'tijdregister-categories-v1';
-
-const DEFAULT_CATEGORIES = [
-  { name: 'Inefficiënt', color: '#b34a35', bg: '#f0d4cb' },
-  { name: 'Zelf',        color: '#c97e3a', bg: '#f0dcc1' },
-  { name: 'Boek',        color: '#5a7a3e', bg: '#d8e4c8' },
-  { name: 'SMART',       color: '#4a7a5e', bg: '#cce0d4' },
-  { name: 'Bedrijf',     color: '#6a8a3e', bg: '#dde6c8' },
+const PROJECT_PALETTE = [
+  '#2E6FD8', '#2E8540', '#C9842A', '#B3362C', '#6B4FA1',
+  '#1E8E99', '#8A6D3B', '#C25588', '#4A6B8A', '#5E7D2F'
 ];
 
-// Palet voor automatische kleurkeuze bij nieuwe categorieën
-const COLOR_PALETTE = [
-  { color: '#3a6a8e', bg: '#d0dde6' },
-  { color: '#8e3a6a', bg: '#e6d0dd' },
-  { color: '#6a3a8e', bg: '#ddd0e6' },
-  { color: '#2e8a8a', bg: '#c8e0e0' },
-  { color: '#8a6a2e', bg: '#e6dcc1' },
-  { color: '#9b3737', bg: '#ebcccc' },
-  { color: '#3b7d4f', bg: '#cee2d6' },
-  { color: '#6b6b6b', bg: '#dcdcdc' },
-];
+let state = {
+  projects: [],        // [{id, name, color, archived}]
+  projectsTableOk: false,
+  activities: {},      // activities[projectName] = [activiteit, ...]
+  entries: {},         // entries[YYYY-MM-DD][HH:MM] = {category, activity, note}
+  clipboard: null      // {category, activity, note}
+};
 
-function loadCategories() {
-  try {
-    const raw = localStorage.getItem(CATEGORIES_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-    }
-  } catch (e) {}
-  return DEFAULT_CATEGORIES.slice();
-}
-function saveCategories() {
-  try { localStorage.setItem(CATEGORIES_KEY, JSON.stringify(state.categories)); } catch (e) {}
-}
-function getCategoryNames() { return state.categories.map(c => c.name); }
-function getCategory(name) { return state.categories.find(c => c.name === name); }
+let view = 'day';
+let scope = 'day';
+let cursor = new Date();
+let modal = { date: null, time: null, draft: null };
+let section = 'tracker'; // tracker | analyse
+let scrollToMorning = true;
 
-function applyCategoryStyles() {
+function getProjectNames(includeArchived) {
+  return state.projects.filter(p => includeArchived || !p.archived).map(p => p.name);
+}
+function getProject(name) { return state.projects.find(p => p.name === name); }
+function projectColor(name) {
+  const p = getProject(name);
+  if (p && p.color) return p.color;
+  return '#4A6B8A';
+}
+function tint(color) { return `color-mix(in srgb, ${color} 14%, white)`; }
+
+function applyProjectStyles() {
   let css = '';
-  for (const c of state.categories) {
-    const sel = `[data-cat="${c.name.replace(/"/g, '\\"')}"]`;
-    css += `.day-grid .row${sel} .col-cat { background: ${c.bg}; color: ${c.color}; }`;
-    css += `.week-grid td${sel} { background: ${c.bg}; color: ${c.color}; font-weight: 500; }`;
-    css += `.cat-btn${sel}.selected { background: ${c.color}; border-color: ${c.color}; color: var(--paper); }`;
+  for (const p of state.projects) {
+    const sel = `[data-cat="${p.name.replace(/"/g, '\\"')}"]`;
+    css += `.day-grid .row${sel} .col-cat { background: ${tint(p.color)}; color: ${p.color}; }`;
+    css += `.week-grid td${sel} { background: ${tint(p.color)}; color: ${p.color}; font-weight: 600; }`;
+    css += `.cat-btn${sel}.selected { background: ${p.color}; border-color: ${p.color}; color: #fff; }`;
   }
   const el = document.getElementById('dynamic-cat-styles');
   if (el) el.textContent = css;
 }
 
-function renderCategoryButtons() {
-  const wrap = document.getElementById('cat-buttons');
-  if (!wrap) return;
-  wrap.innerHTML = '';
-  for (const c of state.categories) {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'cat-btn';
-    btn.dataset.cat = c.name;
-    btn.textContent = c.name;
-    btn.addEventListener('click', () => selectCategory(c.name));
-    // Verwijder-knopje in hoek (alleen voor categorieën zonder entries — anders blokkeren we)
-    const isDefault = DEFAULT_CATEGORIES.some(dc => dc.name === c.name);
-    if (!isDefault) {
-      const rm = document.createElement('button');
-      rm.type = 'button';
-      rm.className = 'cat-remove';
-      rm.title = 'Categorie verwijderen';
-      rm.textContent = '×';
-      rm.addEventListener('click', (e) => {
-        e.stopPropagation();
-        removeCategory(c.name);
-      });
-      btn.appendChild(rm);
-    }
-    wrap.appendChild(btn);
-  }
-  // + Nieuw knop
-  const addBtn = document.createElement('button');
-  addBtn.type = 'button';
-  addBtn.className = 'cat-btn cat-btn-add';
-  addBtn.textContent = '+ Nieuw';
-  addBtn.addEventListener('click', addCategoryUI);
-  wrap.appendChild(addBtn);
-}
-
-function addCategoryUI() {
-  const name = prompt('Naam van de nieuwe categorie:');
-  if (!name) return;
-  const trimmed = name.trim();
-  if (!trimmed) return;
-  if (state.categories.some(c => c.name.toLowerCase() === trimmed.toLowerCase())) {
-    alert('Er bestaat al een categorie met deze naam.');
-    return;
-  }
-  // Kies eerstvolgende vrije kleur uit palet
-  const usedColors = new Set(state.categories.map(c => c.color));
-  const next = COLOR_PALETTE.find(p => !usedColors.has(p.color)) || COLOR_PALETTE[0];
-  state.categories.push({ name: trimmed, color: next.color, bg: next.bg });
-  state.activities[trimmed] = [];
-  saveCategories();
-  applyCategoryStyles();
-  renderCategoryButtons();
-  // Selecteer meteen
-  selectCategory(trimmed);
-}
-
-function removeCategory(name) {
-  if (DEFAULT_CATEGORIES.some(dc => dc.name === name)) {
-    alert('Standaard categorieën kunnen niet verwijderd worden.');
-    return;
-  }
-  // Check of er entries zijn met deze categorie
-  let inUse = 0;
-  for (const ds of Object.keys(state.entries)) {
-    for (const t of Object.keys(state.entries[ds])) {
-      if (state.entries[ds][t].category === name) inUse++;
-    }
-  }
-  const msg = inUse > 0
-    ? `"${name}" wordt nog gebruikt in ${inUse} tijdblok${inUse===1?'':'ken'}. Verwijderen? (de categorie wordt uit de lijst gehaald, bestaande blokken behouden hun label)`
-    : `"${name}" verwijderen?`;
-  if (!confirm(msg)) return;
-  state.categories = state.categories.filter(c => c.name !== name);
-  delete state.activities[name];
-  saveCategories();
-  applyCategoryStyles();
-  renderCategoryButtons();
-  if (modal.draft && modal.draft.category === name) modal.draft.category = '';
-}
-
+/* ============================================
+   DATE HELPERS
+============================================ */
 const DAY_NAMES_NL = ['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag'];
 const DAY_NAMES_NL_SHORT = ['zo','ma','di','wo','do','vr','za'];
 const MONTH_NAMES_NL = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
 
-let state = {
-  categories: loadCategories(),
-  activities: {}, // wordt onder geïnitialiseerd op basis van categories
-  entries: {} // entries[YYYY-MM-DD][HH:MM] = {category, activity, note}
-};
-for (const c of state.categories) state.activities[c.name] = [];
-
-let view = 'day';     // day | week | month
-let scope = 'day';    // for stats panel
-let cursor = new Date(); // currently viewed date
-let modal = { date: null, time: null, draft: null };
-
-function loadState() {
-  // No-op: data wordt geladen via cloudFetchAll() na login
-}
-
-function saveState() {
-  // No-op: per-operatie cloud sync via setEntry/deleteEntry
-}
-
-/* ============================================
-   DATE HELPERS
-============================================ */
 function fmtDate(d) {
   const y = d.getFullYear();
   const m = String(d.getMonth()+1).padStart(2,'0');
@@ -1922,20 +1270,16 @@ function fmtDateLong(d) {
 function isSameDate(a, b) {
   return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
 }
-function startOfWeek(d) { // Monday-based
-  const day = d.getDay(); // 0=Sun..6=Sat
+function startOfWeek(d) {
+  const day = d.getDay();
   const diff = (day === 0 ? -6 : 1 - day);
   const out = new Date(d);
   out.setDate(d.getDate() + diff);
   out.setHours(0,0,0,0);
   return out;
 }
-function startOfMonth(d) {
-  return new Date(d.getFullYear(), d.getMonth(), 1);
-}
-function endOfMonth(d) {
-  return new Date(d.getFullYear(), d.getMonth()+1, 0);
-}
+function startOfMonth(d) { return new Date(d.getFullYear(), d.getMonth(), 1); }
+function endOfMonth(d) { return new Date(d.getFullYear(), d.getMonth()+1, 0); }
 function eachDay(start, end) {
   const out = [];
   const cur = new Date(start);
@@ -1947,22 +1291,22 @@ function eachDay(start, end) {
 }
 
 /* ============================================
-   TIME GRID HELPERS (07:00 → 24:00 in 15min)
+   TIME GRID — 24 uur (00:00 → 23:45) in 15 min
 ============================================ */
-function getTimeSlots() {
+function allSlots() {
   const out = [];
-  for (let h = 7; h < 24; h++) {
+  for (let h = 0; h < 24; h++) {
     for (let m = 0; m < 60; m += 15) {
       out.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
     }
   }
   return out;
 }
-const TIME_SLOTS = getTimeSlots();
+const TIME_SLOTS = allSlots();
+const MORNING_SLOT = '07:00';
 
 function currentTimeSlot() {
   const now = new Date();
-  if (now.getHours() < 7 || now.getHours() >= 24) return null;
   const h = now.getHours();
   const m = Math.floor(now.getMinutes() / 15) * 15;
   return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
@@ -1977,13 +1321,11 @@ function getEntry(dateStr, time) {
 function setEntry(dateStr, time, entry) {
   if (!state.entries[dateStr]) state.entries[dateStr] = {};
   state.entries[dateStr][time] = entry;
-  // learn activity
   if (entry.category && entry.activity) {
     if (!state.activities[entry.category]) state.activities[entry.category] = [];
     const list = state.activities[entry.category];
     if (!list.includes(entry.activity)) list.push(entry.activity);
   }
-  // Cloud sync
   cloudUpsertEntry(dateStr, time, entry).catch(e => console.warn('upsert entry', e));
 }
 function deleteEntry(dateStr, time) {
@@ -1998,9 +1340,8 @@ function deleteEntry(dateStr, time) {
    AGGREGATION
 ============================================ */
 function aggregateRange(startDate, endDate) {
-  // returns {<category>: nBlocks, ..., empty: nBlocks, total: nBlocks}
   const out = { empty: 0, total: 0 };
-  for (const c of state.categories) out[c.name] = 0;
+  for (const p of state.projects) out[p.name] = 0;
   const days = eachDay(startDate, endDate);
   for (const d of days) {
     const ds = fmtDate(d);
@@ -2027,14 +1368,76 @@ function blocksToHrs(n) {
   return `${h}u${String(m).padStart(2,'0')}`;
 }
 
+function fmtValue(v, unit) {
+  if (unit === 'min') {
+    const n = Number(v) || 0;
+    if (n < 60) return `${n}m`;
+    const h = Math.floor(n/60); const m = n%60;
+    return m === 0 ? `${h}u` : `${h}u${String(m).padStart(2,'0')}`;
+  }
+  return `${v}${unit ? ' '+unit : ''}`;
+}
+
+/* ============================================
+   TOAST
+============================================ */
+let toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+/* ============================================
+   KLEMBORD (vrij kopiëren/plakken)
+============================================ */
+function copyBlock(dateStr, time) {
+  const e = getEntry(dateStr, time);
+  if (!e) return;
+  state.clipboard = { category: e.category || '', activity: e.activity || '', note: e.note || '' };
+  showToast(`Gekopieerd: ${e.activity || e.category}`);
+  renderClipboardBar();
+  renderDayView();
+}
+function pasteBlock(dateStr, time) {
+  if (!state.clipboard) return;
+  setEntry(dateStr, time, { ...state.clipboard });
+  renderDayView();
+  renderStats();
+}
+function clearClipboard() {
+  state.clipboard = null;
+  renderClipboardBar();
+  renderDayView();
+}
+function renderClipboardBar() {
+  const slot = document.getElementById('clipboard-slot');
+  if (!slot) return;
+  if (!state.clipboard) { slot.innerHTML = ''; return; }
+  const c = state.clipboard;
+  slot.innerHTML = `
+    <div class="clipboard-bar">
+      <span class="cb-label">Klembord</span>
+      <span class="cb-content">${escapeHtml(c.activity || '—')} <span style="opacity:0.7;">(${escapeHtml(c.category)})</span></span>
+      <button id="cb-clear">✕ wissen</button>
+    </div>`;
+  document.getElementById('cb-clear').addEventListener('click', clearClipboard);
+}
+
 /* ============================================
    RENDER — DAY VIEW
 ============================================ */
 function renderDayView() {
+  const container = document.getElementById('day-view');
+  const prevScroll = container.querySelector('.day-grid')?.scrollTop ?? null;
+
   const dateStr = fmtDate(cursor);
   const today = new Date();
   const isToday = isSameDate(cursor, today);
   const nowSlot = isToday ? currentTimeSlot() : null;
+  const hasClipboard = !!state.clipboard;
 
   let html = '<div class="day-grid">';
   for (let i = 0; i < TIME_SLOTS.length; i++) {
@@ -2044,31 +1447,53 @@ function renderDayView() {
     const cat = entry?.category || '';
     const act = entry?.activity || '';
     const note = entry?.note || '';
+    const filled = !!(cat || act || note);
     const prevTime = i > 0 ? TIME_SLOTS[i-1] : null;
     const prevEntry = prevTime ? getEntry(dateStr, prevTime) : null;
     const prevHasContent = prevEntry && (prevEntry.category || prevEntry.activity || prevEntry.note);
-    const showCopyBtn = !cat && !act && !note && prevHasContent;
+    const showCopyBtn = !filled && prevHasContent;
     const classes = ['row'];
     if (isHourStart) classes.push('hour-start');
     if (time === nowSlot) classes.push('now');
-    html += `<div class="${classes.join(' ')}" data-time="${time}" ${cat ? `data-cat="${cat}"` : ''}>`;
+    html += `<div class="${classes.join(' ')}" data-time="${time}" ${cat ? `data-cat="${escapeAttr(cat)}"` : ''}>`;
     const timeClasses = ['col-time'];
     if (showCopyBtn) timeClasses.push('can-copy');
-    html += `<div class="${timeClasses.join(' ')}" ${showCopyBtn ? `data-action="copy-prev" title="Klik om inhoud vorig kwartier over te nemen"` : ''}>${time}</div>`;
-    html += `<div class="col-cat" data-action="edit">${cat}</div>`;
+    html += `<div class="${timeClasses.join(' ')}" ${showCopyBtn ? `data-action="copy-prev" title="Neem inhoud vorig kwartier over"` : ''}>${time}</div>`;
+    html += `<div class="col-cat" data-action="edit">${escapeHtml(cat)}</div>`;
     html += `<div class="col-act" data-action="edit">${escapeHtml(act)}</div>`;
     html += `<div class="col-note" data-action="edit">${escapeHtml(note)}</div>`;
+    html += `<div class="col-actions">`;
+    if (filled) html += `<button class="mini-btn" data-action="copy-block" title="Kopieer blok naar klembord">⧉</button>`;
+    if (hasClipboard) html += `<button class="mini-btn paste" data-action="paste-block" title="Plak klembord in dit blok">⇩</button>`;
+    html += `</div>`;
     html += `</div>`;
   }
   html += '</div>';
 
-  document.getElementById('day-view').innerHTML = html;
+  container.innerHTML = html;
+  renderClipboardBar();
+
+  const grid = container.querySelector('.day-grid');
+  if (scrollToMorning) {
+    const morningRow = grid.querySelector(`[data-time="${MORNING_SLOT}"]`);
+    if (morningRow) grid.scrollTop = morningRow.offsetTop - grid.offsetTop;
+    scrollToMorning = false;
+  } else if (prevScroll !== null) {
+    grid.scrollTop = prevScroll;
+  }
 
   // event delegation
-  document.querySelectorAll('#day-view .row').forEach(row => {
+  container.querySelectorAll('.row').forEach(row => {
     row.addEventListener('click', (e) => {
       const time = row.dataset.time;
-      // Klik op donkergrijs tijdvak → neem inhoud vorig kwartier over
+      if (e.target.closest('[data-action="copy-block"]')) {
+        copyBlock(dateStr, time);
+        return;
+      }
+      if (e.target.closest('[data-action="paste-block"]')) {
+        pasteBlock(dateStr, time);
+        return;
+      }
       if (e.target.closest('.col-time.can-copy')) {
         const idx = TIME_SLOTS.indexOf(time);
         if (idx <= 0) return;
@@ -2089,9 +1514,12 @@ function renderDayView() {
 }
 
 /* ============================================
-   RENDER — WEEK VIEW (Monday → Sunday)
+   RENDER — WEEK VIEW
 ============================================ */
 function renderWeekView() {
+  const container = document.getElementById('week-view');
+  const prevScroll = container.querySelector('.week-grid')?.scrollTop ?? null;
+
   const start = startOfWeek(cursor);
   const days = [];
   for (let i = 0; i < 7; i++) {
@@ -2103,7 +1531,6 @@ function renderWeekView() {
   const nowSlot = currentTimeSlot();
 
   let html = '<div class="week-grid"><table>';
-  // header row
   html += '<thead><tr><th class="col-time-h">tijd</th>';
   for (const d of days) {
     const cls = isSameDate(d, today) ? 'today' : '';
@@ -2114,23 +1541,32 @@ function renderWeekView() {
   for (const time of TIME_SLOTS) {
     const isHourStart = time.endsWith(':00');
     html += '<tr>';
-    html += `<td class="col-time-h${isHourStart?' hour-mark':''}">${time}</td>`;
+    html += `<td class="col-time-h${isHourStart?' hour-mark':''}" data-time-label="${time}">${time}</td>`;
     for (const d of days) {
       const ds = fmtDate(d);
       const entry = getEntry(ds, time);
       const cls = ['cell'];
       if (isHourStart) cls.push('hour-mark');
       if (isSameDate(d, today) && time === nowSlot) cls.push('now-cell');
-      const catAttr = entry?.category ? `data-cat="${entry.category}"` : '';
+      const catAttr = entry?.category ? `data-cat="${escapeAttr(entry.category)}"` : '';
       const label = entry?.activity || '';
       html += `<td class="${cls.join(' ')}" data-date="${ds}" data-time="${time}" ${catAttr}>${escapeHtml(label)}</td>`;
     }
     html += '</tr>';
   }
   html += '</tbody></table></div>';
-  document.getElementById('week-view').innerHTML = html;
+  container.innerHTML = html;
 
-  document.querySelectorAll('#week-view td.cell').forEach(cell => {
+  const grid = container.querySelector('.week-grid');
+  if (scrollToMorning) {
+    const morningCell = grid.querySelector(`td[data-time-label="${MORNING_SLOT}"]`);
+    if (morningCell) grid.scrollTop = Math.max(0, morningCell.offsetTop - 30);
+    scrollToMorning = false;
+  } else if (prevScroll !== null) {
+    grid.scrollTop = prevScroll;
+  }
+
+  container.querySelectorAll('td.cell').forEach(cell => {
     cell.addEventListener('click', () => {
       openModal(cell.dataset.date, cell.dataset.time);
     });
@@ -2138,7 +1574,7 @@ function renderWeekView() {
 }
 
 /* ============================================
-   RENDER — MONTH VIEW (calendar with daily totals)
+   RENDER — MONTH VIEW
 ============================================ */
 function renderMonthView() {
   const monthStart = startOfMonth(cursor);
@@ -2148,12 +1584,12 @@ function renderMonthView() {
   gridEnd.setDate(gridEnd.getDate()+6);
 
   const today = new Date();
-  let html = `<div class="day-grid" style="border:1px solid var(--ink);background:var(--paper);">`;
-  html += `<div style="padding:14px 18px;border-bottom:2px solid var(--ink);font-family:'Fraunces',serif;font-size:22px;font-weight:500;">${MONTH_NAMES_NL[cursor.getMonth()]} <em style="font-style:italic;color:var(--ink-soft);">${cursor.getFullYear()}</em></div>`;
+  let html = `<div>`;
+  html += `<div style="padding:14px 18px;border-bottom:2px solid var(--navy);font-size:18px;font-weight:700;color:var(--navy);">${MONTH_NAMES_NL[cursor.getMonth()]} <span style="font-weight:400;color:var(--steel);">${cursor.getFullYear()}</span></div>`;
   html += `<table style="width:100%;border-collapse:collapse;">`;
   html += '<thead><tr>';
   ['ma','di','wo','do','vr','za','zo'].forEach(n => {
-    html += `<th style="padding:8px;font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-faint);background:var(--paper-2);border-bottom:1px solid var(--rule);text-align:left;">${n}</th>`;
+    html += `<th style="padding:8px;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-faint);background:var(--surface-2);border-bottom:1px solid var(--line);text-align:left;">${n}</th>`;
   });
   html += '</tr></thead><tbody>';
 
@@ -2168,18 +1604,16 @@ function renderMonthView() {
       const filled = totals.total - totals.empty;
       const isTodayCell = isSameDate(d, today);
 
-      html += `<td data-date="${ds}" style="border:1px solid var(--rule-soft);padding:8px;height:100px;vertical-align:top;cursor:pointer;${inMonth?'':'opacity:0.35;'}${isTodayCell?'background:rgba(184,133,58,0.10);':''}">`;
-      html += `<div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:${isTodayCell?'var(--ink)':'var(--ink-soft)'};margin-bottom:6px;font-weight:${isTodayCell?'600':'400'};">${d.getDate()}</div>`;
+      html += `<td data-date="${ds}" style="border:1px solid var(--line-soft);padding:8px;height:100px;vertical-align:top;cursor:pointer;${inMonth?'':'opacity:0.35;'}${isTodayCell?'background:rgba(46,111,216,0.08);':''}">`;
+      html += `<div style="font-family:var(--mono);font-size:12px;color:${isTodayCell?'var(--navy)':'var(--steel)'};margin-bottom:6px;font-weight:${isTodayCell?'700':'400'};">${d.getDate()}</div>`;
       if (filled > 0) {
         html += `<div style="display:flex;flex-direction:column;gap:2px;">`;
-        for (const c of CATEGORIES) {
-          if (totals[c] > 0) {
-            const w = Math.round((totals[c] / 68) * 100);
-            const colorVar = `--c-${c.toLowerCase()}`;
-            html += `<div style="display:flex;align-items:center;gap:4px;font-size:9px;font-family:'JetBrains Mono',monospace;color:var(${colorVar});">`;
-            html += `<div style="width:6px;height:6px;background:var(${colorVar});"></div>`;
-            html += `<span style="font-weight:500;">${c}</span>`;
-            html += `<span style="margin-left:auto;">${blocksToHrs(totals[c])}</span>`;
+        for (const p of state.projects) {
+          if (totals[p.name] > 0) {
+            html += `<div style="display:flex;align-items:center;gap:4px;font-size:9px;font-family:var(--mono);color:${p.color};">`;
+            html += `<div style="width:6px;height:6px;background:${p.color};border-radius:1px;"></div>`;
+            html += `<span style="font-weight:600;">${escapeHtml(p.name)}</span>`;
+            html += `<span style="margin-left:auto;">${blocksToHrs(totals[p.name])}</span>`;
             html += `</div>`;
           }
         }
@@ -2197,6 +1631,7 @@ function renderMonthView() {
     td.addEventListener('click', () => {
       cursor = parseDate(td.dataset.date);
       view = 'day';
+      scrollToMorning = true;
       updateView();
     });
   });
@@ -2206,54 +1641,104 @@ function renderMonthView() {
    RENDER — STATS PANEL
 ============================================ */
 function renderStats() {
-  let start, end, scopeLabel;
+  let start, end;
   if (scope === 'day') {
     start = end = new Date(cursor);
-    scopeLabel = 'Dag';
   } else if (scope === 'week') {
     start = startOfWeek(cursor);
     end = new Date(start); end.setDate(start.getDate()+6);
-    scopeLabel = 'Week';
   } else {
     start = startOfMonth(cursor);
     end = endOfMonth(cursor);
-    scopeLabel = 'Maand';
   }
 
   const totals = aggregateRange(start, end);
   const filled = totals.total - totals.empty;
-  const filledPct = totals.total ? (filled / totals.total) * 100 : 0;
 
   let html = '';
-  for (const cat of state.categories) {
-    const blocks = totals[cat.name] || 0;
+  for (const p of state.projects) {
+    const blocks = totals[p.name] || 0;
+    if (p.archived && blocks === 0) continue;
     const pct = filled > 0 ? (blocks / filled) * 100 : 0;
     html += `
       <div class="stat-bar">
         <div style="flex:1;">
           <div style="display:flex;justify-content:space-between;align-items:baseline;">
             <div class="label">
-              <div class="swatch" style="background:${cat.color};"></div>
-              ${escapeHtml(cat.name)}
+              <div class="swatch" style="background:${p.color};"></div>
+              ${escapeHtml(p.name)}
             </div>
             <div class="value">${blocksToHrs(blocks)} <span class="min">${blocks}b</span></div>
           </div>
-          <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${cat.color};"></div></div>
+          <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${p.color};"></div></div>
         </div>
       </div>`;
   }
 
   html += `<div class="stat-total">
     <div class="label">Geregistreerd</div>
-    <div class="value">${blocksToHrs(filled)} <span style="color:var(--ink-faint);font-size:11px;">/ ${blocksToHrs(totals.total)} (${filledPct.toFixed(0)}%)</span></div>
+    <div class="value">${blocksToHrs(filled)}</div>
   </div>`;
 
   document.getElementById('stats-content').innerHTML = html;
 }
 
 /* ============================================
-   MODAL
+   BLOK MODAL
 ============================================ */
+function renderProjectButtons() {
+  const wrap = document.getElementById('cat-buttons');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  for (const p of state.projects.filter(x => !x.archived)) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'cat-btn';
+    btn.dataset.cat = p.name;
+    btn.textContent = p.name;
+    btn.addEventListener('click', () => selectProject(p.name));
+    wrap.appendChild(btn);
+  }
+  const addBtn = document.createElement('button');
+  addBtn.type = 'button';
+  addBtn.className = 'cat-btn cat-btn-add';
+  addBtn.textContent = '+ Nieuw project…';
+  addBtn.addEventListener('click', () => addProjectUI(true));
+  wrap.appendChild(addBtn);
+}
+
+function addProjectUI(selectAfter) {
+  const name = prompt('Naam van het nieuwe project:');
+  if (!name) return;
+  const trimmed = name.trim();
+  if (!trimmed) return;
+  if (state.projects.some(p => p.name.toLowerCase() === trimmed.toLowerCase())) {
+    alert('Er bestaat al een project met deze naam.');
+    return;
+  }
+  const usedColors = new Set(state.projects.map(p => p.color));
+  const next = PROJECT_PALETTE.find(c => !usedColors.has(c)) || PROJECT_PALETTE[state.projects.length % PROJECT_PALETTE.length];
+  const p = { id: null, name: trimmed, color: next, archived: false };
+  state.projects.push(p);
+  if (!state.activities[trimmed]) state.activities[trimmed] = [];
+  cloudInsertProject(p).catch(e => console.warn('project insert', e));
+  applyProjectStyles();
+  renderProjectButtons();
+  renderProjectManager();
+  if (selectAfter && modal.draft) selectProject(trimmed);
+}
+
+function selectProject(name) {
+  if (!modal.draft) return;
+  modal.draft.category = name;
+  document.querySelectorAll('.cat-btn').forEach(b => {
+    if (b.classList.contains('cat-btn-add')) return;
+    b.classList.toggle('selected', b.dataset.cat === name);
+  });
+  renderSuggestions();
+  document.getElementById('activity-input').focus();
+}
+
 function openModal(dateStr, time) {
   const entry = getEntry(dateStr, time) || { category: '', activity: '', note: '' };
   modal = { date: dateStr, time, draft: { ...entry } };
@@ -2262,7 +1747,6 @@ function openModal(dateStr, time) {
   document.getElementById('modal-title').textContent = `${time}`;
   document.getElementById('modal-subtitle').textContent = fmtDateLong(d);
 
-  // category buttons (alleen echte cat-btns, niet de + knop)
   document.querySelectorAll('.cat-btn').forEach(b => {
     if (b.classList.contains('cat-btn-add')) return;
     b.classList.toggle('selected', b.dataset.cat === modal.draft.category);
@@ -2274,7 +1758,6 @@ function openModal(dateStr, time) {
   document.getElementById('modal-backdrop').classList.add('open');
   setTimeout(() => {
     if (!modal.draft.category) {
-      // focus first cat button
       const first = document.querySelector('.cat-btn:not(.cat-btn-add)');
       if (first) first.focus();
     } else {
@@ -2289,13 +1772,13 @@ function closeModal() {
 }
 
 function renderSuggestions() {
-  const cat = modal.draft.category;
+  const proj = modal.draft?.category;
   const wrap = document.getElementById('suggestions');
-  if (!cat || !state.activities[cat] || state.activities[cat].length === 0) {
-    wrap.innerHTML = `<div style="font-size:11px;color:var(--ink-faint);font-family:'JetBrains Mono',monospace;">${cat ? 'Nog geen opgeslagen activiteiten — typ er eentje, dan wordt deze onthouden.' : 'Kies eerst een categorie.'}</div>`;
+  if (!proj || !state.activities[proj] || state.activities[proj].length === 0) {
+    wrap.innerHTML = `<div style="font-size:11px;color:var(--ink-faint);font-family:var(--mono);">${proj ? 'Nog geen opgeslagen activiteiten — typ er eentje, dan wordt deze onthouden.' : 'Kies eerst een project.'}</div>`;
     return;
   }
-  wrap.innerHTML = state.activities[cat]
+  wrap.innerHTML = state.activities[proj]
     .map(a => `<button class="suggestion-chip" data-act="${escapeAttr(a)}">${escapeHtml(a)}</button>`)
     .join('');
   wrap.querySelectorAll('.suggestion-chip').forEach(chip => {
@@ -2308,21 +1791,11 @@ function renderSuggestions() {
   });
 }
 
-function selectCategory(cat) {
-  modal.draft.category = cat;
-  document.querySelectorAll('.cat-btn').forEach(b => {
-    if (b.classList.contains('cat-btn-add')) return;
-    b.classList.toggle('selected', b.dataset.cat === cat);
-  });
-  renderSuggestions();
-  document.getElementById('activity-input').focus();
-}
-
 function saveModal() {
   modal.draft.activity = document.getElementById('activity-input').value.trim();
   modal.draft.note = document.getElementById('note-input').value.trim();
   if (!modal.draft.category) {
-    alert('Kies een categorie.');
+    alert('Kies een project.');
     return;
   }
   setEntry(modal.date, modal.time, { ...modal.draft });
@@ -2340,24 +1813,78 @@ function deleteFromModal() {
 }
 
 /* ============================================
+   PROJECTEN BEHEER
+============================================ */
+function openProjectManager() {
+  renderProjectManager();
+  document.getElementById('proj-modal-backdrop').classList.add('open');
+}
+function closeProjectManager() {
+  document.getElementById('proj-modal-backdrop').classList.remove('open');
+}
+function renderProjectManager() {
+  const wrap = document.getElementById('proj-list');
+  if (!wrap) return;
+  if (state.projects.length === 0) {
+    wrap.innerHTML = '<div style="color:var(--ink-faint);font-style:italic;padding:12px 0;">Nog geen projecten.</div>';
+    return;
+  }
+  wrap.innerHTML = state.projects.map((p, i) => `
+    <div class="proj-row ${p.archived ? 'archived' : ''}">
+      <span class="swatch" style="background:${p.color};"></span>
+      <span class="proj-name">${escapeHtml(p.name)}</span>
+      <button data-idx="${i}" data-act="rename">hernoem</button>
+      <button data-idx="${i}" data-act="archive">${p.archived ? 'activeer' : 'archiveer'}</button>
+    </div>
+  `).join('');
+  wrap.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => {
+      const p = state.projects[Number(b.dataset.idx)];
+      if (!p) return;
+      if (b.dataset.act === 'rename') {
+        const name = prompt('Nieuwe naam voor project:', p.name);
+        if (!name) return;
+        const trimmed = name.trim();
+        if (!trimmed || trimmed === p.name) return;
+        if (state.projects.some(x => x !== p && x.name.toLowerCase() === trimmed.toLowerCase())) {
+          alert('Er bestaat al een project met deze naam.');
+          return;
+        }
+        const oldName = p.name;
+        p.name = trimmed;
+        if (state.activities[oldName]) {
+          state.activities[trimmed] = state.activities[oldName];
+          delete state.activities[oldName];
+        }
+        cloudUpdateProject(p).catch(e => console.warn('project update', e));
+      } else if (b.dataset.act === 'archive') {
+        p.archived = !p.archived;
+        cloudUpdateProject(p).catch(e => console.warn('project update', e));
+      }
+      applyProjectStyles();
+      renderProjectButtons();
+      renderProjectManager();
+      initAnalyseFilters();
+      updateView();
+    });
+  });
+}
+
+/* ============================================
    UPDATE / WIRING
 ============================================ */
 function updateView() {
-  // date display
   document.getElementById('date-display').innerHTML = `<span class="day-name">${DAY_NAMES_NL[cursor.getDay()]}</span> ${cursor.getDate()} ${MONTH_NAMES_NL[cursor.getMonth()]} ${cursor.getFullYear()}`;
   document.getElementById('date-picker').value = fmtDate(cursor);
-  document.getElementById('today-label').textContent = fmtDateLong(new Date());
 
-  // toggle sections
   document.getElementById('section-tracker').classList.toggle('hidden', section !== 'tracker');
-  document.getElementById('section-checklist').classList.toggle('hidden', section !== 'checklist');
-  document.getElementById('section-rapportage').classList.toggle('hidden', section !== 'rapportage');
-  if (section === 'rapportage') renderRapportage();
+  document.getElementById('section-analyse').classList.toggle('hidden', section !== 'analyse');
+  document.getElementById('tracker-controls').classList.toggle('hidden', section !== 'tracker');
+  if (section === 'analyse') renderAnalyse();
   document.querySelectorAll('.section-nav button').forEach(b => {
     b.classList.toggle('active', b.dataset.section === section);
   });
 
-  // toggle view tabs (shared across sections)
   document.querySelectorAll('.view-group button').forEach(b => {
     b.classList.toggle('active', b.dataset.view === view);
   });
@@ -2370,9 +1897,6 @@ function updateView() {
     else if (view === 'week') renderWeekView();
     else renderMonthView();
     renderStats();
-  } else {
-    clView = view;
-    renderChecklist();
   }
 }
 
@@ -2383,15 +1907,20 @@ function escapeHtml(s) {
 function escapeAttr(s) { return escapeHtml(s); }
 
 /* ============================================
-   IMPORT / EXPORT
+   IMPORT / EXPORT (JSON backup)
 ============================================ */
 function exportData() {
-  const payload = { tracker: state, checklist: cl, _exportedAt: new Date().toISOString(), _version: 2 };
+  const payload = {
+    tracker: { entries: state.entries, activities: state.activities },
+    projects: state.projects,
+    _exportedAt: new Date().toISOString(),
+    _version: 3
+  };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `tijdregister-backup-${fmtDate(new Date())}.json`;
+  a.download = `tijd-backup-${fmtDate(new Date())}.json`;
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -2401,55 +1930,26 @@ async function importData(file) {
   reader.onload = async e => {
     try {
       const data = JSON.parse(e.target.result);
-      const isV2 = data._version === 2 || data.tracker || data.checklist;
-      if (!isV2 && (!data.activities || !data.entries)) throw new Error('Onbekend formaat');
-      if (!confirm('Huidige cloud-data overschrijven met geïmporteerde backup? Dit kan niet ongedaan gemaakt worden.')) return;
+      const trackerData = data.tracker || (data.entries ? data : null);
+      if (!trackerData || !trackerData.entries) throw new Error('Onbekend formaat');
+      if (!confirm('Huidige cloud-tijdregistraties overschrijven met deze backup? Dit kan niet ongedaan gemaakt worden.')) return;
 
       const sb = await ensureSb();
       syncStart();
 
-      // Tracker
-      const trackerData = isV2 ? (data.tracker || null) : data;
-      if (trackerData && trackerData.entries) {
-        await sb.from('tracker_entries').delete().match({ user_id: auth.user.id });
-        const rows = [];
-        for (const date of Object.keys(trackerData.entries)) {
-          for (const time of Object.keys(trackerData.entries[date])) {
-            const ent = trackerData.entries[date][time];
-            rows.push({
-              user_id: auth.user.id, date, time,
-              category: ent.category, activity: ent.activity || null, note: ent.note || null
-            });
-          }
-        }
-        if (rows.length) {
-          // batch in chunks of 500
-          for (let i = 0; i < rows.length; i += 500) {
-            await sb.from('tracker_entries').insert(rows.slice(i, i+500));
-          }
+      await sb.from('tracker_entries').delete().match({ user_id: auth.user.id });
+      const rows = [];
+      for (const date of Object.keys(trackerData.entries)) {
+        for (const time of Object.keys(trackerData.entries[date])) {
+          const ent = trackerData.entries[date][time];
+          rows.push({
+            user_id: auth.user.id, date, time,
+            category: ent.category, activity: ent.activity || null, note: ent.note || null
+          });
         }
       }
-
-      // Checklist
-      if (isV2 && data.checklist) {
-        await sb.from('checklist_log').delete().match({ user_id: auth.user.id });
-        await sb.from('checklist_items').delete().match({ user_id: auth.user.id });
-        const itemRows = (data.checklist.items || []).map(it => ({
-          user_id: auth.user.id, item_id: it.id, data: it
-        }));
-        if (itemRows.length) await sb.from('checklist_items').insert(itemRows);
-        const logRows = [];
-        for (const itemId of Object.keys(data.checklist.log || {})) {
-          for (const dateStr of Object.keys(data.checklist.log[itemId])) {
-            logRows.push({
-              user_id: auth.user.id, item_id: itemId, date: dateStr,
-              value: data.checklist.log[itemId][dateStr]
-            });
-          }
-        }
-        for (let i = 0; i < logRows.length; i += 500) {
-          await sb.from('checklist_log').insert(logRows.slice(i, i+500));
-        }
+      for (let i = 0; i < rows.length; i += 500) {
+        await sb.from('tracker_entries').insert(rows.slice(i, i+500));
       }
 
       await cloudFetchAll();
@@ -2465,537 +1965,7 @@ async function importData(file) {
 }
 
 /* ============================================
-   INIT
-============================================ */
-/* ============================================
-   CHECKLIST MODULE
-============================================ */
-const CL_STORAGE_KEY = 'tijdregister-checklist-v1';
-
-// Default seeded items based on user's list
-const DEFAULT_ITEMS = [
-  // GOEDE ZAKEN
-  { id: 'lezen', group: 'goede', name: 'Lezen', type: 'DAILY_VALUE', target: 30, unit: 'min', direction: 'min' },
-  { id: 'ai-inlezen', group: 'goede', name: 'Inlezen over AI', type: 'DAILY_VALUE', target: 60, unit: 'min', direction: 'min' },
-  { id: 'sport', group: 'goede', name: 'Sport', type: 'DAILY_VALUE', target: 60, unit: 'min', direction: 'min' },
-  { id: 'stappen', group: 'goede', name: '10.000 stappen', type: 'DAILY_VALUE', target: 10000, unit: 'stappen', direction: 'min' },
-  { id: 'opstaan-7', group: 'goede', name: 'Opstaan om 7 uur', type: 'DAILY_CHECK' },
-  { id: 'bed-24', group: 'goede', name: 'Voor 24:00 naar bed', type: 'DAILY_CHECK' },
-  { id: 'hyperfocus', group: 'goede', name: 'Hyperfocus', type: 'DAILY_VALUE', target: 300, unit: 'min', direction: 'min' },
-  { id: 'tanden', group: 'goede', name: 'Tandenpoetsen', type: 'DAILY_VALUE', target: 2, unit: 'x', direction: 'min' },
-  { id: 'email-sameday', group: 'goede', name: 'Emails dezelfde dag beantwoord', type: 'DAILY_CHECK' },
-  { id: 'huis-bed', group: 'goede', name: 'Voor bed huis organiseren', type: 'DAILY_CHECK' },
-  { id: 'water-2l', group: 'goede', name: 'Water drinken', type: 'DAILY_VALUE', target: 2, unit: 'L', direction: 'min' },
-  { id: 'water-start', group: 'goede', name: '2x glas water bij ontwaken', type: 'DAILY_CHECK' },
-  { id: 'no-snacks', group: 'goede', name: 'Geen onnodige snacks', type: 'DAILY_CHECK' },
-  { id: 'tiktok-2', group: 'goede', name: 'TikTok posts', type: 'DAILY_VALUE', target: 2, unit: 'x', direction: 'min' },
-  { id: 'instagram-1', group: 'goede', name: 'Instagram post', type: 'DAILY_VALUE', target: 1, unit: 'x', direction: 'min' },
-  { id: 'serie-max-1u', group: 'goede', name: 'Serie kijken (max)', type: 'DAILY_VALUE', target: 60, unit: 'min', direction: 'max' },
-  { id: 'netwerk-30', group: 'goede', name: 'Aan netwerk werken', type: 'DAILY_VALUE', target: 30, unit: 'min', direction: 'min' },
-  // SLECHTE ZAKEN
-  { id: 'chips', group: 'slechte', name: 'Chips', type: 'WEEKLY_LIMIT', target: 3, unit: 'x' },
-  { id: 'huidpulken', group: 'slechte', name: 'Huidpulken', type: 'WEEKLY_LIMIT', target: 0, unit: 'x', penalty: '10x push-up als straf' },
-  { id: 'gamen', group: 'slechte', name: 'Gamen (sessies van 1u)', type: 'WEEKLY_LIMIT', target: 3, unit: 'x' },
-  { id: 'no-procrastinate', group: 'slechte', name: 'Start met moeilijkste werk', type: 'DAILY_CHECK' },
-  { id: 'no-doomscroll', group: 'slechte', name: 'Geen doomscrolling', type: 'DAILY_CHECK' },
-  { id: 'inchecken', group: 'slechte', name: 'Inchecken bij mensen', type: 'PERIODIC', period: 7 },
-  { id: 'gezond-eten', group: 'slechte', name: 'Gezond eten (ma-vr)', type: 'DAILY_CHECK' },
-  // SIDEQUESTS
-  { id: 'buitenshuis', group: 'sidequests', name: 'Buitenshuis werken', type: 'PERIODIC', period: 7 },
-  { id: 'nieuw-leren', group: 'sidequests', name: 'Iets nieuws leren', type: 'PERIODIC', period: 30 },
-  { id: 'strand', group: 'sidequests', name: 'Strand bezoeken', type: 'PERIODIC', period: 21 },
-  { id: 'datenight', group: 'sidequests', name: 'Datenight met vrouw', type: 'PERIODIC', period: 7 },
-  { id: 'vrienden', group: 'sidequests', name: 'Nieuwe vriend / connectie', type: 'PERIODIC', period: 14 }
-];
-
-const GROUP_LABELS = { goede: 'Goede zaken', slechte: 'Slechte zaken / te verbeteren', sidequests: 'Sidequests' };
-
-let cl = { items: [], log: {}, collapsed: {} };
-let clView = 'day';
-let editingItemId = null;
-
-function loadCl() {
-  // No-op: data wordt geladen via cloudFetchAll() na login
-}
-function saveCl() {
-  // No-op: per-operatie cloud sync; collapsed-state blijft lokaal
-  try { localStorage.setItem('tijdregister-cl-ui', JSON.stringify(cl.collapsed || {})); } catch(e) {}
-}
-
-function getItemValue(itemId, dateStr) {
-  return cl.log[itemId] && cl.log[itemId][dateStr];
-}
-function setItemValue(itemId, dateStr, value) {
-  if (!cl.log[itemId]) cl.log[itemId] = {};
-  // Wissen: alleen op echt "lege" waarden, NIET op 'nee'
-  if (value === null || value === undefined || value === '' || value === 0 || value === false) {
-    delete cl.log[itemId][dateStr];
-    if (Object.keys(cl.log[itemId]).length === 0) delete cl.log[itemId];
-  } else {
-    cl.log[itemId][dateStr] = value;
-  }
-  cloudUpsertChecklistLog(itemId, dateStr, value).catch(e => console.warn('upsert log', e));
-}
-
-// status: hit | partial | miss | pending
-function getDailyStatus(item, dateStr) {
-  const v = getItemValue(item.id, dateStr);
-  if (item.type === 'DAILY_CHECK' || item.type === 'PERIODIC') {
-    if (v === true) return 'hit';
-    if (v === 'nee') return 'miss';
-    return 'pending';
-  }
-  if (item.type === 'DAILY_VALUE') {
-    const actual = Number(v) || 0;
-    if (actual === 0) return 'pending';
-    if (item.direction === 'max') return actual <= item.target ? 'hit' : 'miss';
-    return actual >= item.target ? 'hit' : 'partial';
-  }
-  return 'pending';
-}
-
-function getWeekStats(item, weekStart) {
-  let total = 0, daysHit = 0, daysAny = 0, daysMissed = 0;
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(weekStart); d.setDate(weekStart.getDate()+i);
-    const ds = fmtDate(d);
-    const v = getItemValue(item.id, ds);
-    if (item.type === 'DAILY_VALUE') {
-      const n = Number(v) || 0;
-      total += n;
-      if (n > 0) daysAny++;
-      const hit = item.direction === 'max' ? (n > 0 && n <= item.target) : n >= item.target;
-      if (hit) daysHit++;
-    } else if (item.type === 'DAILY_CHECK') {
-      if (v === true) { total++; daysHit++; daysAny++; }
-    } else if (item.type === 'WEEKLY_LIMIT') {
-      const n = Number(v) || 0;
-      total += n;
-      if (n > 0) daysAny++;
-    } else if (item.type === 'PERIODIC') {
-      if (v === true) { total++; daysHit++; daysAny++; }
-    }
-  }
-  return { total, daysHit, daysAny };
-}
-
-function getMonthStats(item, monthStart, monthEnd) {
-  let total = 0, daysHit = 0, daysAny = 0, dayCount = 0;
-  const cur = new Date(monthStart);
-  while (cur <= monthEnd) {
-    dayCount++;
-    const ds = fmtDate(cur);
-    const v = getItemValue(item.id, ds);
-    if (item.type === 'DAILY_VALUE') {
-      const n = Number(v) || 0;
-      total += n;
-      if (n > 0) daysAny++;
-      const hit = item.direction === 'max' ? (n > 0 && n <= item.target) : n >= item.target;
-      if (hit) daysHit++;
-    } else if (item.type === 'DAILY_CHECK') {
-      if (v === true) { total++; daysHit++; daysAny++; }
-    } else if (item.type === 'WEEKLY_LIMIT') {
-      const n = Number(v) || 0;
-      total += n;
-      if (n > 0) daysAny++;
-    } else if (item.type === 'PERIODIC') {
-      if (v === true) { total++; daysHit++; daysAny++; }
-    }
-    cur.setDate(cur.getDate()+1);
-  }
-  return { total, daysHit, daysAny, dayCount };
-}
-
-function lastDoneDate(itemId) {
-  const log = cl.log[itemId] || {};
-  const dates = Object.keys(log).filter(d => log[d]).sort();
-  return dates.length ? dates[dates.length - 1] : null;
-}
-function daysBetween(fromStr, toDate) {
-  const a = parseDate(fromStr); a.setHours(0,0,0,0);
-  const b = new Date(toDate); b.setHours(0,0,0,0);
-  return Math.floor((b - a) / 86400000);
-}
-
-function fmtValue(v, unit) {
-  if (unit === 'min') {
-    const n = Number(v) || 0;
-    if (n < 60) return `${n}m`;
-    const h = Math.floor(n/60); const m = n%60;
-    return m === 0 ? `${h}u` : `${h}u${String(m).padStart(2,'0')}`;
-  }
-  if (unit === 'stappen') return Number(v).toLocaleString('nl-NL');
-  if (unit === 'L') return `${v} L`;
-  return `${v}${unit ? ' '+unit : ''}`;
-}
-
-/* === CHECKLIST: DAY VIEW === */
-function renderChecklistDay() {
-  const dateStr = fmtDate(cursor);
-  const groups = ['goede','slechte','sidequests'];
-  let html = '<div class="cl-day">';
-  for (const g of groups) {
-    const items = cl.items.filter(i => i.group === g);
-    const collapsed = cl.collapsed[g];
-    html += `<div class="cl-group${collapsed?' collapsed':''}" data-group="${g}">`;
-    html += `<div class="cl-group-header" data-action="toggle">
-      <h3>${GROUP_LABELS[g]}</h3>
-      <span class="count">${items.length} items ${collapsed?'· ingeklapt':''}</span>
-    </div>`;
-    html += `<div class="cl-items">`;
-    const isToday = dateStr === fmtDate(new Date());
-    for (const item of items) {
-      const status = getDailyStatus(item, dateStr);
-      let hide = false;
-      if (isToday) {
-        if (item.type === 'DAILY_CHECK' || item.type === 'PERIODIC') {
-          if (status === 'hit' || status === 'miss') hide = true;
-        } else if (item.type === 'DAILY_VALUE') {
-          if (status === 'hit') hide = true;
-        }
-      }
-      if (!hide) html += renderClItem(item, dateStr);
-    }
-    if (isToday) {
-      const allItems = cl.items.filter(i => i.group === g);
-      const hiddenCount = allItems.filter(it => {
-        const st = getDailyStatus(it, dateStr);
-        if (it.type === 'DAILY_CHECK' || it.type === 'PERIODIC') return st === 'hit' || st === 'miss';
-        if (it.type === 'DAILY_VALUE') return st === 'hit';
-        return false;
-      }).length;
-      if (hiddenCount > 0) {
-        html += `<div class="cl-hidden-info">${hiddenCount} voltooid voor vandaag (zie week- of maandoverzicht)</div>`;
-      }
-    }
-    html += `<div class="cl-add" data-group="${g}" data-action="add">+ item toevoegen aan ${GROUP_LABELS[g].toLowerCase()}</div>`;
-    html += `</div></div>`;
-  }
-  html += '</div>';
-  document.getElementById('cl-day-view').innerHTML = html;
-
-  // wire interactions
-  document.querySelectorAll('.cl-group-header').forEach(h => {
-    h.addEventListener('click', () => {
-      const g = h.parentElement.dataset.group;
-      cl.collapsed[g] = !cl.collapsed[g];
-      saveCl(); renderChecklistDay();
-    });
-  });
-  document.querySelectorAll('.cl-add').forEach(a => {
-    a.addEventListener('click', e => { e.stopPropagation(); openItemModal(null, a.dataset.group); });
-  });
-  document.querySelectorAll('.cl-item-edit').forEach(b => {
-    b.addEventListener('click', e => { e.stopPropagation(); openItemModal(b.dataset.id); });
-  });
-  document.querySelectorAll('.cl-control [data-act]').forEach(el => {
-    el.addEventListener('click', e => {
-      e.stopPropagation();
-      handleClAction(el.dataset.id, el.dataset.act, el);
-    });
-  });
-  document.querySelectorAll('.cl-control input.value').forEach(inp => {
-    inp.addEventListener('change', () => {
-      const v = inp.value === '' ? 0 : Number(inp.value);
-      setItemValue(inp.dataset.id, dateStr, v);
-      renderChecklistDay();
-    });
-  });
-}
-
-function renderClItem(item, dateStr) {
-  const v = getItemValue(item.id, dateStr);
-  const status = getDailyStatus(item, dateStr);
-  const dotCls = status === 'hit' ? 'hit' : status === 'partial' ? 'partial' : status === 'miss' ? 'miss' : '';
-
-  let target = '';
-  if (item.type === 'DAILY_VALUE') target = `${fmtValue(item.target, item.unit)}${item.direction==='max'?' max':''}`;
-  else if (item.type === 'WEEKLY_LIMIT') target = `≤ ${item.target}${item.unit?item.unit:''} per week`;
-  else if (item.type === 'PERIODIC') target = `1× per ${item.period} dagen`;
-  else target = 'ja / nee';
-
-  let control = '';
-  if (item.type === 'DAILY_VALUE') {
-    const cur = Number(v) || 0;
-    const step = item.unit === 'min' ? 5 : item.unit === 'stappen' ? 500 : item.unit === 'L' ? 0.25 : 1;
-    control = `
-      <button class="step" data-id="${item.id}" data-act="dec" data-step="${step}">−</button>
-      <input class="value" type="number" inputmode="decimal" step="${step}" data-id="${item.id}" value="${cur||''}" placeholder="0">
-      <button class="step" data-id="${item.id}" data-act="inc" data-step="${step}">+</button>
-      <span class="unit">${item.unit||''}</span>`;
-  } else if (item.type === 'DAILY_CHECK') {
-    const yesActive = v === true;
-    const noActive = v === 'nee';
-    control = `
-      <button class="check ${yesActive?'checked':''}" data-id="${item.id}" data-act="set-ja">${yesActive?'✓ Ja':'Ja'}</button>
-      <button class="check-no ${noActive?'checked':''}" data-id="${item.id}" data-act="set-nee">${noActive?'✗ Nee':'Nee'}</button>`;
-  } else if (item.type === 'WEEKLY_LIMIT') {
-    const cur = Number(v) || 0;
-    const wkStart = startOfWeek(cursor);
-    const wk = getWeekStats(item, wkStart);
-    let cls = 'ok';
-    if (wk.total > item.target) cls = 'over';
-    else if (wk.total === item.target) cls = 'warning';
-    control = `
-      <button class="step" data-id="${item.id}" data-act="dec" data-step="1">−</button>
-      <input class="value" type="number" inputmode="numeric" step="1" data-id="${item.id}" value="${cur||''}" placeholder="0">
-      <button class="step" data-id="${item.id}" data-act="inc" data-step="1">+</button>
-      <span class="week-counter ${cls}">${wk.total}/${item.target} wk</span>`;
-  } else if (item.type === 'PERIODIC') {
-    const yesActive = v === true;
-    const noActive = v === 'nee';
-    const last = lastDoneDate(item.id);
-    let dueInfo = '';
-    let dueCls = '';
-    if (!last) {
-      dueInfo = 'nog nooit gedaan';
-      dueCls = 'overdue';
-    } else {
-      const since = daysBetween(last, cursor);
-      const remaining = item.period - since;
-      if (remaining <= 0) { dueInfo = `${-remaining}d te laat`; dueCls = 'overdue'; }
-      else if (remaining <= 1) { dueInfo = `vandaag/morgen`; dueCls = 'due-soon'; }
-      else dueInfo = `over ${remaining}d`;
-    }
-    control = `
-      <button class="check ${yesActive?'checked':''}" data-id="${item.id}" data-act="set-ja">${yesActive?'✓ Ja':'Ja'}</button>
-      <button class="check-no ${noActive?'checked':''}" data-id="${item.id}" data-act="set-nee">${noActive?'✗ Nee':'Nee'}</button>
-      <span class="due-info ${dueCls}">${dueInfo}</span>`;
-  }
-  // step -> +/- helper data attribute (so dec=−step, inc=+step) we'll handle in handleClAction
-  control = control.replace('data-act="dec"', 'data-act="step" data-dir="-1"').replace('data-act="inc"', 'data-act="step" data-dir="1"');
-
-  const penalty = (item.penalty && (status === 'miss' || (item.type==='WEEKLY_LIMIT'))) ? `<div class="penalty">${escapeHtml(item.penalty)}</div>` : '';
-
-  return `<div class="cl-item">
-    <div class="info">
-      <div class="name"><span class="status-dot ${dotCls}"></span>${escapeHtml(item.name)}<button class="cl-item-edit" data-id="${item.id}" title="bewerk">✎</button></div>
-      <div class="target">${target}</div>
-      ${penalty}
-    </div>
-    <div class="cl-control">${control}</div>
-  </div>`;
-}
-
-function handleClAction(itemId, act, el) {
-  const item = cl.items.find(i => i.id === itemId);
-  if (!item) return;
-  const dateStr = fmtDate(cursor);
-  const cur = getItemValue(itemId, dateStr);
-
-  if (act === 'set-ja') {
-    setItemValue(itemId, dateStr, cur === true ? null : true);
-  } else if (act === 'set-nee') {
-    setItemValue(itemId, dateStr, cur === 'nee' ? null : 'nee');
-  } else if (act === 'toggle') {
-    setItemValue(itemId, dateStr, cur === true ? false : true);
-  } else if (act === 'step') {
-    const curNum = Number(cur) || 0;
-    const step = parseFloat(el.dataset.step) * parseInt(el.dataset.dir);
-    const next = Math.max(0, +(curNum + step).toFixed(2));
-    setItemValue(itemId, dateStr, next);
-  }
-  renderChecklistDay();
-}
-
-/* === CHECKLIST: WEEK VIEW === */
-function renderChecklistWeek() {
-  const start = startOfWeek(cursor);
-  const days = [];
-  for (let i = 0; i < 7; i++) { const d = new Date(start); d.setDate(start.getDate()+i); days.push(d); }
-  const today = new Date();
-
-  let html = '<div class="cl-week"><table>';
-  html += '<thead><tr><th class="col-name">Item</th>';
-  for (const d of days) {
-    const cls = isSameDate(d, today) ? 'today' : '';
-    html += `<th class="${cls}">${DAY_NAMES_NL_SHORT[d.getDay()]}<br>${d.getDate()}/${d.getMonth()+1}</th>`;
-  }
-  html += '<th>Week</th></tr></thead><tbody>';
-
-  for (const g of ['goede','slechte','sidequests']) {
-    const items = cl.items.filter(i => i.group === g);
-    if (items.length === 0) continue;
-    html += `<tr class="group-row"><td colspan="9">${GROUP_LABELS[g]}</td></tr>`;
-    for (const item of items) {
-      let target = '';
-      if (item.type === 'DAILY_VALUE') target = `${fmtValue(item.target, item.unit)}/d${item.direction==='max'?' max':''}`;
-      else if (item.type === 'WEEKLY_LIMIT') target = `≤ ${item.target}${item.unit?item.unit:''}/wk`;
-      else if (item.type === 'PERIODIC') target = `1× /${item.period}d`;
-      else target = 'ja/nee';
-
-      html += `<tr><td class="col-name">${escapeHtml(item.name)}<br><span class="target-sub">${target}</span></td>`;
-      for (const d of days) {
-        const ds = fmtDate(d);
-        const v = getItemValue(item.id, ds);
-        const status = getDailyStatus(item, ds);
-        let cell = '';
-        if (item.type === 'DAILY_VALUE') {
-          cell = v ? fmtValue(v, item.unit) : '';
-        } else if (item.type === 'DAILY_CHECK' || item.type === 'PERIODIC') {
-          cell = v === true ? '✓' : '';
-        } else if (item.type === 'WEEKLY_LIMIT') {
-          cell = v ? String(v) : '';
-        }
-        const cls = status;
-        html += `<td class="day-cell ${cls}">${cell}</td>`;
-      }
-      // week summary
-      const wk = getWeekStats(item, start);
-      let summary = '', sumCls = '';
-      if (item.type === 'DAILY_VALUE') {
-        const wkTarget = item.target * 7;
-        if (item.direction === 'max') {
-          const overDays = wk.daysAny - wk.daysHit; // days where exceeded
-          summary = `${fmtValue(wk.total, item.unit)}`;
-          sumCls = overDays > 0 ? 'miss' : 'ok';
-        } else {
-          summary = `${fmtValue(wk.total, item.unit)} / ${fmtValue(wkTarget, item.unit)}`;
-          sumCls = wk.total >= wkTarget ? 'ok' : (wk.total >= wkTarget*0.6 ? 'warning' : 'miss');
-        }
-      } else if (item.type === 'DAILY_CHECK') {
-        summary = `${wk.daysHit} / 7 dagen`;
-        sumCls = wk.daysHit >= 6 ? 'ok' : wk.daysHit >= 4 ? 'warning' : 'miss';
-      } else if (item.type === 'WEEKLY_LIMIT') {
-        summary = `${wk.total} / ${item.target}`;
-        sumCls = wk.total > item.target ? 'miss' : (wk.total === item.target ? 'warning' : 'ok');
-      } else if (item.type === 'PERIODIC') {
-        summary = wk.daysHit > 0 ? `✓ deze week` : '— niet';
-        sumCls = wk.daysHit > 0 ? 'ok' : (item.period <= 7 ? 'miss' : 'warning');
-      }
-      html += `<td class="summary ${sumCls}">${summary}</td></tr>`;
-    }
-  }
-  html += '</tbody></table></div>';
-  document.getElementById('cl-week-view').innerHTML = html;
-}
-
-/* === CHECKLIST: MONTH VIEW === */
-function renderChecklistMonth() {
-  const monthStart = startOfMonth(cursor);
-  const monthEnd = endOfMonth(cursor);
-  let html = `<div class="cl-month">`;
-  html += `<div class="cl-month-row group-header"><h3>${MONTH_NAMES_NL[cursor.getMonth()]} ${cursor.getFullYear()}</h3><div class="col-h">Werkelijk</div><div class="col-h">Doel-dagen</div><div class="col-h">Gem./dag</div></div>`;
-
-  for (const g of ['goede','slechte','sidequests']) {
-    const items = cl.items.filter(i => i.group === g);
-    if (items.length === 0) continue;
-    html += `<div class="cl-month-row group-header"><h3>${GROUP_LABELS[g]}</h3><div class="col-h"></div><div class="col-h"></div><div class="col-h"></div></div>`;
-    for (const item of items) {
-      const m = getMonthStats(item, monthStart, monthEnd);
-      let target = '', actual = '', hitInfo = '', avg = '';
-      if (item.type === 'DAILY_VALUE') {
-        target = `${fmtValue(item.target, item.unit)}/d${item.direction==='max'?' max':''}`;
-        actual = fmtValue(m.total, item.unit);
-        hitInfo = `${m.daysHit}/${m.dayCount}`;
-        avg = fmtValue(Math.round(m.total / m.dayCount), item.unit);
-      } else if (item.type === 'DAILY_CHECK') {
-        target = 'ja/nee';
-        actual = `${m.daysHit} dgn ✓`;
-        hitInfo = `${m.daysHit}/${m.dayCount}`;
-        avg = `${Math.round(m.daysHit/m.dayCount*100)}%`;
-      } else if (item.type === 'WEEKLY_LIMIT') {
-        const wkLimit = item.target * (m.dayCount/7);
-        target = `≤ ${item.target}/wk`;
-        actual = `${m.total}${item.unit||''}`;
-        hitInfo = `vs ${wkLimit.toFixed(1)} max`;
-        avg = `${(m.total/(m.dayCount/7)).toFixed(1)}/wk`;
-      } else if (item.type === 'PERIODIC') {
-        target = `1× /${item.period}d`;
-        actual = `${m.daysHit}× gedaan`;
-        const expected = Math.floor(m.dayCount/item.period);
-        hitInfo = `${m.daysHit}/${expected || 1} verwacht`;
-        avg = m.daysHit > 0 ? `${(m.dayCount/m.daysHit).toFixed(0)}d gem.` : '—';
-      }
-      html += `<div class="cl-month-row"><div><span class="name">${escapeHtml(item.name)}</span><span class="target-sub">${target}</span></div><div class="stat">${actual}</div><div class="stat">${hitInfo}</div><div class="stat">${avg}</div></div>`;
-    }
-  }
-  html += `</div>`;
-  document.getElementById('cl-month-view').innerHTML = html;
-}
-
-/* === ITEM EDIT MODAL === */
-function openItemModal(itemId, defaultGroup) {
-  editingItemId = itemId;
-  const item = itemId ? cl.items.find(i => i.id === itemId) : null;
-  document.getElementById('item-modal-title').textContent = item ? 'Bewerk item' : 'Nieuw item';
-  document.getElementById('item-name').value = item?.name || '';
-  document.getElementById('item-group').value = item?.group || defaultGroup || 'goede';
-  document.getElementById('item-type').value = item?.type || 'DAILY_VALUE';
-  document.getElementById('item-target').value = item?.target ?? 30;
-  document.getElementById('item-unit').value = item?.unit || 'min';
-  document.getElementById('item-direction').value = item?.direction || 'min';
-  document.getElementById('item-period').value = item?.period ?? 7;
-  document.getElementById('item-penalty').value = item?.penalty || '';
-  document.getElementById('item-modal-delete').style.display = item ? '' : 'none';
-  toggleItemModalFields();
-  document.getElementById('item-modal-backdrop').classList.add('open');
-}
-function closeItemModal() {
-  document.getElementById('item-modal-backdrop').classList.remove('open');
-  editingItemId = null;
-}
-function toggleItemModalFields() {
-  const t = document.getElementById('item-type').value;
-  document.getElementById('item-target-row').style.display = (t === 'DAILY_CHECK') ? 'none' : 'grid';
-  document.getElementById('item-direction-row').style.display = (t === 'DAILY_VALUE') ? '' : 'none';
-  document.getElementById('item-period-row').style.display = (t === 'PERIODIC') ? '' : 'none';
-}
-function saveItemModal() {
-  const name = document.getElementById('item-name').value.trim();
-  if (!name) { alert('Naam verplicht'); return; }
-  const data = {
-    name,
-    group: document.getElementById('item-group').value,
-    type: document.getElementById('item-type').value,
-    penalty: document.getElementById('item-penalty').value.trim() || undefined
-  };
-  if (data.type === 'DAILY_VALUE' || data.type === 'WEEKLY_LIMIT' || data.type === 'PERIODIC') {
-    data.target = Number(document.getElementById('item-target').value) || 0;
-    data.unit = document.getElementById('item-unit').value.trim() || '';
-  }
-  if (data.type === 'DAILY_VALUE') data.direction = document.getElementById('item-direction').value;
-  if (data.type === 'PERIODIC') data.period = Number(document.getElementById('item-period').value) || 7;
-
-  let itemToSync;
-  if (editingItemId) {
-    const it = cl.items.find(i => i.id === editingItemId);
-    Object.assign(it, data);
-    itemToSync = it;
-  } else {
-    data.id = 'custom-' + Date.now();
-    cl.items.push(data);
-    itemToSync = data;
-  }
-  cloudUpsertItem(itemToSync).catch(e => console.warn('upsert item', e));
-  closeItemModal();
-  updateView();
-}
-function deleteItem() {
-  if (!editingItemId) return;
-  if (!confirm('Item verwijderen? Alle logs van dit item gaan ook weg.')) return;
-  const id = editingItemId;
-  cl.items = cl.items.filter(i => i.id !== id);
-  delete cl.log[id];
-  cloudDeleteItem(id).catch(e => console.warn('delete item', e));
-  closeItemModal();
-  updateView();
-}
-
-/* === SECTION ROUTING === */
-let section = 'tracker'; // tracker | checklist
-function renderChecklist() {
-  document.getElementById('cl-day-view').classList.toggle('hidden', clView !== 'day');
-  document.getElementById('cl-week-view').classList.toggle('hidden', clView !== 'week');
-  document.getElementById('cl-month-view').classList.toggle('hidden', clView !== 'month');
-  if (clView === 'day') renderChecklistDay();
-  else if (clView === 'week') renderChecklistWeek();
-  else renderChecklistMonth();
-}
-
-
-/* ============================================
-   SHEETJS LAZY LOADER
+   LAZY LOADERS (SheetJS + Chart.js)
 ============================================ */
 function loadSheetJS() {
   if (typeof XLSX !== 'undefined' && window._sheetjsStyled) return Promise.resolve();
@@ -3008,21 +1978,36 @@ function loadSheetJS() {
   });
 }
 
+function loadChartJS() {
+  if (typeof Chart !== 'undefined') return Promise.resolve();
+  if (window._chartJsLoading) return window._chartJsLoading;
+  window._chartJsLoading = new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js';
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('Chart-library kon niet geladen worden'));
+    document.head.appendChild(script);
+  });
+  return window._chartJsLoading;
+}
+
 /* ============================================
-   RAPPORTAGE MODULE
+   ANALYSE MODULE (filters + grafieken + tabellen + Excel)
 ============================================ */
-const rap = {
+const ana = {
   period: 'all',
   from: null,
   to: null,
-  categories: [],
+  projects: [],
   activity: ''
 };
+let chartDonut = null;
+let chartStack = null;
 
-function getRapDateRange() {
+function getAnaDateRange() {
   const today = new Date();
   const todayStr = fmtDate(today);
-  switch (rap.period) {
+  switch (ana.period) {
     case 'today':
       return { from: todayStr, to: todayStr };
     case 'this-week': {
@@ -3046,7 +2031,7 @@ function getRapDateRange() {
       return { from: fmtDate(start), to: todayStr };
     }
     case 'custom':
-      return { from: rap.from || todayStr, to: rap.to || todayStr };
+      return { from: ana.from || todayStr, to: ana.to || todayStr };
     case 'all':
     default: {
       const all = Object.keys(state.entries).sort();
@@ -3055,14 +2040,25 @@ function getRapDateRange() {
   }
 }
 
+function allProjectNamesInScope() {
+  // Alle projectnamen uit de projectenlijst + historische namen die in de data voorkomen
+  const names = new Set(state.projects.map(p => p.name));
+  for (const blocks of Object.values(state.entries)) {
+    for (const e of Object.values(blocks)) {
+      if (e.category) names.add(e.category);
+    }
+  }
+  return [...names];
+}
+
 function filterEntries() {
-  const { from, to } = getRapDateRange();
+  const { from, to } = getAnaDateRange();
   const out = [];
-  const actLower = (rap.activity || '').toLowerCase().trim();
+  const actLower = (ana.activity || '').toLowerCase().trim();
   for (const [date, blocks] of Object.entries(state.entries)) {
     if (date < from || date > to) continue;
     for (const [time, entry] of Object.entries(blocks)) {
-      if (rap.categories.length && !rap.categories.includes(entry.category)) continue;
+      if (ana.projects.length && !ana.projects.includes(entry.category)) continue;
       if (actLower && !(entry.activity || '').toLowerCase().includes(actLower)) continue;
       out.push({ date, time, ...entry });
     }
@@ -3072,12 +2068,12 @@ function filterEntries() {
 
 function aggregateEntries(entries) {
   const byActivity = {};
-  const byCategory = {};
+  const byProject = {};
   const byDate = {};
   for (const e of entries) {
     const a = e.activity || '(geen activiteit)';
     byActivity[a] = (byActivity[a] || 0) + 1;
-    byCategory[e.category] = (byCategory[e.category] || 0) + 1;
+    byProject[e.category] = (byProject[e.category] || 0) + 1;
     byDate[e.date] = (byDate[e.date] || 0) + 1;
   }
   const dayCount = Object.keys(byDate).length;
@@ -3087,37 +2083,48 @@ function aggregateEntries(entries) {
     dayCount,
     avgPerDay: dayCount ? (entries.length * 15) / dayCount : 0,
     byActivity: Object.entries(byActivity).sort((a, b) => b[1] - a[1]),
-    byCategory: Object.entries(byCategory).sort((a, b) => b[1] - a[1]),
+    byProject: Object.entries(byProject).sort((a, b) => b[1] - a[1]),
     byDate: Object.entries(byDate).sort()
   };
 }
 
-function renderRapportage() {
+function renderAnalyse() {
   const { entries, from, to } = filterEntries();
   const agg = aggregateEntries(entries);
-  const container = document.getElementById('rap-results');
+  const container = document.getElementById('ana-results');
   if (!container) return;
 
   if (entries.length === 0) {
-    container.innerHTML = `<div class="rap-empty">Geen blokken gevonden voor deze filter.</div>`;
+    container.innerHTML = `<div class="ana-empty panel" style="border-top-width:1px;">Geen blokken gevonden voor deze filter.</div>`;
+    destroyCharts();
     return;
   }
 
-  const allCatNames = getCategoryNames();
+  const allNames = allProjectNamesInScope();
   const filterDesc = [
     `${from} t/m ${to}`,
-    rap.categories.length < allCatNames.length ? `${rap.categories.length} van ${allCatNames.length} categorieën` : 'alle categorieën',
-    rap.activity ? `activiteit bevat "${rap.activity}"` : 'alle activiteiten'
+    ana.projects.length < allNames.length ? `${ana.projects.length} van ${allNames.length} projecten` : 'alle projecten',
+    ana.activity ? `activiteit bevat "${ana.activity}"` : 'alle activiteiten'
   ].join(' · ');
 
   let html = `
-    <div class="rap-totals">
+    <div class="ana-totals">
       <div class="stat-card"><div class="stat-label">Totale tijd</div><div class="stat-value">${fmtValue(agg.totalMinutes, 'min')}</div></div>
       <div class="stat-card"><div class="stat-label">Blokken</div><div class="stat-value">${agg.totalBlocks}</div></div>
       <div class="stat-card"><div class="stat-label">Dagen actief</div><div class="stat-value">${agg.dayCount}</div></div>
       <div class="stat-card"><div class="stat-label">Gem. per dag</div><div class="stat-value">${fmtValue(Math.round(agg.avgPerDay), 'min')}</div></div>
     </div>
-    <div class="rap-meta">${escapeHtml(filterDesc)}</div>
+    <div class="ana-meta">${escapeHtml(filterDesc)}</div>
+    <div class="ana-charts">
+      <div class="chart-card panel">
+        <h3>Verdeling per project</h3>
+        <div class="chart-wrap"><canvas id="chart-donut"></canvas></div>
+      </div>
+      <div class="chart-card panel">
+        <h3>Tijd per ${agg.byDate.length > 35 ? 'week' : 'dag'}</h3>
+        <div class="chart-wrap"><canvas id="chart-stack"></canvas></div>
+      </div>
+    </div>
   `;
 
   html += `<h3>Per activiteit</h3><table><thead><tr><th>Activiteit</th><th class="num">Blokken</th><th class="num">Tijd</th></tr></thead><tbody>`;
@@ -3126,9 +2133,9 @@ function renderRapportage() {
   }
   html += `</tbody></table>`;
 
-  html += `<h3>Per categorie</h3><table><thead><tr><th>Categorie</th><th class="num">Blokken</th><th class="num">Tijd</th></tr></thead><tbody>`;
-  for (const [name, blocks] of agg.byCategory) {
-    html += `<tr><td>${escapeHtml(name)}</td><td class="num">${blocks}</td><td class="num">${fmtValue(blocks * 15, 'min')}</td></tr>`;
+  html += `<h3>Per project</h3><table><thead><tr><th>Project</th><th class="num">Blokken</th><th class="num">Tijd</th></tr></thead><tbody>`;
+  for (const [name, blocks] of agg.byProject) {
+    html += `<tr><td><span style="display:inline-block;width:9px;height:9px;background:${projectColor(name)};border-radius:2px;margin-right:7px;"></span>${escapeHtml(name)}</td><td class="num">${blocks}</td><td class="num">${fmtValue(blocks * 15, 'min')}</td></tr>`;
   }
   html += `</tbody></table>`;
 
@@ -3141,26 +2148,121 @@ function renderRapportage() {
   }
 
   container.innerHTML = html;
+  renderAnalyseCharts(entries, agg).catch(e => console.warn('charts', e));
 }
 
-async function exportRapportageToExcel() {
+function destroyCharts() {
+  if (chartDonut) { chartDonut.destroy(); chartDonut = null; }
+  if (chartStack) { chartStack.destroy(); chartStack = null; }
+}
+
+async function renderAnalyseCharts(entries, agg) {
+  try { await loadChartJS(); }
+  catch (e) { console.warn('Chart.js niet geladen', e); return; }
+
+  const donutEl = document.getElementById('chart-donut');
+  const stackEl = document.getElementById('chart-stack');
+  if (!donutEl || !stackEl) return;
+  destroyCharts();
+
+  const hrs = b => +(b * 0.25).toFixed(2);
+  const hrsLabel = b => blocksToHrs(b);
+
+  // --- Donut: verdeling per project ---
+  const projNames = agg.byProject.map(([n]) => n);
+  const projBlocks = agg.byProject.map(([, b]) => b);
+  chartDonut = new Chart(donutEl, {
+    type: 'doughnut',
+    data: {
+      labels: projNames,
+      datasets: [{
+        data: projBlocks.map(hrs),
+        backgroundColor: projNames.map(projectColor),
+        borderColor: '#FFFFFF',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '58%',
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: 'Inter', size: 11 } } },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.label}: ${hrsLabel(projBlocks[ctx.dataIndex])}`
+          }
+        }
+      }
+    }
+  });
+
+  // --- Gestapelde staaf: per dag (of per week bij lange periodes) ---
+  const perWeek = agg.byDate.length > 35;
+  const buckets = {};   // label -> { projName -> blocks }
+  const bucketOrder = [];
+  for (const e of entries) {
+    let label;
+    if (perWeek) {
+      const ws = startOfWeek(parseDate(e.date));
+      label = `wk ${ws.getDate()}/${ws.getMonth()+1}`;
+      var sortKey = fmtDate(ws);
+    } else {
+      const d = parseDate(e.date);
+      label = `${DAY_NAMES_NL_SHORT[d.getDay()]} ${d.getDate()}/${d.getMonth()+1}`;
+      sortKey = e.date;
+    }
+    if (!buckets[label]) { buckets[label] = { _key: sortKey }; bucketOrder.push(label); }
+    buckets[label][e.category] = (buckets[label][e.category] || 0) + 1;
+  }
+  bucketOrder.sort((a, b) => buckets[a]._key.localeCompare(buckets[b]._key));
+
+  const datasets = projNames.map(name => ({
+    label: name,
+    data: bucketOrder.map(l => hrs(buckets[l][name] || 0)),
+    backgroundColor: projectColor(name),
+    stack: 'tijd',
+    borderRadius: 2
+  }));
+
+  chartStack = new Chart(stackEl, {
+    type: 'bar',
+    data: { labels: bucketOrder, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: { stacked: true, grid: { display: false }, ticks: { font: { family: 'Inter', size: 10 }, maxRotation: 45 } },
+        y: { stacked: true, title: { display: true, text: 'uur', font: { family: 'Inter', size: 10 } }, grid: { color: '#E6EAF0' } }
+      },
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: 'Inter', size: 11 } } },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label}: ${blocksToHrs(Math.round(ctx.parsed.y * 4))}`
+          }
+        }
+      }
+    }
+  });
+}
+
+/* === EXCEL EXPORT (time-grid template met dynamische formules) === */
+async function exportAnalyseToExcel() {
   try { await loadSheetJS(); }
   catch (e) { alert('Excel-library kon niet geladen worden. Check je internetverbinding.'); return; }
 
   const { entries, from, to } = filterEntries();
   if (!from || !to) { alert('Geen geldige periode geselecteerd.'); return; }
 
-  // Dagen + slots
   const dates = [];
-  const cursor = parseDate(from);
+  const cur = parseDate(from);
   const endDate = parseDate(to);
-  while (cursor <= endDate) { dates.push(fmtDate(cursor)); cursor.setDate(cursor.getDate() + 1); }
+  while (cur <= endDate) { dates.push(fmtDate(cur)); cur.setDate(cur.getDate() + 1); }
   if (dates.length === 0) { alert('Geen dagen in periode.'); return; }
   if (dates.length > 365 && !confirm(`Periode beslaat ${dates.length} dagen — Excel wordt erg breed. Doorgaan?`)) return;
 
-  const slots = [];
-  for (let h = 7; h < 24; h++) for (let m = 0; m < 60; m += 15)
-    slots.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+  const slots = allSlots(); // 96 slots, 00:00–23:45
 
   const lookup = {};
   for (const e of entries) lookup[e.date + '_' + e.time] = e;
@@ -3171,18 +2273,17 @@ async function exportRapportageToExcel() {
     return s;
   }
 
-  // Styles
-  const INK='1A1A1A', INK_SOFT='4A4A4A', INK_FAINT='888888', RULE='D8D8D8', RULE_LIGHT='EEEEEE', NOTE_BG='F7F5F1', WHITE='FFFFFF';
+  const INK='1C2530', INK_SOFT='42587A', INK_FAINT='7C8899', RULE='D4DBE5', RULE_LIGHT='E6EAF0', NOTE_BG='F4F6F9', WHITE='FFFFFF', NAVY='16304F';
 
-  const sTitle = { font:{name:'Cambria',sz:22,italic:true,color:{rgb:INK}}, alignment:{horizontal:'left',vertical:'center'}, fill:{fgColor:{rgb:WHITE}} };
-  const sSection = { font:{name:'Cambria',sz:14,italic:true,color:{rgb:INK}}, alignment:{horizontal:'left',vertical:'center'}, fill:{fgColor:{rgb:WHITE}} };
+  const sTitle = { font:{name:'Cambria',sz:22,italic:true,color:{rgb:NAVY}}, alignment:{horizontal:'left',vertical:'center'}, fill:{fgColor:{rgb:WHITE}} };
+  const sSection = { font:{name:'Cambria',sz:14,italic:true,color:{rgb:NAVY}}, alignment:{horizontal:'left',vertical:'center'}, fill:{fgColor:{rgb:WHITE}} };
   const sMetaLabel = { font:{name:'Consolas',sz:9,color:{rgb:INK_FAINT}}, alignment:{horizontal:'left',vertical:'center'}, fill:{fgColor:{rgb:WHITE}} };
   const sMetaValue = { font:{name:'Calibri',sz:11,color:{rgb:INK}}, alignment:{horizontal:'left',vertical:'center'}, fill:{fgColor:{rgb:WHITE}} };
-  const sHead = { font:{name:'Consolas',sz:9,bold:true,color:{rgb:INK_FAINT}}, alignment:{horizontal:'left',vertical:'center'}, fill:{fgColor:{rgb:WHITE}}, border:{bottom:{style:'medium',color:{rgb:INK}}} };
+  const sHead = { font:{name:'Consolas',sz:9,bold:true,color:{rgb:INK_FAINT}}, alignment:{horizontal:'left',vertical:'center'}, fill:{fgColor:{rgb:WHITE}}, border:{bottom:{style:'medium',color:{rgb:NAVY}}} };
   const sHeadRight = { ...sHead, alignment:{horizontal:'right',vertical:'center'} };
   const sCell = { font:{name:'Calibri',sz:11,color:{rgb:INK}}, alignment:{horizontal:'left',vertical:'top',wrapText:true}, fill:{fgColor:{rgb:WHITE}}, border:{bottom:{style:'thin',color:{rgb:RULE_LIGHT}}} };
   const sCellRight = { font:{name:'Calibri',sz:11,color:{rgb:INK}}, alignment:{horizontal:'right',vertical:'top'}, fill:{fgColor:{rgb:WHITE}}, border:{bottom:{style:'thin',color:{rgb:RULE_LIGHT}}}, numFmt:'0.00' };
-  const sDateHdr = { font:{name:'Cambria',sz:12,italic:true,bold:true,color:{rgb:INK}}, alignment:{horizontal:'center',vertical:'center'}, fill:{fgColor:{rgb:WHITE}}, border:{bottom:{style:'medium',color:{rgb:INK}}} };
+  const sDateHdr = { font:{name:'Cambria',sz:12,italic:true,bold:true,color:{rgb:NAVY}}, alignment:{horizontal:'center',vertical:'center'}, fill:{fgColor:{rgb:WHITE}}, border:{bottom:{style:'medium',color:{rgb:NAVY}}} };
   const sTijd = { font:{name:'Consolas',sz:10,color:{rgb:INK_FAINT}}, alignment:{horizontal:'right',vertical:'center'}, fill:{fgColor:{rgb:WHITE}}, border:{right:{style:'thin',color:{rgb:RULE}}} };
   const sAct = { font:{name:'Calibri',sz:10,color:{rgb:INK}}, alignment:{horizontal:'left',vertical:'center',wrapText:true}, fill:{fgColor:{rgb:WHITE}}, border:{right:{style:'hair',color:{rgb:RULE_LIGHT}},bottom:{style:'hair',color:{rgb:RULE_LIGHT}}} };
   const sNote = { font:{name:'Calibri',sz:9,italic:true,color:{rgb:INK_SOFT}}, alignment:{horizontal:'left',vertical:'center',wrapText:true}, fill:{fgColor:{rgb:NOTE_BG}}, border:{right:{style:'thin',color:{rgb:RULE_LIGHT}},bottom:{style:'hair',color:{rgb:RULE_LIGHT}}} };
@@ -3244,18 +2345,18 @@ async function exportRapportageToExcel() {
   let row = 1;
   const put = (ref, cell) => { summaryWs[ref] = cell; };
 
-  put('A' + row, { v: 'Tijdregister export', s: sTitle }); row++;
+  put('A' + row, { v: 'Tijd export', s: sTitle }); row++;
   put('A' + row, { v: `${from} t/m ${to}`, s: sMetaLabel }); row += 2;
 
-  put('A' + row, { v: 'CATEGORIEËN', s: sMetaLabel });
-  put('B' + row, { v: rap.categories.join(', '), s: sMetaValue }); row++;
+  const allNames = allProjectNamesInScope();
+  put('A' + row, { v: 'PROJECTEN', s: sMetaLabel });
+  put('B' + row, { v: ana.projects.join(', '), s: sMetaValue }); row++;
   put('A' + row, { v: 'ACTIVITEIT-FILTER', s: sMetaLabel });
-  put('B' + row, { v: rap.activity || '(geen)', s: sMetaValue }); row++;
+  put('B' + row, { v: ana.activity || '(geen)', s: sMetaValue }); row++;
   put('A' + row, { v: 'GEGENEREERD', s: sMetaLabel });
   put('B' + row, { v: new Date().toISOString().slice(0,16).replace('T',' '), s: sMetaValue });
   row += 2;
 
-  // Per activiteit
   put('A' + row, { v: 'Per activiteit', s: sSection }); row++;
   put('A' + row, { v: 'Activiteit', s: sHead });
   put('B' + row, { v: 'Uur', s: sHeadRight }); row++;
@@ -3269,7 +2370,6 @@ async function exportRapportageToExcel() {
   }
   row += 2;
 
-  // Per notitie
   put('A' + row, { v: 'Per notitie', s: sSection }); row++;
   put('A' + row, { v: 'Notitie', s: sHead });
   put('B' + row, { v: 'Uur', s: sHeadRight }); row++;
@@ -3292,89 +2392,82 @@ async function exportRapportageToExcel() {
   summaryWs['!ref'] = `A1:B${row}`;
   summaryWs['!cols'] = [{ wch: 42 }, { wch: 12 }];
 
-  // Workbook
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, summaryWs, 'Overzicht');
   XLSX.utils.book_append_sheet(wb, detailWs, 'Detail');
 
-  const allCats = (typeof getCategoryNames === 'function') ? getCategoryNames() : [];
   const parts = [`${from}_${to}`];
-  if (rap.activity) parts.push('act-' + rap.activity.replace(/[^a-z0-9]/gi, '').slice(0, 20));
-  if (allCats.length && rap.categories.length < allCats.length) {
-    parts.push('cat-' + rap.categories.join('-').replace(/[^a-z0-9-]/gi, ''));
+  if (ana.activity) parts.push('act-' + ana.activity.replace(/[^a-z0-9]/gi, '').slice(0, 20));
+  if (allNames.length && ana.projects.length < allNames.length) {
+    parts.push('proj-' + ana.projects.join('-').replace(/[^a-z0-9-]/gi, ''));
   }
-  XLSX.writeFile(wb, `tijdregister_${parts.join('_')}.xlsx`);
+  XLSX.writeFile(wb, `tijd_${parts.join('_')}.xlsx`);
 }
 
-function initRapportage() {
-  const catContainer = document.getElementById('rap-cats');
-  if (!catContainer) return;
-
-  // Populate category pills from current state
-  const catNames = getCategoryNames();
-  rap.categories = [...catNames];
-  catContainer.innerHTML = catNames.map(c =>
-    `<span class="rap-cat-pill active" data-cat="${escapeHtml(c)}">${escapeHtml(c)}</span>`
+function initAnalyseFilters() {
+  const container = document.getElementById('ana-projects');
+  if (!container) return;
+  const names = allProjectNamesInScope();
+  // behoud actieve selectie waar mogelijk; default alles aan
+  const prevActive = ana.projects.length ? new Set(ana.projects) : null;
+  ana.projects = prevActive ? names.filter(n => prevActive.has(n)) : [...names];
+  if (ana.projects.length === 0) ana.projects = [...names];
+  container.innerHTML = names.map(n =>
+    `<span class="ana-pill ${ana.projects.includes(n) ? 'active' : ''}" data-proj="${escapeAttr(n)}">${escapeHtml(n)}</span>`
   ).join('');
-  catContainer.querySelectorAll('.rap-cat-pill').forEach(p => {
+  container.querySelectorAll('.ana-pill').forEach(p => {
     p.addEventListener('click', () => {
       p.classList.toggle('active');
-      rap.categories = [...catContainer.querySelectorAll('.rap-cat-pill.active')].map(e => e.dataset.cat);
-      renderRapportage();
+      ana.projects = [...container.querySelectorAll('.ana-pill.active')].map(e => e.dataset.proj);
+      renderAnalyse();
     });
   });
+}
 
-  document.getElementById('rap-period').addEventListener('change', e => {
-    rap.period = e.target.value;
-    document.querySelectorAll('.rap-custom').forEach(el => el.classList.toggle('hidden', rap.period !== 'custom'));
-    if (rap.period === 'custom') {
+function initAnalyse() {
+  initAnalyseFilters();
+
+  document.getElementById('ana-period').addEventListener('change', e => {
+    ana.period = e.target.value;
+    document.querySelectorAll('.ana-custom').forEach(el => el.classList.toggle('hidden', ana.period !== 'custom'));
+    if (ana.period === 'custom') {
       const today = fmtDate(new Date());
-      if (!rap.from) { rap.from = today; document.getElementById('rap-from').value = today; }
-      if (!rap.to) { rap.to = today; document.getElementById('rap-to').value = today; }
+      if (!ana.from) { ana.from = today; document.getElementById('ana-from').value = today; }
+      if (!ana.to) { ana.to = today; document.getElementById('ana-to').value = today; }
     }
-    renderRapportage();
+    renderAnalyse();
   });
 
-  document.getElementById('rap-from').addEventListener('change', e => {
-    rap.from = e.target.value; renderRapportage();
+  document.getElementById('ana-from').addEventListener('change', e => {
+    ana.from = e.target.value; renderAnalyse();
   });
-  document.getElementById('rap-to').addEventListener('change', e => {
-    rap.to = e.target.value; renderRapportage();
+  document.getElementById('ana-to').addEventListener('change', e => {
+    ana.to = e.target.value; renderAnalyse();
   });
 
   let activityTimer;
-  document.getElementById('rap-activity').addEventListener('input', e => {
+  document.getElementById('ana-activity').addEventListener('input', e => {
     clearTimeout(activityTimer);
     activityTimer = setTimeout(() => {
-      rap.activity = e.target.value;
-      renderRapportage();
+      ana.activity = e.target.value;
+      renderAnalyse();
     }, 200);
   });
 
-  document.getElementById('rap-export').addEventListener('click', exportRapportageToExcel);
+  document.getElementById('ana-export').addEventListener('click', exportAnalyseToExcel);
 }
 
+/* ============================================
+   INIT
+============================================ */
 function init() {
-  loadState();
-  loadCl();
-  applyCategoryStyles();
-  renderCategoryButtons();
-
   // section nav
   document.querySelectorAll('.section-nav button').forEach(b => {
     b.addEventListener('click', () => {
       section = b.dataset.section;
+      if (section === 'tracker') scrollToMorning = true;
       updateView();
     });
-  });
-
-  // item modal wiring
-  document.getElementById('item-type').addEventListener('change', toggleItemModalFields);
-  document.getElementById('item-modal-save').addEventListener('click', saveItemModal);
-  document.getElementById('item-modal-cancel').addEventListener('click', closeItemModal);
-  document.getElementById('item-modal-delete').addEventListener('click', deleteItem);
-  document.getElementById('item-modal-backdrop').addEventListener('click', e => {
-    if (e.target.id === 'item-modal-backdrop') closeItemModal();
   });
 
   // navigation
@@ -3382,21 +2475,25 @@ function init() {
     if (view === 'day') cursor.setDate(cursor.getDate()-1);
     else if (view === 'week') cursor.setDate(cursor.getDate()-7);
     else cursor.setMonth(cursor.getMonth()-1);
+    scrollToMorning = true;
     updateView();
   });
   document.getElementById('btn-next').addEventListener('click', () => {
     if (view === 'day') cursor.setDate(cursor.getDate()+1);
     else if (view === 'week') cursor.setDate(cursor.getDate()+7);
     else cursor.setMonth(cursor.getMonth()+1);
+    scrollToMorning = true;
     updateView();
   });
   document.getElementById('btn-today').addEventListener('click', () => {
     cursor = new Date();
+    scrollToMorning = true;
     updateView();
   });
   document.getElementById('date-picker').addEventListener('change', e => {
     if (e.target.value) {
       cursor = parseDate(e.target.value);
+      scrollToMorning = true;
       updateView();
     }
   });
@@ -3405,6 +2502,7 @@ function init() {
   document.querySelectorAll('.view-group button').forEach(b => {
     b.addEventListener('click', () => {
       view = b.dataset.view;
+      scrollToMorning = true;
       updateView();
     });
   });
@@ -3418,7 +2516,7 @@ function init() {
     });
   });
 
-  // modal: cat-buttons worden dynamisch gerenderd via renderCategoryButtons()
+  // blok modal
   document.getElementById('modal-save').addEventListener('click', saveModal);
   document.getElementById('modal-cancel').addEventListener('click', closeModal);
   document.getElementById('modal-delete').addEventListener('click', deleteFromModal);
@@ -3426,21 +2524,27 @@ function init() {
     if (e.target.id === 'modal-backdrop') closeModal();
   });
 
-  // keyboard shortcuts in modal
+  // projecten beheer
+  document.getElementById('btn-projects').addEventListener('click', openProjectManager);
+  document.getElementById('proj-close').addEventListener('click', closeProjectManager);
+  document.getElementById('proj-add').addEventListener('click', () => addProjectUI(false));
+  document.getElementById('proj-modal-backdrop').addEventListener('click', e => {
+    if (e.target.id === 'proj-modal-backdrop') closeProjectManager();
+  });
+
+  // keyboard shortcuts in blok modal
   document.addEventListener('keydown', e => {
     const open = document.getElementById('modal-backdrop').classList.contains('open');
     if (!open) return;
     if (e.key === 'Escape') closeModal();
-    else if (e.key === 'Enter' && (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target === document.body)) {
-      // Don't intercept if focused on a button (let the button handle it)
-      if (e.target.tagName === 'INPUT') {
-        e.preventDefault();
-        saveModal();
-      }
+    else if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
+      e.preventDefault();
+      saveModal();
     }
     else if (/^[1-9]$/.test(e.key) && document.activeElement.tagName !== 'INPUT') {
+      const active = state.projects.filter(p => !p.archived);
       const idx = parseInt(e.key) - 1;
-      if (idx < state.categories.length) selectCategory(state.categories[idx].name);
+      if (idx < active.length) selectProject(active[idx].name);
     }
   });
 
@@ -3451,35 +2555,8 @@ function init() {
     if (e.target.files[0]) importData(e.target.files[0]);
     e.target.value = '';
   });
-  document.getElementById('btn-reset').addEventListener('click', async () => {
-    const choice = prompt('Wat wil je wissen?\n• "tracker" — alle tijdregister-blokken\n• "checklist" — alle checklist items + logs\n• "alles" — alles\n\n(annuleer = niets doen)\n\nLET OP: dit wist data in de cloud, ook van je andere apparaten.');
-    if (!choice) return;
-    const c = choice.toLowerCase().trim();
-    if (!['tracker','checklist','alles'].includes(c)) { alert('Onbekende keuze. Niets gewist.'); return; }
-    if (!confirm('Zeker weten? Data wordt permanent verwijderd uit de cloud.')) return;
 
-    syncStart();
-    const sb = await ensureSb();
-    try {
-      if (c === 'tracker' || c === 'alles') {
-        await sb.from('tracker_entries').delete().match({ user_id: auth.user.id });
-        state = { activities: { 'Inefficiënt':[], Zelf:[], Boek:[], SMART:[], Bedrijf:[] }, entries: {} };
-      }
-      if (c === 'checklist' || c === 'alles') {
-        await sb.from('checklist_log').delete().match({ user_id: auth.user.id });
-        await sb.from('checklist_items').delete().match({ user_id: auth.user.id });
-        cl = { items: [], log: {}, collapsed: {} };
-        await seedDefaultItems();
-      }
-      syncEnd();
-      updateView();
-    } catch (err) {
-      syncEnd(err);
-      alert('Wissen mislukt: ' + err.message);
-    }
-  });
-
-  // Auth form wiring
+  // Auth wiring
   document.getElementById('auth-send-code').addEventListener('click', async () => {
     const email = document.getElementById('auth-email').value.trim();
     if (!email || !email.includes('@')) { setAuthStatus('Vul een geldig e-mailadres in', 'error'); return; }
@@ -3528,10 +2605,9 @@ function init() {
     if (confirm('Uitloggen?')) logoutUser();
   });
 
-  initRapportage();
+  initAnalyse();
   loadSheetJS().catch(e => console.warn('SheetJS preload mislukt', e));
 
-  // Bootstrap: check session, route to login or app
   bootstrap();
 }
 
@@ -3542,12 +2618,6 @@ function setAuthStatus(text, cls) {
 }
 
 async function bootstrap() {
-  // Restore collapsed state for checklist groups (UI-only, lokaal)
-  try {
-    const ui = JSON.parse(localStorage.getItem('tijdregister-cl-ui') || '{}');
-    cl.collapsed = ui;
-  } catch(e) {}
-
   setAuthStatus('Verbinden…', 'info');
   try {
     await checkSession();
@@ -3557,7 +2627,6 @@ async function bootstrap() {
   }
 
   if (!auth.user) {
-    // Not logged in — show login overlay
     document.getElementById('auth-overlay').classList.remove('hidden');
     document.getElementById('app-container').classList.add('hidden');
     setAuthStatus('', '');
@@ -3568,12 +2637,13 @@ async function bootstrap() {
 }
 
 async function postLoginBootstrap() {
-  document.getElementById('user-email').textContent = auth.user.email;
   document.getElementById('auth-overlay').classList.add('hidden');
   document.getElementById('app-container').classList.remove('hidden');
   try {
     await cloudFetchAll();
     await startRealtime();
+    initAnalyseFilters();
+    scrollToMorning = true;
     updateView();
   } catch (e) {
     setSyncStatus('● fout bij laden', 'error');
