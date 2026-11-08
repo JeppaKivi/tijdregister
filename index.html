@@ -241,7 +241,7 @@
   }
   .day-grid .row {
     display: grid;
-    grid-template-columns: 58px 110px 1fr 1.1fr 64px;
+    grid-template-columns: 58px 190px 1fr 64px;
     border-bottom: 1px solid var(--line-soft);
     min-height: 34px;
   }
@@ -264,10 +264,8 @@
     background: var(--surface-2);
     justify-content: flex-end;
   }
-  .col-cat { font-weight: 600; font-size: 12px; cursor: pointer; }
-  .col-cat:empty::before { content: '—'; color: var(--ink-faint); font-weight: 400; }
-  .col-act { cursor: pointer; }
-  .col-act:empty::before { content: 'klik om in te vullen'; color: var(--ink-faint); font-style: italic; font-size: 12px; }
+  .col-cat { font-weight: 600; font-size: 13px; cursor: pointer; }
+  .col-cat:empty::before { content: 'klik om in te vullen'; color: var(--ink-faint); font-weight: 400; font-style: italic; font-size: 12px; }
   .col-note { cursor: pointer; color: var(--steel); font-size: 12px; }
   .col-note:empty::before { content: '+ notitie'; color: var(--ink-faint); opacity: 0.5; font-size: 11px; }
   .col-actions { gap: 4px; justify-content: flex-end; padding-right: 8px !important; }
@@ -533,11 +531,10 @@
     .controls > * { font-size: 11px; }
     .date-display { font-size: 15px; min-width: 0; padding: 4px 6px; flex: 1 1 100%; order: 99; }
     .util-group { margin-left: 0; }
-    .day-grid .row { grid-template-columns: 48px 80px 1fr 52px; min-height: 30px; }
+    .day-grid .row { grid-template-columns: 48px 1fr 52px; min-height: 30px; }
     .day-grid .row > div { padding: 4px 6px; font-size: 12px; }
     .col-time { font-size: 10px; padding: 4px 4px !important; }
-    .col-cat { font-size: 11px; }
-    .col-act { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .col-cat { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .day-grid .col-note { display: none !important; }
     .modal { padding: 16px; }
     .cat-buttons { grid-template-columns: repeat(3, 1fr); }
@@ -891,8 +888,8 @@
           <input type="date" id="ana-to">
         </div>
         <div class="ana-field ana-grow">
-          <label>Activiteit (zoekt op bevat)</label>
-          <input type="text" id="ana-activity" placeholder="laat leeg voor alle activiteiten">
+          <label>Zoek in project of notitie</label>
+          <input type="text" id="ana-activity" placeholder="laat leeg voor alles">
         </div>
         <div class="ana-field">
           <label>&nbsp;</label>
@@ -910,7 +907,7 @@
   </section>
 
   <p class="hint">
-    Tip · klik blok → project + activiteit · toetsen 1-9 kiezen projecten in het invulscherm · ⧉ kopieert een blok, ⇩ plakt het klembord · data staat in de cloud, Export voor backup.
+    Tip · klik blok → project + notitie · toetsen 1-9 kiezen de meestgebruikte projecten · ⧉ kopieert een blok, ⇩ plakt het klembord · via Projecten voeg je benamingen samen · data staat in de cloud, Export voor backup.
   </p>
 
   </div><!-- /.app -->
@@ -925,14 +922,6 @@
     <div class="modal-section">
       <div class="modal-label">Project</div>
       <div class="cat-buttons" id="cat-buttons"></div>
-    </div>
-
-    <div class="modal-section">
-      <div class="modal-label">Activiteit</div>
-      <div class="activity-input-wrap">
-        <input type="text" id="activity-input" placeholder="Wat heb je gedaan? (typ of klik suggestie)" />
-      </div>
-      <div class="suggestions" id="suggestions"></div>
     </div>
 
     <div class="modal-section">
@@ -956,7 +945,7 @@
     <h3>Projecten</h3>
     <div class="modal-time">Beheer je projectenlijst</div>
     <div id="proj-list"></div>
-    <p class="proj-note">Hernoemen geldt voor nieuwe invoer; bestaande registraties behouden hun oude naam (zichtbaar in Analyse). Archiveren haalt een project uit de keuzelijst — data en analyses blijven volledig intact.</p>
+    <p class="proj-note"><strong>Hernoemen</strong> wijzigt alleen het label (bestaande blokken behouden hun naam). <strong>Voeg samen</strong> zet alle blokken van een project om naar een ander project — zo integreer je twee benamingen. <strong>Archiveren</strong> haalt een project uit de keuzelijst; data blijft intact. <strong>Verwijderen</strong> kan alleen bij projecten zonder blokken.</p>
     <div class="modal-actions">
       <button class="primary" id="proj-add">+ Nieuw project</button>
       <button id="proj-close">Sluiten</button>
@@ -1046,21 +1035,16 @@ async function cloudFetchAll() {
   try {
     const entriesData = await fetchAllPages(sb, 'tracker_entries');
 
-    // Reset state — activiteiten-keys worden dynamisch aangemaakt
+    // Reset state. Project = wat vroeger "activiteit" was; oude blokken
+    // zonder activiteit vallen terug op hun oude categorienaam.
     state.entries = {};
-    state.activities = {};
     const usage = {};
 
     for (const e of entriesData) {
       if (!state.entries[e.date]) state.entries[e.date] = {};
       state.entries[e.date][e.time] = { category: e.category, activity: e.activity || '', note: e.note || '' };
-      if (e.category) {
-        usage[e.category] = (usage[e.category] || 0) + 1;
-        if (e.activity) {
-          if (!state.activities[e.category]) state.activities[e.category] = [];
-          if (!state.activities[e.category].includes(e.activity)) state.activities[e.category].push(e.activity);
-        }
-      }
+      const proj = e.activity || e.category;
+      if (proj) usage[proj] = (usage[proj] || 0) + 1;
     }
 
     // Projecten laden (nieuwe tabel) — graceful fallback als tabel nog niet bestaat
@@ -1092,6 +1076,16 @@ async function cloudFetchAll() {
         } catch (e) { console.warn('project seed mislukt', e); }
       }
     }
+    // Reconcile: elke projectnaam die in de data voorkomt moet in de lijst staan
+    // (vangt ook de overstap van categorie- naar activiteit-gebaseerde projecten op)
+    const known = new Set(state.projects.map(p => p.name));
+    const missing = Object.keys(usage).filter(n => !known.has(n)).sort((a, b) => usage[b] - usage[a]);
+    for (const n of missing) {
+      const np = { id: null, name: n, color: null, archived: false };
+      state.projects.push(np);
+      if (state.projectsTableOk) cloudInsertProject(np).catch(e => console.warn('project reconcile', e));
+    }
+
     // Zorg dat elk project een kleur heeft
     state.projects.forEach((p, i) => { if (!p.color) p.color = PROJECT_PALETTE[i % PROJECT_PALETTE.length]; });
 
@@ -1144,6 +1138,33 @@ async function cloudUpdateProject(p) {
   syncEnd(error);
 }
 
+async function cloudDeleteProject(p) {
+  if (!state.projectsTableOk || !p.id) return;
+  const sb = await ensureSb();
+  syncStart();
+  const { error } = await sb.from('projects').delete().eq('id', p.id);
+  syncEnd(error);
+}
+
+/* Voeg project samen: alle blokken van source krijgen target als project.
+   Twee passes: (1) blokken met activity=source, (2) oude blokken zonder
+   activity die op categorienaam=source terugvielen. */
+async function cloudMergeProject(sourceName, targetName) {
+  const sb = await ensureSb();
+  syncStart();
+  const r1 = await sb.from('tracker_entries')
+    .update({ activity: targetName, category: targetName, updated_at: new Date().toISOString() })
+    .match({ user_id: auth.user.id, activity: sourceName });
+  const r2 = await sb.from('tracker_entries')
+    .update({ activity: targetName, category: targetName, updated_at: new Date().toISOString() })
+    .eq('user_id', auth.user.id)
+    .is('activity', null)
+    .eq('category', sourceName);
+  syncEnd(r1.error || r2.error);
+  if (r1.error) throw r1.error;
+  if (r2.error) throw r2.error;
+}
+
 /* === REALTIME — payload-based (geen full refetch) === */
 async function startRealtime() {
   const sb = await ensureSb();
@@ -1157,10 +1178,6 @@ async function startRealtime() {
       const e = payload.new; if (!e) return;
       if (!state.entries[e.date]) state.entries[e.date] = {};
       state.entries[e.date][e.time] = { category: e.category, activity: e.activity || '', note: e.note || '' };
-      if (e.category && e.activity) {
-        if (!state.activities[e.category]) state.activities[e.category] = [];
-        if (!state.activities[e.category].includes(e.activity)) state.activities[e.category].push(e.activity);
-      }
       updateView();
     })
     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'tracker_entries' }, (payload) => {
@@ -1212,7 +1229,6 @@ const PROJECT_PALETTE = [
 let state = {
   projects: [],        // [{id, name, color, archived}]
   projectsTableOk: false,
-  activities: {},      // activities[projectName] = [activiteit, ...]
   entries: {},         // entries[YYYY-MM-DD][HH:MM] = {category, activity, note}
   clipboard: null      // {category, activity, note}
 };
@@ -1231,7 +1247,26 @@ function getProject(name) { return state.projects.find(p => p.name === name); }
 function projectColor(name) {
   const p = getProject(name);
   if (p && p.color) return p.color;
-  return '#4A6B8A';
+  return '#9AA5B1';
+}
+// Het project van een blok: de (oude) activiteit, met terugval op de oude categorienaam
+function entryProject(e) { return (e && (e.activity || e.category)) || ''; }
+// Blokken per project, over alle data
+function computeUsage() {
+  const usage = {};
+  for (const blocks of Object.values(state.entries)) {
+    for (const e of Object.values(blocks)) {
+      const proj = entryProject(e);
+      if (proj) usage[proj] = (usage[proj] || 0) + 1;
+    }
+  }
+  return usage;
+}
+function sortedActiveProjects() {
+  const usage = computeUsage();
+  return state.projects
+    .filter(p => !p.archived)
+    .sort((a, b) => (usage[b.name] || 0) - (usage[a.name] || 0));
 }
 function tint(color) { return `color-mix(in srgb, ${color} 14%, white)`; }
 
@@ -1321,11 +1356,6 @@ function getEntry(dateStr, time) {
 function setEntry(dateStr, time, entry) {
   if (!state.entries[dateStr]) state.entries[dateStr] = {};
   state.entries[dateStr][time] = entry;
-  if (entry.category && entry.activity) {
-    if (!state.activities[entry.category]) state.activities[entry.category] = [];
-    const list = state.activities[entry.category];
-    if (!list.includes(entry.activity)) list.push(entry.activity);
-  }
   cloudUpsertEntry(dateStr, time, entry).catch(e => console.warn('upsert entry', e));
 }
 function deleteEntry(dateStr, time) {
@@ -1348,9 +1378,10 @@ function aggregateRange(startDate, endDate) {
     for (const t of TIME_SLOTS) {
       const e = getEntry(ds, t);
       out.total++;
-      if (e && e.category) {
-        if (out[e.category] === undefined) out[e.category] = 0;
-        out[e.category]++;
+      const proj = entryProject(e);
+      if (proj) {
+        if (out[proj] === undefined) out[proj] = 0;
+        out[proj]++;
       } else {
         out.empty++;
       }
@@ -1396,8 +1427,9 @@ function showToast(msg) {
 function copyBlock(dateStr, time) {
   const e = getEntry(dateStr, time);
   if (!e) return;
-  state.clipboard = { category: e.category || '', activity: e.activity || '', note: e.note || '' };
-  showToast(`Gekopieerd: ${e.activity || e.category}`);
+  const proj = entryProject(e);
+  state.clipboard = { category: proj, activity: proj, note: e.note || '' };
+  showToast(`Gekopieerd: ${proj}`);
   renderClipboardBar();
   renderDayView();
 }
@@ -1420,7 +1452,7 @@ function renderClipboardBar() {
   slot.innerHTML = `
     <div class="clipboard-bar">
       <span class="cb-label">Klembord</span>
-      <span class="cb-content">${escapeHtml(c.activity || '—')} <span style="opacity:0.7;">(${escapeHtml(c.category)})</span></span>
+      <span class="cb-content">${escapeHtml(c.activity || c.category || '—')}${c.note ? ` <span style="opacity:0.7;">· ${escapeHtml(c.note)}</span>` : ''}</span>
       <button id="cb-clear">✕ wissen</button>
     </div>`;
   document.getElementById('cb-clear').addEventListener('click', clearClipboard);
@@ -1444,23 +1476,21 @@ function renderDayView() {
     const time = TIME_SLOTS[i];
     const isHourStart = time.endsWith(':00');
     const entry = getEntry(dateStr, time);
-    const cat = entry?.category || '';
-    const act = entry?.activity || '';
+    const proj = entryProject(entry);
     const note = entry?.note || '';
-    const filled = !!(cat || act || note);
+    const filled = !!(proj || note);
     const prevTime = i > 0 ? TIME_SLOTS[i-1] : null;
     const prevEntry = prevTime ? getEntry(dateStr, prevTime) : null;
-    const prevHasContent = prevEntry && (prevEntry.category || prevEntry.activity || prevEntry.note);
+    const prevHasContent = prevEntry && (entryProject(prevEntry) || prevEntry.note);
     const showCopyBtn = !filled && prevHasContent;
     const classes = ['row'];
     if (isHourStart) classes.push('hour-start');
     if (time === nowSlot) classes.push('now');
-    html += `<div class="${classes.join(' ')}" data-time="${time}" ${cat ? `data-cat="${escapeAttr(cat)}"` : ''}>`;
+    html += `<div class="${classes.join(' ')}" data-time="${time}" ${proj ? `data-cat="${escapeAttr(proj)}"` : ''}>`;
     const timeClasses = ['col-time'];
     if (showCopyBtn) timeClasses.push('can-copy');
     html += `<div class="${timeClasses.join(' ')}" ${showCopyBtn ? `data-action="copy-prev" title="Neem inhoud vorig kwartier over"` : ''}>${time}</div>`;
-    html += `<div class="col-cat" data-action="edit">${escapeHtml(cat)}</div>`;
-    html += `<div class="col-act" data-action="edit">${escapeHtml(act)}</div>`;
+    html += `<div class="col-cat" data-action="edit">${escapeHtml(proj)}</div>`;
     html += `<div class="col-note" data-action="edit">${escapeHtml(note)}</div>`;
     html += `<div class="col-actions">`;
     if (filled) html += `<button class="mini-btn" data-action="copy-block" title="Kopieer blok naar klembord">⧉</button>`;
@@ -1499,9 +1529,10 @@ function renderDayView() {
         if (idx <= 0) return;
         const prev = getEntry(dateStr, TIME_SLOTS[idx-1]);
         if (!prev) return;
+        const prevProj = entryProject(prev);
         setEntry(dateStr, time, {
-          category: prev.category || '',
-          activity: prev.activity || '',
+          category: prevProj,
+          activity: prevProj,
           note: prev.note || ''
         });
         renderDayView();
@@ -1548,9 +1579,9 @@ function renderWeekView() {
       const cls = ['cell'];
       if (isHourStart) cls.push('hour-mark');
       if (isSameDate(d, today) && time === nowSlot) cls.push('now-cell');
-      const catAttr = entry?.category ? `data-cat="${escapeAttr(entry.category)}"` : '';
-      const label = entry?.activity || '';
-      html += `<td class="${cls.join(' ')}" data-date="${ds}" data-time="${time}" ${catAttr}>${escapeHtml(label)}</td>`;
+      const proj = entryProject(entry);
+      const catAttr = proj ? `data-cat="${escapeAttr(proj)}"` : '';
+      html += `<td class="${cls.join(' ')}" data-date="${ds}" data-time="${time}" ${catAttr}>${escapeHtml(proj)}</td>`;
     }
     html += '</tr>';
   }
@@ -1607,15 +1638,20 @@ function renderMonthView() {
       html += `<td data-date="${ds}" style="border:1px solid var(--line-soft);padding:8px;height:100px;vertical-align:top;cursor:pointer;${inMonth?'':'opacity:0.35;'}${isTodayCell?'background:rgba(46,111,216,0.08);':''}">`;
       html += `<div style="font-family:var(--mono);font-size:12px;color:${isTodayCell?'var(--navy)':'var(--steel)'};margin-bottom:6px;font-weight:${isTodayCell?'700':'400'};">${d.getDate()}</div>`;
       if (filled > 0) {
+        const dayProjects = Object.keys(totals)
+          .filter(k => k !== 'empty' && k !== 'total' && totals[k] > 0)
+          .sort((a, b) => totals[b] - totals[a]);
         html += `<div style="display:flex;flex-direction:column;gap:2px;">`;
-        for (const p of state.projects) {
-          if (totals[p.name] > 0) {
-            html += `<div style="display:flex;align-items:center;gap:4px;font-size:9px;font-family:var(--mono);color:${p.color};">`;
-            html += `<div style="width:6px;height:6px;background:${p.color};border-radius:1px;"></div>`;
-            html += `<span style="font-weight:600;">${escapeHtml(p.name)}</span>`;
-            html += `<span style="margin-left:auto;">${blocksToHrs(totals[p.name])}</span>`;
-            html += `</div>`;
-          }
+        for (const name of dayProjects.slice(0, 4)) {
+          const col = projectColor(name);
+          html += `<div style="display:flex;align-items:center;gap:4px;font-size:9px;font-family:var(--mono);color:${col};">`;
+          html += `<div style="width:6px;height:6px;background:${col};border-radius:1px;"></div>`;
+          html += `<span style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70px;">${escapeHtml(name)}</span>`;
+          html += `<span style="margin-left:auto;">${blocksToHrs(totals[name])}</span>`;
+          html += `</div>`;
+        }
+        if (dayProjects.length > 4) {
+          html += `<div style="font-size:9px;font-family:var(--mono);color:var(--ink-faint);">+${dayProjects.length - 4} meer</div>`;
         }
         html += `</div>`;
       }
@@ -1655,22 +1691,45 @@ function renderStats() {
   const totals = aggregateRange(start, end);
   const filled = totals.total - totals.empty;
 
+  const ranked = Object.keys(totals)
+    .filter(k => k !== 'empty' && k !== 'total' && totals[k] > 0)
+    .sort((a, b) => totals[b] - totals[a]);
+
   let html = '';
-  for (const p of state.projects) {
-    const blocks = totals[p.name] || 0;
-    if (p.archived && blocks === 0) continue;
+  if (ranked.length === 0) {
+    html += `<div style="color:var(--ink-faint);font-style:italic;font-size:12px;padding:10px 0;">Nog niets geregistreerd in deze periode.</div>`;
+  }
+  const TOP = 10;
+  for (const name of ranked.slice(0, TOP)) {
+    const blocks = totals[name];
+    const col = projectColor(name);
     const pct = filled > 0 ? (blocks / filled) * 100 : 0;
     html += `
       <div class="stat-bar">
         <div style="flex:1;">
           <div style="display:flex;justify-content:space-between;align-items:baseline;">
             <div class="label">
-              <div class="swatch" style="background:${p.color};"></div>
-              ${escapeHtml(p.name)}
+              <div class="swatch" style="background:${col};"></div>
+              ${escapeHtml(name)}
             </div>
             <div class="value">${blocksToHrs(blocks)} <span class="min">${blocks}b</span></div>
           </div>
-          <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${p.color};"></div></div>
+          <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${col};"></div></div>
+        </div>
+      </div>`;
+  }
+  if (ranked.length > TOP) {
+    const restBlocks = ranked.slice(TOP).reduce((a, n) => a + totals[n], 0);
+    html += `
+      <div class="stat-bar">
+        <div style="flex:1;">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;">
+            <div class="label">
+              <div class="swatch" style="background:#9AA5B1;"></div>
+              overig (${ranked.length - TOP})
+            </div>
+            <div class="value">${blocksToHrs(restBlocks)}</div>
+          </div>
         </div>
       </div>`;
   }
@@ -1690,7 +1749,7 @@ function renderProjectButtons() {
   const wrap = document.getElementById('cat-buttons');
   if (!wrap) return;
   wrap.innerHTML = '';
-  for (const p of state.projects.filter(x => !x.archived)) {
+  for (const p of sortedActiveProjects()) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'cat-btn';
@@ -1720,7 +1779,6 @@ function addProjectUI(selectAfter) {
   const next = PROJECT_PALETTE.find(c => !usedColors.has(c)) || PROJECT_PALETTE[state.projects.length % PROJECT_PALETTE.length];
   const p = { id: null, name: trimmed, color: next, archived: false };
   state.projects.push(p);
-  if (!state.activities[trimmed]) state.activities[trimmed] = [];
   cloudInsertProject(p).catch(e => console.warn('project insert', e));
   applyProjectStyles();
   renderProjectButtons();
@@ -1731,17 +1789,20 @@ function addProjectUI(selectAfter) {
 function selectProject(name) {
   if (!modal.draft) return;
   modal.draft.category = name;
+  modal.draft.activity = name;
   document.querySelectorAll('.cat-btn').forEach(b => {
     if (b.classList.contains('cat-btn-add')) return;
     b.classList.toggle('selected', b.dataset.cat === name);
   });
-  renderSuggestions();
-  document.getElementById('activity-input').focus();
+  document.getElementById('note-input').focus();
 }
 
 function openModal(dateStr, time) {
   const entry = getEntry(dateStr, time) || { category: '', activity: '', note: '' };
-  modal = { date: dateStr, time, draft: { ...entry } };
+  // Normaliseer naar project-vorm: het project van een bestaand blok
+  // (oude activiteit, of oude categorienaam als er geen activiteit was)
+  const proj = entryProject(entry);
+  modal = { date: dateStr, time, draft: { category: proj, activity: proj, note: entry.note || '' } };
 
   const d = parseDate(dateStr);
   document.getElementById('modal-title').textContent = `${time}`;
@@ -1749,20 +1810,14 @@ function openModal(dateStr, time) {
 
   document.querySelectorAll('.cat-btn').forEach(b => {
     if (b.classList.contains('cat-btn-add')) return;
-    b.classList.toggle('selected', b.dataset.cat === modal.draft.category);
+    b.classList.toggle('selected', b.dataset.cat === proj);
   });
-  document.getElementById('activity-input').value = modal.draft.activity;
   document.getElementById('note-input').value = modal.draft.note;
-  renderSuggestions();
 
   document.getElementById('modal-backdrop').classList.add('open');
   setTimeout(() => {
-    if (!modal.draft.category) {
-      const first = document.querySelector('.cat-btn:not(.cat-btn-add)');
-      if (first) first.focus();
-    } else {
-      document.getElementById('activity-input').focus();
-    }
+    const first = document.querySelector('.cat-btn:not(.cat-btn-add)');
+    if (!proj && first) first.focus();
   }, 50);
 }
 
@@ -1771,33 +1826,13 @@ function closeModal() {
   modal = { date: null, time: null, draft: null };
 }
 
-function renderSuggestions() {
-  const proj = modal.draft?.category;
-  const wrap = document.getElementById('suggestions');
-  if (!proj || !state.activities[proj] || state.activities[proj].length === 0) {
-    wrap.innerHTML = `<div style="font-size:11px;color:var(--ink-faint);font-family:var(--mono);">${proj ? 'Nog geen opgeslagen activiteiten — typ er eentje, dan wordt deze onthouden.' : 'Kies eerst een project.'}</div>`;
-    return;
-  }
-  wrap.innerHTML = state.activities[proj]
-    .map(a => `<button class="suggestion-chip" data-act="${escapeAttr(a)}">${escapeHtml(a)}</button>`)
-    .join('');
-  wrap.querySelectorAll('.suggestion-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      const inp = document.getElementById('activity-input');
-      inp.value = chip.dataset.act;
-      modal.draft.activity = chip.dataset.act;
-      inp.focus();
-    });
-  });
-}
-
 function saveModal() {
-  modal.draft.activity = document.getElementById('activity-input').value.trim();
   modal.draft.note = document.getElementById('note-input').value.trim();
   if (!modal.draft.category) {
     alert('Kies een project.');
     return;
   }
+  modal.draft.activity = modal.draft.category;
   setEntry(modal.date, modal.time, { ...modal.draft });
   closeModal();
   updateView();
@@ -1829,20 +1864,27 @@ function renderProjectManager() {
     wrap.innerHTML = '<div style="color:var(--ink-faint);font-style:italic;padding:12px 0;">Nog geen projecten.</div>';
     return;
   }
-  wrap.innerHTML = state.projects.map((p, i) => `
+  const usage = computeUsage();
+  const sorted = [...state.projects].sort((a, b) => (usage[b.name] || 0) - (usage[a.name] || 0));
+  wrap.innerHTML = sorted.map(p => {
+    const i = state.projects.indexOf(p);
+    const n = usage[p.name] || 0;
+    return `
     <div class="proj-row ${p.archived ? 'archived' : ''}">
       <span class="swatch" style="background:${p.color};"></span>
-      <span class="proj-name">${escapeHtml(p.name)}</span>
+      <span class="proj-name">${escapeHtml(p.name)} <span style="font-family:var(--mono);font-size:10px;color:var(--ink-faint);font-weight:400;">${n}b · ${blocksToHrs(n)}</span></span>
       <button data-idx="${i}" data-act="rename">hernoem</button>
+      <button data-idx="${i}" data-act="merge">voeg samen</button>
       <button data-idx="${i}" data-act="archive">${p.archived ? 'activeer' : 'archiveer'}</button>
-    </div>
-  `).join('');
+      ${n === 0 ? `<button data-idx="${i}" data-act="delete" style="color:var(--err);border-color:var(--err);">verwijder</button>` : ''}
+    </div>`;
+  }).join('');
   wrap.querySelectorAll('button').forEach(b => {
-    b.addEventListener('click', () => {
+    b.addEventListener('click', async () => {
       const p = state.projects[Number(b.dataset.idx)];
       if (!p) return;
       if (b.dataset.act === 'rename') {
-        const name = prompt('Nieuwe naam voor project:', p.name);
+        const name = prompt('Nieuwe naam voor project (alleen het label; bestaande blokken behouden hun naam — gebruik "voeg samen" om die om te zetten):', p.name);
         if (!name) return;
         const trimmed = name.trim();
         if (!trimmed || trimmed === p.name) return;
@@ -1850,16 +1892,19 @@ function renderProjectManager() {
           alert('Er bestaat al een project met deze naam.');
           return;
         }
-        const oldName = p.name;
         p.name = trimmed;
-        if (state.activities[oldName]) {
-          state.activities[trimmed] = state.activities[oldName];
-          delete state.activities[oldName];
-        }
         cloudUpdateProject(p).catch(e => console.warn('project update', e));
+      } else if (b.dataset.act === 'merge') {
+        await mergeProjectUI(p);
       } else if (b.dataset.act === 'archive') {
         p.archived = !p.archived;
         cloudUpdateProject(p).catch(e => console.warn('project update', e));
+      } else if (b.dataset.act === 'delete') {
+        const usageNow = computeUsage();
+        if ((usageNow[p.name] || 0) > 0) { alert('Dit project heeft blokken — gebruik "voeg samen" of archiveer.'); return; }
+        if (!confirm(`Project "${p.name}" verwijderen uit de lijst? (Er zijn geen blokken die dit project gebruiken.)`)) return;
+        state.projects = state.projects.filter(x => x !== p);
+        cloudDeleteProject(p).catch(e => console.warn('project delete', e));
       }
       applyProjectStyles();
       renderProjectButtons();
@@ -1868,6 +1913,44 @@ function renderProjectManager() {
       updateView();
     });
   });
+}
+
+/* Samenvoegen: alle blokken van source → target, source verdwijnt uit de lijst */
+async function mergeProjectUI(source) {
+  const targets = state.projects.filter(p => p !== source);
+  if (targets.length === 0) { alert('Geen ander project om mee samen te voegen.'); return; }
+  const usage = computeUsage();
+  const n = usage[source.name] || 0;
+  const input = prompt(
+    `In welk project moeten alle blokken van "${source.name}" (${n} blokken, ${blocksToHrs(n)}) opgaan?\n\nKies uit:\n${targets.map(t => '· ' + t.name).join('\n')}`
+  );
+  if (!input) return;
+  const target = targets.find(t => t.name.toLowerCase() === input.trim().toLowerCase());
+  if (!target) { alert(`Project "${input.trim()}" niet gevonden. Typ de naam exact zoals in de lijst.`); return; }
+  if (!confirm(`${n} blokken van "${source.name}" worden omgezet naar "${target.name}", en "${source.name}" verdwijnt uit de projectenlijst. Dit geldt ook voor historische data. Doorgaan?`)) return;
+
+  try {
+    await cloudMergeProject(source.name, target.name);
+  } catch (e) {
+    alert('Samenvoegen mislukt: ' + (e.message || e));
+    return;
+  }
+
+  // Lokale state bijwerken
+  for (const blocks of Object.values(state.entries)) {
+    for (const entry of Object.values(blocks)) {
+      if (entryProject(entry) === source.name) {
+        entry.category = target.name;
+        entry.activity = target.name;
+      }
+    }
+  }
+  state.projects = state.projects.filter(x => x !== source);
+  cloudDeleteProject(source).catch(e => console.warn('project delete na merge', e));
+  if (state.clipboard && (state.clipboard.activity === source.name || state.clipboard.category === source.name)) {
+    state.clipboard = { category: target.name, activity: target.name, note: state.clipboard.note };
+  }
+  showToast(`"${source.name}" samengevoegd met "${target.name}"`);
 }
 
 /* ============================================
@@ -1911,7 +1994,7 @@ function escapeAttr(s) { return escapeHtml(s); }
 ============================================ */
 function exportData() {
   const payload = {
-    tracker: { entries: state.entries, activities: state.activities },
+    tracker: { entries: state.entries },
     projects: state.projects,
     _exportedAt: new Date().toISOString(),
     _version: 3
@@ -2045,7 +2128,8 @@ function allProjectNamesInScope() {
   const names = new Set(state.projects.map(p => p.name));
   for (const blocks of Object.values(state.entries)) {
     for (const e of Object.values(blocks)) {
-      if (e.category) names.add(e.category);
+      const proj = entryProject(e);
+      if (proj) names.add(proj);
     }
   }
   return [...names];
@@ -2054,12 +2138,16 @@ function allProjectNamesInScope() {
 function filterEntries() {
   const { from, to } = getAnaDateRange();
   const out = [];
-  const actLower = (ana.activity || '').toLowerCase().trim();
+  const q = (ana.activity || '').toLowerCase().trim();
   for (const [date, blocks] of Object.entries(state.entries)) {
     if (date < from || date > to) continue;
     for (const [time, entry] of Object.entries(blocks)) {
-      if (ana.projects.length && !ana.projects.includes(entry.category)) continue;
-      if (actLower && !(entry.activity || '').toLowerCase().includes(actLower)) continue;
+      const proj = entryProject(entry);
+      if (ana.projects.length && !ana.projects.includes(proj)) continue;
+      if (q) {
+        const hay = (proj + ' ' + (entry.note || '')).toLowerCase();
+        if (!hay.includes(q)) continue;
+      }
       out.push({ date, time, ...entry });
     }
   }
@@ -2067,13 +2155,16 @@ function filterEntries() {
 }
 
 function aggregateEntries(entries) {
-  const byActivity = {};
   const byProject = {};
+  const byNote = {};
   const byDate = {};
   for (const e of entries) {
-    const a = e.activity || '(geen activiteit)';
-    byActivity[a] = (byActivity[a] || 0) + 1;
-    byProject[e.category] = (byProject[e.category] || 0) + 1;
+    const proj = entryProject(e) || '(geen project)';
+    byProject[proj] = (byProject[proj] || 0) + 1;
+    if (e.note && e.note.trim()) {
+      const note = e.note.trim();
+      byNote[note] = (byNote[note] || 0) + 1;
+    }
     byDate[e.date] = (byDate[e.date] || 0) + 1;
   }
   const dayCount = Object.keys(byDate).length;
@@ -2082,8 +2173,8 @@ function aggregateEntries(entries) {
     totalMinutes: entries.length * 15,
     dayCount,
     avgPerDay: dayCount ? (entries.length * 15) / dayCount : 0,
-    byActivity: Object.entries(byActivity).sort((a, b) => b[1] - a[1]),
     byProject: Object.entries(byProject).sort((a, b) => b[1] - a[1]),
+    byNote: Object.entries(byNote).sort((a, b) => b[1] - a[1]),
     byDate: Object.entries(byDate).sort()
   };
 }
@@ -2104,7 +2195,7 @@ function renderAnalyse() {
   const filterDesc = [
     `${from} t/m ${to}`,
     ana.projects.length < allNames.length ? `${ana.projects.length} van ${allNames.length} projecten` : 'alle projecten',
-    ana.activity ? `activiteit bevat "${ana.activity}"` : 'alle activiteiten'
+    ana.activity ? `zoekterm "${ana.activity}"` : 'geen zoekfilter'
   ].join(' · ');
 
   let html = `
@@ -2127,17 +2218,19 @@ function renderAnalyse() {
     </div>
   `;
 
-  html += `<h3>Per activiteit</h3><table><thead><tr><th>Activiteit</th><th class="num">Blokken</th><th class="num">Tijd</th></tr></thead><tbody>`;
-  for (const [name, blocks] of agg.byActivity) {
-    html += `<tr><td>${escapeHtml(name)}</td><td class="num">${blocks}</td><td class="num">${fmtValue(blocks * 15, 'min')}</td></tr>`;
-  }
-  html += `</tbody></table>`;
-
   html += `<h3>Per project</h3><table><thead><tr><th>Project</th><th class="num">Blokken</th><th class="num">Tijd</th></tr></thead><tbody>`;
   for (const [name, blocks] of agg.byProject) {
     html += `<tr><td><span style="display:inline-block;width:9px;height:9px;background:${projectColor(name)};border-radius:2px;margin-right:7px;"></span>${escapeHtml(name)}</td><td class="num">${blocks}</td><td class="num">${fmtValue(blocks * 15, 'min')}</td></tr>`;
   }
   html += `</tbody></table>`;
+
+  if (agg.byNote.length > 0) {
+    html += `<h3>Per notitie</h3><table><thead><tr><th>Notitie</th><th class="num">Blokken</th><th class="num">Tijd</th></tr></thead><tbody>`;
+    for (const [name, blocks] of agg.byNote) {
+      html += `<tr><td>${escapeHtml(name)}</td><td class="num">${blocks}</td><td class="num">${fmtValue(blocks * 15, 'min')}</td></tr>`;
+    }
+    html += `</tbody></table>`;
+  }
 
   if (agg.dayCount > 1) {
     html += `<h3>Per dag</h3><table><thead><tr><th>Datum</th><th class="num">Blokken</th><th class="num">Tijd</th></tr></thead><tbody>`;
@@ -2168,16 +2261,27 @@ async function renderAnalyseCharts(entries, agg) {
   const hrs = b => +(b * 0.25).toFixed(2);
   const hrsLabel = b => blocksToHrs(b);
 
-  // --- Donut: verdeling per project ---
-  const projNames = agg.byProject.map(([n]) => n);
-  const projBlocks = agg.byProject.map(([, b]) => b);
+  // --- Donut: verdeling per project (top 9 + overig) ---
+  const MAXP = 9;
+  const topPairs = agg.byProject.slice(0, MAXP);
+  const restPairs = agg.byProject.slice(MAXP);
+  const projNames = topPairs.map(([n]) => n);
+  const projBlocks = topPairs.map(([, b]) => b);
+  const donutLabels = [...projNames];
+  const donutBlocks = [...projBlocks];
+  const donutColors = projNames.map(projectColor);
+  if (restPairs.length > 0) {
+    donutLabels.push(`overig (${restPairs.length})`);
+    donutBlocks.push(restPairs.reduce((a, [, b]) => a + b, 0));
+    donutColors.push('#9AA5B1');
+  }
   chartDonut = new Chart(donutEl, {
     type: 'doughnut',
     data: {
-      labels: projNames,
+      labels: donutLabels,
       datasets: [{
-        data: projBlocks.map(hrs),
-        backgroundColor: projNames.map(projectColor),
+        data: donutBlocks.map(hrs),
+        backgroundColor: donutColors,
         borderColor: '#FFFFFF',
         borderWidth: 2
       }]
@@ -2190,7 +2294,7 @@ async function renderAnalyseCharts(entries, agg) {
         legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: 'Inter', size: 11 } } },
         tooltip: {
           callbacks: {
-            label: ctx => ` ${ctx.label}: ${hrsLabel(projBlocks[ctx.dataIndex])}`
+            label: ctx => ` ${ctx.label}: ${hrsLabel(donutBlocks[ctx.dataIndex])}`
           }
         }
       }
@@ -2213,10 +2317,12 @@ async function renderAnalyseCharts(entries, agg) {
       sortKey = e.date;
     }
     if (!buckets[label]) { buckets[label] = { _key: sortKey }; bucketOrder.push(label); }
-    buckets[label][e.category] = (buckets[label][e.category] || 0) + 1;
+    const bProj = entryProject(e) || '(geen project)';
+    buckets[label][bProj] = (buckets[label][bProj] || 0) + 1;
   }
   bucketOrder.sort((a, b) => buckets[a]._key.localeCompare(buckets[b]._key));
 
+  const topSet = new Set(projNames);
   const datasets = projNames.map(name => ({
     label: name,
     data: bucketOrder.map(l => hrs(buckets[l][name] || 0)),
@@ -2224,6 +2330,21 @@ async function renderAnalyseCharts(entries, agg) {
     stack: 'tijd',
     borderRadius: 2
   }));
+  if (restPairs.length > 0) {
+    datasets.push({
+      label: 'overig',
+      data: bucketOrder.map(l => {
+        let sum = 0;
+        for (const [k, v] of Object.entries(buckets[l])) {
+          if (k !== '_key' && !topSet.has(k)) sum += v;
+        }
+        return hrs(sum);
+      }),
+      backgroundColor: '#9AA5B1',
+      stack: 'tijd',
+      borderRadius: 2
+    });
+  }
 
   chartStack = new Chart(stackEl, {
     type: 'bar',
@@ -2305,7 +2426,7 @@ async function exportAnalyseToExcel() {
     detailWs['A' + row] = { v: slots[r], s: sTijd };
     for (let i = 0; i < dates.length; i++) {
       const e = lookup[dates[i] + '_' + slots[r]];
-      detailWs[colLetter(2 + i*2) + row] = { v: e?.activity || '', s: sAct };
+      detailWs[colLetter(2 + i*2) + row] = { v: e ? entryProject(e) : '', s: sAct };
       detailWs[colLetter(3 + i*2) + row] = { v: e?.note || '', s: sNote };
     }
   }
@@ -2351,19 +2472,19 @@ async function exportAnalyseToExcel() {
   const allNames = allProjectNamesInScope();
   put('A' + row, { v: 'PROJECTEN', s: sMetaLabel });
   put('B' + row, { v: ana.projects.join(', '), s: sMetaValue }); row++;
-  put('A' + row, { v: 'ACTIVITEIT-FILTER', s: sMetaLabel });
+  put('A' + row, { v: 'ZOEKFILTER', s: sMetaLabel });
   put('B' + row, { v: ana.activity || '(geen)', s: sMetaValue }); row++;
   put('A' + row, { v: 'GEGENEREERD', s: sMetaLabel });
   put('B' + row, { v: new Date().toISOString().slice(0,16).replace('T',' '), s: sMetaValue });
   row += 2;
 
-  put('A' + row, { v: 'Per activiteit', s: sSection }); row++;
-  put('A' + row, { v: 'Activiteit', s: sHead });
+  put('A' + row, { v: 'Per project', s: sSection }); row++;
+  put('A' + row, { v: 'Project', s: sHead });
   put('B' + row, { v: 'Uur', s: sHeadRight }); row++;
 
-  const actSet = new Set();
-  for (const e of entries) if (e.activity) actSet.add(e.activity);
-  for (const a of [...actSet].sort()) {
+  const projSet = new Set();
+  for (const e of entries) { const p = entryProject(e); if (p) projSet.add(p); }
+  for (const a of [...projSet].sort()) {
     put('A' + row, { v: a, s: sCell });
     put('B' + row, { t: 'n', f: `(${actF(a)})*0.25`, s: sCellRight });
     row++;
@@ -2542,7 +2663,7 @@ function init() {
       saveModal();
     }
     else if (/^[1-9]$/.test(e.key) && document.activeElement.tagName !== 'INPUT') {
-      const active = state.projects.filter(p => !p.archived);
+      const active = sortedActiveProjects();
       const idx = parseInt(e.key) - 1;
       if (idx < active.length) selectProject(active[idx].name);
     }
